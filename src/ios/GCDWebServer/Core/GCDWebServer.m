@@ -1035,24 +1035,6 @@ static inline NSString* _EncodeBase64(NSString* string) {
   NSMutableString* html = [NSMutableString string];
   [html appendString:@"<!DOCTYPE html>\n"];
   [html appendString:@"<html><head><meta charset=\"utf-8\"></head><body>\n"];
-  [html appendString:@"<ul>\n"];
-  for (NSString* file in enumerator) {
-    if (![file hasPrefix:@"."]) {
-      NSString* type = [[enumerator fileAttributes] objectForKey:NSFileType];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-      NSString* escapedFile = [file stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-#pragma clang diagnostic pop
-      GWS_DCHECK(escapedFile);
-      if ([type isEqualToString:NSFileTypeRegular]) {
-        [html appendFormat:@"<li><a href=\"%@\">%@</a></li>\n", escapedFile, file];
-      } else if ([type isEqualToString:NSFileTypeDirectory]) {
-        [html appendFormat:@"<li><a href=\"%@/\">%@/</a></li>\n", escapedFile, file];
-      }
-    }
-    [enumerator skipDescendents];
-  }
-  [html appendString:@"</ul>\n"];
   [html appendString:@"</body></html>\n"];
   return [GCDWebServerDataResponse responseWithHTML:html];
 }
