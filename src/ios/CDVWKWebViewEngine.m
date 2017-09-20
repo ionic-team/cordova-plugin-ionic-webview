@@ -117,6 +117,9 @@
         if (NSClassFromString(@"WKWebView") == nil) {
             return nil;
         }
+        if(!IsAtLeastiOSVersion(@"9.0")) {
+            return nil;
+        }
         self.frame = frame;
         self.webServer = [[GCDWebServer alloc] init];
         [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
@@ -339,7 +342,7 @@ static void * KVOContext = &KVOContext;
 
     // By default, DisallowOverscroll is false (thus bounce is allowed)
     BOOL bounceAllowed = !([settings cordovaBoolSettingForKey:@"DisallowOverscroll" defaultValue:NO]);
-    
+
     // prevent webView from bouncing
     if (!bounceAllowed) {
         if ([wkWebView respondsToSelector:@selector(scrollView)]) {
@@ -352,7 +355,7 @@ static void * KVOContext = &KVOContext;
             }
         }
     }
- 
+
     wkWebView.configuration.preferences.minimumFontSize = [settings cordovaFloatSettingForKey:@"MinimumFontSize" defaultValue:0.0];
     wkWebView.allowsLinkPreview = [settings cordovaBoolSettingForKey:@"AllowLinkPreview" defaultValue:NO];
     wkWebView.scrollView.scrollEnabled = [settings cordovaBoolSettingForKey:@"ScrollEnabled" defaultValue:NO];
