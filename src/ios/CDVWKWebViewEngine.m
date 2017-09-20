@@ -337,6 +337,22 @@ static void * KVOContext = &KVOContext;
 {
     WKWebView* wkWebView = (WKWebView*)_engineWebView;
 
+    // By default, DisallowOverscroll is false (thus bounce is allowed)
+    BOOL bounceAllowed = !([settings cordovaBoolSettingForKey:@"DisallowOverscroll" defaultValue:NO]);
+    
+    // prevent webView from bouncing
+    if (!bounceAllowed) {
+        if ([wkWebView respondsToSelector:@selector(scrollView)]) {
+            ((UIScrollView*)[wkWebView scrollView]).bounces = NO;
+        } else {
+            for (id subview in wkWebView.subviews) {
+                if ([[subview class] isSubclassOfClass:[UIScrollView class]]) {
+                    ((UIScrollView*)subview).bounces = NO;
+                }
+            }
+        }
+    }
+ 
     wkWebView.configuration.preferences.minimumFontSize = [settings cordovaFloatSettingForKey:@"MinimumFontSize" defaultValue:0.0];
     wkWebView.allowsLinkPreview = [settings cordovaBoolSettingForKey:@"AllowLinkPreview" defaultValue:NO];
     wkWebView.scrollView.scrollEnabled = [settings cordovaBoolSettingForKey:@"ScrollEnabled" defaultValue:NO];
