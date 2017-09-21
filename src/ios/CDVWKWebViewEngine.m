@@ -137,11 +137,15 @@
 {
     WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
     configuration.processPool = [[CDVWKProcessPoolFactory sharedFactory] sharedProcessPool];
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
     if(@available(iOS 10.0, *)) {
         configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
     }else{
         configuration.mediaPlaybackRequiresUserAction = YES;
     }
+#else
+    configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
+#endif
 
     if (settings == nil) {
         return configuration;
