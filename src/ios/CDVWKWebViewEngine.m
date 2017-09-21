@@ -29,10 +29,9 @@
 #define CDV_BRIDGE_NAME @"cordova"
 #define CDV_IONIC_STOP_SCROLL @"stopScroll"
 
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
 
 @implementation UIScrollView (BugIOS11)
-
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
 
 + (void)load {
     if (@available(iOS 11.0, *)) {
@@ -63,8 +62,6 @@
     }
 }
 
-#endif
-
 #pragma mark - Method Swizzling
 
 - (id)xxx_init {
@@ -82,6 +79,8 @@
 }
 
 @end
+
+#endif
 
 
 @interface CDVWKWeakScriptMessageHandler : NSObject <WKScriptMessageHandler>
