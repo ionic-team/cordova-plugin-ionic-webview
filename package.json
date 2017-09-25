@@ -1,14 +1,14 @@
 {
-  "name": "cordova-plugin-wkwebview-engine",
+  "name": "cordova-plugin-ionic-webview",
   "version": "1.1.6",
-  "description": "The official Apache Cordova WKWebView Engine Plugin",
+  "description": "The official Ionic's WKWebView Engine Plugin",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ionic-team/cordova-plugin-wkwebview-engine"
+    "url": "https://github.com/ionic-team/cordova-plugin-ionic-webview"
   },
   "bugs": {
-    "url": "https://github.com/ionic-team/cordova-plugin-wkwebview-engine/issues"
+    "url": "https://github.com/ionic-team/cordova-plugin-ionic-webview/issues"
   },
   "keywords": [
     "cordova",

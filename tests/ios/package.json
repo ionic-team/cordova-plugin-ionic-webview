@@ -1,7 +1,7 @@
 {
-    "name": "cordova-plugin-wkwebview-engine-test-ios",
+    "name": "cordova-plugin-ionic-webview-test-ios",
     "version": "1.0.0",
-    "description": "iOS Unit Tests for cordova-plugin-wkwebview-engine Plugin",
+    "description": "iOS Unit Tests for cordova-plugin-ionic-webview Plugin",
     "author": "Apache Software Foundation",
     "license": "Apache Version 2.0",
     "dependencies": {

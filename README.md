@@ -17,7 +17,7 @@
 #         under the License.
 -->
 
-Cordova WKWebView Engine
+Ionic's Webview
 ======
 
 This plugin is an extension of the [Apache Cordova WKWebView plugin](https://github.com/apache/cordova-plugin-wkwebview-engine). It includes enhancements to resolve some of the issues surrounding XHR requests, along with some DOM exception issues. Ionic is working with the Cordova team
@@ -60,10 +60,10 @@ ionic cordova prepare               # re-install plugins compatible with cordova
 Install the WKWebViewPlugin:
 
 ```
-ionic cordova plugin add https://github.com/ionic-team/cordova-plugin-wkwebview-engine.git --save
+ionic cordova plugin add cordova-plugin-ionic-webview --save
 ```
 
-**Note:** 
+**Note:**
 
 If you already had [apache/cordova-plugin-wkwebview-engine](https://github.com/apache/cordova-plugin-wkwebview-engine) install make sure that is removed before using this version.
 
@@ -84,15 +84,6 @@ Test the app on an iOS 9 or 10 device:
 ionic cordova run ios
 ```
 
-An easy way to verify that WKWebView has been installed on iOS is to check if `window.indexedDB` exists.  For example:
-
-```
-if (window.indexedDB) {
-   console.log("I'm in WKWebView!");
-} else {
-   console.log("I'm in UIWebView");
-}
-```
 
 Required Permissions
 -------------------

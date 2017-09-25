@@ -22,13 +22,13 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:rim="http://www.blackberry.com/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="cordova-plugin-wkwebview-engine"
+    id="cordova-plugin-ionic-webview"
     version="1.1.6">
-    <name>Cordova WKWebView Engine</name>
-    <description>Cordova WKWebView Engine Plugin</description>
+    <name>Ionic's WKWebView Engine</name>
+    <description>Ionic's WKWebView Engine Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,wkwebview,webview</keywords>
-    <repo>https://git-wip-us.apache.org/repos/asf/cordova-plugin-wkwebview-engine.git</repo>
+    <repo>https://github.com/ionic-team/cordova-plugin-ionic-webview</repo>
 
 	<engines>
         <engine name="cordova-ios" version=">=4.0.0-dev" />

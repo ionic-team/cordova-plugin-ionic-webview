@@ -22,8 +22,8 @@
 /* jshint jasmine: true */
 
 exports.defineAutoTests = function () {
-    describe('cordova-plugin-wkwebview-engine (cordova)', function () {
-        it("cordova-plugin-wkwebview-engine.spec.1 should exist", function () {
+    describe('cordova-plugin-ionic-webview-engine (cordova)', function () {
+        it("cordova-plugin-ionic-webview-engine.spec.1 should exist", function () {
             //expect(window).toBeDefined();
         });
     });
