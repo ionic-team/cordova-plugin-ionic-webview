@@ -24,6 +24,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <objc/message.h>
 #import "GCDWebServer.h"
+#import "GCDWebServerPrivate.h"
 
 #define CDV_LOCAL_SERVER @"http://localhost:8080"
 #define CDV_BRIDGE_NAME @"cordova"
@@ -120,6 +121,7 @@
             return nil;
         }
         self.frame = frame;
+        [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
         self.webServer = [[GCDWebServer alloc] init];
         [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
         NSDictionary *options = @{
