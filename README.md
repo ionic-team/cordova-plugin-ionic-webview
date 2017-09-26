@@ -119,8 +119,10 @@ If your app accesses external API endpoints, and you're using `ionic serve` with
 
 Issues and solutions for working with CORS is explained in this [blog](http://blog.ionic.io/handling-cors-issues-in-ionic/), but unfortunately we can't ignore CORS anymore and now need to manage preflight checks by adding the following HTTP headers as a response to client requests on any external API endpoints:
 
-`Access-Control-Allow-Origin: *`
-`Access-Control-Allow-Headers: Accept, Origin, Content-Type`
-`Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS`
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: Accept, Origin, Content-Type
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+```
 
-The best way to troubleshoot any CORS external API endpoint configuration problems is by getting your app to work in the browser using `ionic serve` without `proxyURL` as you'll be able to see the header responses easily in common browser debug console and networking tools. 
+The best way to troubleshoot any CORS external API endpoint configuration problems is by getting your app to work in the browser using `ionic serve` without `proxyURL` as you'll be able to see the header responses easily in common browser debug console and networking tools.
