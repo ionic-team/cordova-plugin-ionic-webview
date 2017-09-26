@@ -111,3 +111,16 @@ Limitations
 --------
 
 There are several [known issues](https://issues.apache.org/jira/issues/?jql=project%20%3D%20CB%20AND%20labels%20%3D%20wkwebview-known-issues) with the official Cordova WKWebView plugin. The Ionic team thinks we have resolved several of the major issues. Please [let us know](https://github.com/driftyco/cordova-plugin-wkwebview-engine/issues) if something isn't working as expected.
+
+External API Endpoints
+-------------------
+
+If your app accesses external API endpoints, and you're using `ionic serve` with `proxyURL` configured in `ionic.config.json`, now is a good time to handle CORS issues as WKWebView won't allow you to access external API endpoints directly anymore like UIWebView.
+
+Issues and solutions for working with CORS is explained in this [blog](http://blog.ionic.io/handling-cors-issues-in-ionic/), but unfortunately we can't ignore CORS anymore and now need to manage preflight checks by adding the following HTTP headers as a response to client requests on any external API endpoints:
+
+`Access-Control-Allow-Origin: *`
+`Access-Control-Allow-Headers: Accept, Origin, Content-Type`
+`Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS`
+
+The best way to troubleshoot any CORS external API endpoint configuration problems is by getting your app to work in the browser using `ionic serve` without `proxyURL` as you'll be able to see the header responses easily in common browser debug console and networking tools. 
