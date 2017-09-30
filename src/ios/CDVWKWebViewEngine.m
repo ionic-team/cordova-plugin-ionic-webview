@@ -146,7 +146,7 @@
         configuration.mediaPlaybackRequiresUserAction = YES;
     }
 #else
-    configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
+    configuration.mediaPlaybackRequiresUserAction = YES;
 #endif
 
     if (settings == nil) {
