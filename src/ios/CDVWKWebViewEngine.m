@@ -17,12 +17,14 @@
  under the License.
  */
 
+#import <Cordova/NSDictionary+CordovaPreferences.h>
+#import <MobileCoreServices/MobileCoreServices.h>
+#import <AVFoundation/AVFoundation.h>
+#import <objc/message.h>
+
 #import "CDVWKWebViewEngine.h"
 #import "CDVWKWebViewUIDelegate.h"
 #import "CDVWKProcessPoolFactory.h"
-#import <Cordova/NSDictionary+CordovaPreferences.h>
-#import <MobileCoreServices/MobileCoreServices.h>
-#import <objc/message.h>
 #import "GCDWebServer.h"
 #import "GCDWebServerPrivate.h"
 
@@ -184,7 +186,7 @@
     }
 
     BOOL autoCordova = [settings cordovaBoolSettingForKey:@"AutoInjectCordova" defaultValue:NO];
-    if(autoCordova){
+    if (autoCordova){
         NSLog(@"CDVWKWebViewEngine: trying to inject XHR polyfill");
         WKUserScript *cordova = [self autoCordovify];
         if (cordova) {
@@ -192,6 +194,12 @@
         }
     }
 
+    BOOL audioCanMix = [settings cordovaBoolSettingForKey:@"AudioCanMix" defaultValue:NO];
+    if (audioCanMix) {
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord
+                                         withOptions:AVAudioSessionCategoryOptionMixWithOthers
+                                               error:nil];
+    }
 
     WKWebViewConfiguration* configuration = [self createConfigurationFromSettings:settings];
     configuration.userContentController = userContentController;
