@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "sync_plugin_xml": "sync-cordova-xml package.json plugin.xml --output=plugin.xml",
-    "postversion": "npm run sync_plugin_xml",
+    "postversion": "npm run sync_plugin_xml && git add plugin.xml",
     "deploy": "np"
   },
   "repository": {
