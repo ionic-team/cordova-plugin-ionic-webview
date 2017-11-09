@@ -238,7 +238,7 @@
         [self keyboardDisplayDoesNotRequireUserAction];
     }
 
-    if ([settings cordovaBoolSettingForKey:@"KeyboardAppearanceDark" defaultValue:NO] == YES) {
+    if ([settings cordovaBoolSettingForKey:@"KeyboardAppearanceDark" defaultValue:NO]) {
         [self setKeyboardAppearanceDark];
     }
 
