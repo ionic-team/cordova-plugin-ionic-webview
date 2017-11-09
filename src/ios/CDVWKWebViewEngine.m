@@ -145,7 +145,7 @@
                               GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
                               GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
                               GCDWebServerOption_Port: @(8080),
-                              GCDWebServerOption_BindToLocalhost: @(NO),
+                              GCDWebServerOption_BindToLocalhost: @(YES),
                               GCDWebServerOption_ServerName: @"Ionic"
                               };
     
