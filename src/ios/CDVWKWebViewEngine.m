@@ -142,7 +142,7 @@
     }
     
     NSDictionary *options = @{
-                              GCDWebServerOption_AutomaticallySuspendInBackground: @(enableBackground),
+                              GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
                               GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
                               GCDWebServerOption_Port: @(8080),
                               GCDWebServerOption_BindToLocalhost: @(NO),
