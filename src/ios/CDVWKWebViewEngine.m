@@ -123,19 +123,33 @@
             return nil;
         }
         self.frame = frame;
-        [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
-        self.webServer = [[GCDWebServer alloc] init];
-        [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
-        NSDictionary *options = @{
-                                  GCDWebServerOption_AutomaticallySuspendInBackground: @(NO),
-                                  GCDWebServerOption_Port: @(8080),
-                                  GCDWebServerOption_BindToLocalhost: @(YES),
-                                  GCDWebServerOption_ServerName: @"Ionic"
-                                  };
-        [self.webServer startWithOptions:options error:nil];
     }
-
     return self;
+}
+
+- (void)initWebServer:(NSDictionary*)settings
+{
+    [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
+    self.webServer = [[GCDWebServer alloc] init];
+    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
+    
+    BOOL suspendInBackground = YES;
+    int waitTime = 10;
+    
+    if ([settings cordovaBoolSettingForKey:@"WKEnableBackground" defaultValue:NO]) {
+        suspendInBackground = NO;
+        waitTime = 60;
+    }
+    
+    NSDictionary *options = @{
+                              GCDWebServerOption_AutomaticallySuspendInBackground: @(enableBackground),
+                              GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
+                              GCDWebServerOption_Port: @(8080),
+                              GCDWebServerOption_BindToLocalhost: @(NO),
+                              GCDWebServerOption_ServerName: @"Ionic"
+                              };
+    
+    [self.webServer startWithOptions:options error:nil];
 }
 
 - (WKWebViewConfiguration*) createConfigurationFromSettings:(NSDictionary*)settings
@@ -165,6 +179,7 @@
 {
     // viewController would be available now. we attempt to set all possible delegates to it, by default
     NSDictionary* settings = self.commandDelegate.settings;
+    [self initWebServer:settings];
 
     self.uiDelegate = [[CDVWKWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
 
