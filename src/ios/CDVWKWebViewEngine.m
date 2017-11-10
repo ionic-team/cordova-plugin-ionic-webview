@@ -28,7 +28,6 @@
 #import "GCDWebServer.h"
 #import "GCDWebServerPrivate.h"
 
-#define CDV_LOCAL_SERVER @"http://localhost:8080"
 #define CDV_BRIDGE_NAME @"cordova"
 #define CDV_IONIC_STOP_SCROLL @"stopScroll"
 
@@ -102,6 +101,7 @@
 @property (nonatomic, weak) id <WKScriptMessageHandler> weakScriptMessageHandler;
 @property (nonatomic, strong) GCDWebServer *webServer;
 @property (nonatomic, readwrite) CGRect frame;
+@property (nonatomic, readwrite) NSString *CDV_LOCAL_SERVER;
 
 @end
 
@@ -122,19 +122,42 @@
         if(!IsAtLeastiOSVersion(@"9.0")) {
             return nil;
         }
-        self.frame = frame;
-        [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
-        self.webServer = [[GCDWebServer alloc] init];
-        [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
-        NSDictionary *options = @{
-                                  GCDWebServerOption_Port: @(8080),
-                                  GCDWebServerOption_BindToLocalhost: @(YES),
-                                  GCDWebServerOption_ServerName: @"Ionic"
-                                  };
-        [self.webServer startWithOptions:options error:nil];
-    }
 
+        //Set default Server String
+        self.CDV_LOCAL_SERVER = @"http://localhost:8080";
+
+        self.frame = frame;
+    }
     return self;
+}
+
+- (void)initWebServer:(NSDictionary*)settings
+{
+    [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
+    self.webServer = [[GCDWebServer alloc] init];
+    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
+    
+    BOOL suspendInBackground = YES;
+    int waitTime = 10;
+    int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
+    if(portNumber != 8080){
+        self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://localhost:%d", portNumber];
+    }
+    
+    if ([settings cordovaBoolSettingForKey:@"WKEnableBackground" defaultValue:NO]) {
+        suspendInBackground = NO;
+        waitTime = 60;
+    }
+    
+    NSDictionary *options = @{
+                              GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
+                              GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
+                              GCDWebServerOption_Port: @(portNumber),
+                              GCDWebServerOption_BindToLocalhost: @(YES),
+                              GCDWebServerOption_ServerName: @"Ionic"
+                              };
+    
+    [self.webServer startWithOptions:options error:nil];
 }
 
 - (WKWebViewConfiguration*) createConfigurationFromSettings:(NSDictionary*)settings
@@ -164,6 +187,7 @@
 {
     // viewController would be available now. we attempt to set all possible delegates to it, by default
     NSDictionary* settings = self.commandDelegate.settings;
+    [self initWebServer:settings];
 
     self.uiDelegate = [[CDVWKWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
 
@@ -325,7 +349,7 @@ static void * KVOContext = &KVOContext;
 - (id)loadRequest:(NSURLRequest *)request
 {
     if (request.URL.fileURL) {
-        NSURL *url = [[NSURL URLWithString:CDV_LOCAL_SERVER] URLByAppendingPathComponent:request.URL.path];
+        NSURL *url = [[NSURL URLWithString:self.CDV_LOCAL_SERVER] URLByAppendingPathComponent:request.URL.path];
         if(request.URL.query) {
             url = [NSURL URLWithString:[@"?" stringByAppendingString:request.URL.query] relativeToURL:url];
         }
@@ -478,7 +502,7 @@ static void * KVOContext = &KVOContext;
         return nil;
     }
     NSLog(@"CDVWKWebViewEngine: auto injecting cordova");
-    NSString *cordovaPath = [CDV_LOCAL_SERVER stringByAppendingString:cordovaURL.URLByDeletingLastPathComponent.path];
+    NSString *cordovaPath = [self.CDV_LOCAL_SERVER stringByAppendingString:cordovaURL.URLByDeletingLastPathComponent.path];
     NSString *replacement = [NSString stringWithFormat:@"var pathPrefix = '%@/';", cordovaPath];
     source = [source stringByReplacingOccurrencesOfString:@"var pathPrefix = findCordovaPath();" withString:replacement];
 
