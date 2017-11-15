@@ -105,6 +105,13 @@
 
 @end
 
+// expose private configuration value required for background operation
+@interface WKWebViewConfiguration ()
+
+@property (setter=_setAlwaysRunsAtForegroundPriority:, nonatomic) bool _alwaysRunsAtForegroundPriority;
+
+@end
+
 // see forwardingTargetForSelector: selector comment for the reason for this pragma
 #pragma clang diagnostic ignored "-Wprotocol"
 
@@ -122,6 +129,9 @@
         if(!IsAtLeastiOSVersion(@"9.0")) {
             return nil;
         }
+        // add to keyWindow to ensure it is 'active'
+        [UIApplication.sharedApplication.keyWindow addSubview:self.engineWebView];
+
         self.frame = frame;
         [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
         self.webServer = [[GCDWebServer alloc] init];
@@ -154,6 +164,8 @@
     if (settings == nil) {
         return configuration;
     }
+    //required to stop wkwebview suspending in background too eagerly (as used in background mode plugin)
+    configuration._alwaysRunsAtForegroundPriority = [settings cordovaBoolSettingForKey:@"WKEnableBackground" defaultValue:NO];
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     configuration.allowsAirPlayForMediaPlayback = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
@@ -205,6 +217,8 @@
     configuration.userContentController = userContentController;
 
     // re-create WKWebView, since we need to update configuration
+    // remove from keyWindow before recreating
+    [self.engineWebView removeFromSuperview];
     WKWebView* wkWebView = [[WKWebView alloc] initWithFrame:self.frame configuration:configuration];
 
     #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
@@ -215,6 +229,9 @@
 
     wkWebView.UIDelegate = self.uiDelegate;
     self.engineWebView = wkWebView;
+
+    // add to keyWindow to ensure it is 'active'
+    [UIApplication.sharedApplication.keyWindow addSubview:self.engineWebView];
 
     if (IsAtLeastiOSVersion(@"9.0") && [self.viewController isKindOfClass:[CDVViewController class]]) {
         wkWebView.customUserAgent = ((CDVViewController*) self.viewController).userAgent;
