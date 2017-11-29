@@ -24,7 +24,7 @@ This plugin is an extension of the [Apache Cordova WKWebView plugin](https://git
 
 This plugin only supports iOS 9 and above and will fall back to UIWebView on iOS 8.
 
-The WKWebView plugin is only used by iOS, so ensure the `cordova-ios` platform is installed. Additionly, the `cordova-ios` platform version must be `4.0` or greater.
+The WKWebView plugin is only used by iOS, so ensure the `cordova-ios` platform is installed. Additionally, the `cordova-ios` platform version must be `4.0` or greater.
 
 Installation Instructions
 -------------------
