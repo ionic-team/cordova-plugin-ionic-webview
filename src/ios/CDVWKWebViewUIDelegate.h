@@ -22,7 +22,7 @@
 @interface CDVWKWebViewUIDelegate : NSObject <WKUIDelegate>
 
 @property (nonatomic, copy) NSString* title;
-@property (nonatomic) UIViewController* rootViewController;
+@property (nonatomic, weak) UIViewController* rootViewController;
 
 - (instancetype)initWithTitle:(NSString*)title viewController:(UIViewController*)vc;
 
