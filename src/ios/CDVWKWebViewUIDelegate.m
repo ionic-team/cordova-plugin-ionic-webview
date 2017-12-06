@@ -21,11 +21,12 @@
 
 @implementation CDVWKWebViewUIDelegate
 
-- (instancetype)initWithTitle:(NSString*)title
+- (instancetype)initWithTitle:(NSString*)title viewController:(UIViewController *)vc
 {
     self = [super init];
     if (self) {
         self.title = title;
+        self.rootViewController = vc;
     }
 
     return self;
@@ -48,9 +49,7 @@
 
     [alert addAction:ok];
 
-    UIViewController* rootController = [UIApplication sharedApplication].delegate.window.rootViewController;
-
-    [rootController presentViewController:alert animated:YES completion:nil];
+    [self.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)     webView:(WKWebView*)webView runJavaScriptConfirmPanelWithMessage:(NSString*)message
@@ -79,9 +78,7 @@
         }];
     [alert addAction:cancel];
 
-    UIViewController* rootController = [UIApplication sharedApplication].delegate.window.rootViewController;
-
-    [rootController presentViewController:alert animated:YES completion:nil];
+    [self.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)      webView:(WKWebView*)webView runJavaScriptTextInputPanelWithPrompt:(NSString*)prompt
@@ -115,9 +112,7 @@
         textField.text = defaultText;
     }];
 
-    UIViewController* rootController = [UIApplication sharedApplication].delegate.window.rootViewController;
-
-    [rootController presentViewController:alert animated:YES completion:nil];
+    [self.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 @end
