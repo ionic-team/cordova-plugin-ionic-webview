@@ -129,6 +129,7 @@
         NSDictionary *options = @{
                                   GCDWebServerOption_Port: @(8080),
                                   GCDWebServerOption_BindToLocalhost: @(YES),
+                                  GCDWebServerOption_AutomaticallySuspendInBackground: false,
                                   GCDWebServerOption_ServerName: @"Ionic"
                                   };
         [self.webServer startWithOptions:options error:nil];
