@@ -565,13 +565,52 @@ static void * KVOContext = &KVOContext;
 {
     CDVViewController* vc = (CDVViewController*)self.viewController;
     [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
+NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+    NSString *JSFuncString =
+    @"function setCookie(name,value,expires)\
+    {\
+    var oDate=new Date();\
+    oDate.setDate(oDate.getDate()+expires);\
+    document.cookie=name+'='+value+';expires='+oDate+';path=/'\
+    }\
+    function getCookie(name)\
+    {\
+    var arr = document.cookie.match(new RegExp('(^| )'+name+'=({FNXX==XXFN}*)(;|$)'));\
+    if(arr != null) return unescape(arr[2]); return null;\
+    }\
+    function delCookie(name)\
+    {\
+    var exp = new Date();\
+    exp.setTime(exp.getTime() - 1);\
+    var cval=getCookie(name);\
+    if(cval!=null) document.cookie= name + '='+cval+';expires='+exp.toGMTString();\
+    }";
 
+
+    NSMutableString *JSCookieString = JSFuncString.mutableCopy;
+    for (NSHTTPCookie *cookie in cookieStorage.cookies) {
+        NSString *excuteJSString = [NSString stringWithFormat:@"setCookie('%@', '%@', 1);", cookie.name, cookie.value];
+        [JSCookieString appendString:excuteJSString];
+    }
+
+    [webView evaluateJavaScript:JSCookieString completionHandler:^(id obj, NSError * _Nullable error) {
+        NSLog(@"%@",error);
+    }];
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPageDidLoadNotification object:webView]];
 }
 
 - (void)webView:(WKWebView*)theWebView didFailProvisionalNavigation:(WKNavigation*)navigation withError:(NSError*)error
 {
     [self webView:theWebView didFailNavigation:navigation withError:error];
+}
+
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler{
+    NSHTTPURLResponse *response = (NSHTTPURLResponse *)navigationResponse.response;
+    NSArray *cookies =[NSHTTPCookie cookiesWithResponseHeaderFields:[response allHeaderFields] forURL:response.URL];
+    for (NSHTTPCookie *cookie in cookies) {
+        [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+    }
+    decisionHandler(WKNavigationResponsePolicyAllow);
 }
 
 - (void)webView:(WKWebView*)theWebView didFailNavigation:(WKNavigation*)navigation withError:(NSError*)error
