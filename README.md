@@ -97,6 +97,18 @@ WKWebView may not fully launch (the deviceready event may not fire) unless if th
 <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
 ```
 
+Webserver port
+--------------
+You can set the port that the built-in local webserver will listen on (default is 8080) using the "WKPort" preference.
+
+If you change the port, be sure to also update your `<allow-navigation>` `href` attribute to match, as mentioned above in the Required Permissions section.
+
+#### config.xml
+```
+<preference name="WKPort" value="12345" />
+<allow-navigation href="http://localhost:12345/*"/>
+```
+
 Application Transport Security (ATS) in iOS 9
 -----------
 
