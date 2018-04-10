@@ -137,20 +137,33 @@
 }
 - (void)initWebServer:(NSDictionary*)settings
 {
-        [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
-        self.webServer = [[GCDWebServer alloc] init];
-        [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
-    int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
-    if(portNumber != 8080){
-        self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://localhost:%d", portNumber];
-    }
-        NSDictionary *options = @{
-                                  GCDWebServerOption_Port: @(portNumber),
-                                  GCDWebServerOption_BindToLocalhost: @(YES),
-                                  GCDWebServerOption_ServerName: @"Ionic"
-                                  };
-    
-        [self.webServer startWithOptions:options error:nil];
+  NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+  NSString *publicPath = [bundle pathForResource: @"www" ofType:nil];
+  NSLog(@"Public path found: %@", publicPath);
+  
+  [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
+  self.webServer = [[GCDWebServer alloc] init];
+  [self.webServer addGETHandlerForBasePath:@"/" directoryPath:publicPath indexFilename:@"index.html" cacheAge:0 allowRangeRequests:YES];
+  
+  //[self.webServer addHandlerForMethod:@"GET" pathRegex:@"_ionicwk_/" requestClass:[GCDWebServerFileRequest.class] proc
+  
+  [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_ionicwk_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
+    NSURL *absUrl = [request URL];
+    //let response = [GCDWebServerFileResponse responseWithFile:]
+    //completionBlock()
+  }];
+  
+  int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
+  if(portNumber != 8080){
+    self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://localhost:%d", portNumber];
+  }
+  NSDictionary *options = @{
+                            GCDWebServerOption_Port: @(portNumber),
+                            GCDWebServerOption_BindToLocalhost: @(YES),
+                            GCDWebServerOption_ServerName: @"Ionic"
+                            };
+  
+  [self.webServer startWithOptions:options error:nil];
 }
 
 - (WKWebViewConfiguration*) createConfigurationFromSettings:(NSDictionary*)settings
@@ -356,17 +369,24 @@ static void * KVOContext = &KVOContext;
 
 - (id)loadRequest:(NSURLRequest *)request
 {
-    if (request.URL.fileURL) {
-        NSURL *url = [[NSURL URLWithString:self.CDV_LOCAL_SERVER] URLByAppendingPathComponent:request.URL.path];
-        if(request.URL.query) {
-            url = [NSURL URLWithString:[@"?" stringByAppendingString:request.URL.query] relativeToURL:url];
-        }
-        if(request.URL.fragment) {
-            url = [NSURL URLWithString:[@"#" stringByAppendingString:request.URL.fragment] relativeToURL:url];
-        }
-        request = [NSURLRequest requestWithURL:url];
+  if (request.URL.fileURL) {
+    NSString *filename = request.URL.lastPathComponent;
+    if([filename isEqualToString:@"index.html"]) {
+      NSURL * url = [NSURL URLWithString:self.CDV_LOCAL_SERVER];
+      request = [NSURLRequest requestWithURL:url];
+      return [(WKWebView*)_engineWebView loadRequest:request];
     }
-    return [(WKWebView*)_engineWebView loadRequest:request];
+    
+    NSURL *url = [[NSURL URLWithString:self.CDV_LOCAL_SERVER] URLByAppendingPathComponent:request.URL.path];
+    if(request.URL.query) {
+      url = [NSURL URLWithString:[@"?" stringByAppendingString:request.URL.query] relativeToURL:url];
+    }
+    if(request.URL.fragment) {
+      url = [NSURL URLWithString:[@"#" stringByAppendingString:request.URL.fragment] relativeToURL:url];
+    }
+    request = [NSURLRequest requestWithURL:url];
+  }
+  return [(WKWebView*)_engineWebView loadRequest:request];
 }
 
 - (id)loadHTMLString:(NSString *)string baseURL:(NSURL*)baseURL
