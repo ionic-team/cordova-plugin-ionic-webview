@@ -178,7 +178,9 @@
   if (self.webServer == nil || webRoot == nil) {
     return;
   }
-  
+  //[self.webServer addGETHandlerForBasePath:@"/" directoryPath:webRoot indexFilename:@"index.html" cacheAge:0 allowRangeRequests:YES];
+  [self.webServer stop];
+
   [self.webServer removeAllHandlers];
   // TODO: Dealloc?
   
