@@ -137,29 +137,32 @@
 }
 - (void)initWebServer:(NSDictionary*)settings
 {
+  NSString *webRoot = [settings valueForKey:@"WKWebRoot"];
   NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-  NSString *publicPath = [bundle pathForResource: @"www" ofType:nil];
+  NSString *publicPath;
+  if (webRoot != nil) {
+    publicPath = webRoot;
+  } else {
+    publicPath = [bundle pathForResource: @"www" ofType:nil];
+  }
   NSLog(@"Public path found: %@", publicPath);
+  
+  [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
+  self.webServer = [[GCDWebServer alloc] init];
+  [self.webServer addGETHandlerForBasePath:@"/" directoryPath:publicPath indexFilename:@"index.html" cacheAge:0 allowRangeRequests:YES];
+
+  //[self.webServer addHandlerForMethod:@"GET" pathRegex:@"_ionicwk_/" requestClass:[GCDWebServerFileRequest.class] proc
+  
+  [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_ionicwk_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
+    NSURL *absUrl = [request URL];
+    //let response = [GCDWebServerFileResponse responseWithFile:]
+    //completionBlock()
+  }];
   
   int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
   if(portNumber != 8080){
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://localhost:%d", portNumber];
   }
-  
-  NSString *serverUrl = self.CDV_LOCAL_SERVER;
-  
-  [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
-  self.webServer = [[GCDWebServer alloc] init];
-  [self.webServer addGETHandlerForBasePath:@"/" directoryPath:publicPath indexFilename:@"index.html" cacheAge:0 allowRangeRequests:YES];
-  
-  [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_ionicwk_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
-    NSString *urlToRemove = [serverUrl stringByAppendingString:@"/_ionicwk_"];
-    NSString *absUrl = [[[request URL] absoluteString] stringByReplacingOccurrencesOfString:urlToRemove withString:@""];
-
-    GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
-    completionBlock(response);
-  }];
-  
   NSDictionary *options = @{
                             GCDWebServerOption_Port: @(portNumber),
                             GCDWebServerOption_BindToLocalhost: @(YES),
@@ -167,6 +170,21 @@
                             };
   
   [self.webServer startWithOptions:options error:nil];
+}
+
+- (void)setWebRoot:(CDVInvokedUrlCommand*)command {
+  NSString *webRoot = [command argumentAtIndex:0];
+  
+  if (self.webServer == nil || webRoot == nil) {
+    return;
+  }
+  
+  [self.webServer removeAllHandlers];
+  // TODO: Dealloc?
+  
+  NSDictionary *newSettings = [NSMutableDictionary dictionaryWithDictionary:self.commandDelegate.settings];
+  [newSettings setValue:webRoot forKey:@"WKWebRoot"];
+  [self initWebServer:newSettings];
 }
 
 - (WKWebViewConfiguration*) createConfigurationFromSettings:(NSDictionary*)settings
@@ -739,4 +757,5 @@ static void * KVOContext = &KVOContext;
 }
 
 @end
+
 

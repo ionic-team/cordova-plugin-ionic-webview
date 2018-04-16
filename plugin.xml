@@ -36,6 +36,9 @@
         <js-module src="src/www/ios/ios-wkwebview-exec.js" name="ios-wkwebview-exec">
             <clobbers target="cordova.exec"/>
         </js-module>
+        <js-module src="src/www/ionic-webview.js" name="ionic-webview">
+            <clobbers target="IonicWebView"/>
+        </js-module>
 
         <config-file target="config.xml" parent="/*">
             <allow-navigation href="http://localhost:8080/*"/>
