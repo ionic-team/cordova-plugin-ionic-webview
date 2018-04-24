@@ -19,7 +19,7 @@
     if (url.length == 0 || url[0] !== '/') { // ensure the new URL starts with /
       url = '/' + url;
     }
-    return window.location.origin + '/_ionicwk_/' + url;
+    return 'http://localhost:8080' + url;
   }
   if (typeof window.wkRewriteURL === 'undefined') {
     window.wkRewriteURL = function (url) {
