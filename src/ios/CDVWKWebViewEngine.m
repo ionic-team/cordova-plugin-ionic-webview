@@ -159,6 +159,22 @@
     GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
     completionBlock(response);
   }];
+
+  [self.webServer addHandlerForMethod:@"GET" pathRegex:@"var/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
+    NSString *urlToRemove = serverUrl;
+    NSString *absUrl = [[[request URL] absoluteString] stringByReplacingOccurrencesOfString:urlToRemove withString:@""];
+
+    GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
+    completionBlock(response);
+  }];
+
+  [self.webServer addHandlerForMethod:@"GET" pathRegex:@"Users/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
+    NSString *urlToRemove = serverUrl;
+    NSString *absUrl = [[[request URL] absoluteString] stringByReplacingOccurrencesOfString:urlToRemove withString:@""];
+
+    GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
+    completionBlock(response);
+  }];
   
   NSDictionary *options = @{
                             GCDWebServerOption_Port: @(portNumber),
