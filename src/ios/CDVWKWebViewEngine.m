@@ -136,13 +136,14 @@
 {
     [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
     self.webServer = [[GCDWebServer alloc] init];
-    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
+    NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
+    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:wwwPath indexFilename:@"index.html" cacheAge:3600 allowRangeRequests:YES];
   
     NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
     if (bind == nil) {
       bind = @"localhost";
     }
-  
+
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
   
     //Set default Server String
@@ -361,7 +362,12 @@ static void * KVOContext = &KVOContext;
 - (id)loadRequest:(NSURLRequest *)request
 {
     if (request.URL.fileURL) {
+        NSURL* startURL = [NSURL URLWithString:((CDVViewController *)self.viewController).startPage];
+        NSString* startFilePath = [self.commandDelegate pathForResource:[startURL path]];
         NSURL *url = [[NSURL URLWithString:self.CDV_LOCAL_SERVER] URLByAppendingPathComponent:request.URL.path];
+        if ([request.URL.path isEqualToString:startFilePath]) {
+            url = [NSURL URLWithString:self.CDV_LOCAL_SERVER];
+        }
         if(request.URL.query) {
             url = [NSURL URLWithString:[@"?" stringByAppendingString:request.URL.query] relativeToURL:url];
         }
