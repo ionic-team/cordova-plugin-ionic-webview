@@ -166,7 +166,12 @@ public class WebViewLocalServer {
     this.protocolHandler = new AndroidProtocolHandler(context.getApplicationContext());
     if (authority != null) {
       this.authority = authority;
-      this.isLocal = false;
+      if (authority.equals("localhost:8080")) {
+        this.isLocal = true;
+      } else {
+        this.isLocal = false;
+      }
+
     } else {
       this.isLocal = true;
       this.authority = UUID.randomUUID().toString() + "" + knownUnusedAuthority;
