@@ -219,11 +219,6 @@ public class WebViewLocalServer {
   private WebResourceResponse handleLocalRequest(WebResourceRequest request, PathHandler handler) {
     String path = request.getUrl().getPath();
 
-    if (path.equals("/cordova.js")) {
-      return new WebResourceResponse("application/javascript", handler.getEncoding(),
-        handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), null);
-    }
-
     if (path.equals("/") || (!request.getUrl().getLastPathSegment().contains(".") && html5mode)) {
       InputStream stream;
       try {
