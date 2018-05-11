@@ -29,6 +29,7 @@
 	<engines>
         <engine name="cordova-ios" version=">=4.0.0-dev"/>
         <engine name="apple-ios" version=">=9.0"/>
+        <engine name="cordova-android" version=">=6.0.0"/>
 	</engines>
 
   <platform name="android">

@@ -24,5 +24,13 @@
   "devDependencies": {
     "np": "^2.16.0",
     "sync-cordova-xml": "^0.4.0"
+  },
+  "engines": {
+    "cordovaDependencies": {
+      "2.0.0": {
+        "cordova-android": ">=6.0.0",
+        "cordova-ios": ">=4.0.0-dev"
+      }
+    }
   }
 }
