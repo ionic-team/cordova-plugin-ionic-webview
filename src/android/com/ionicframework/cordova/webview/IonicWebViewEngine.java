@@ -62,5 +62,9 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
       return localServer.shouldInterceptRequest(request);
     }
   }
+
+  public void setServerBasePath(String path){
+    localServer.hostFiles(path);
+  }
 }
 

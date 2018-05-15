@@ -77,6 +77,11 @@ public class AndroidProtocolHandler {
     }
   }
 
+  public InputStream openFile(String filePath) throws IOException  {
+    File localFile = new File(filePath);
+    return new FileInputStream(localFile);
+  }
+
   private static int getFieldId(Context context, String assetType, String assetName)
     throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
     Class<?> d = context.getClassLoader()
