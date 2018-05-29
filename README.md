@@ -88,7 +88,8 @@ Required Permissions
 -------------------
 WKWebView may not fully launch (the deviceready event may not fire) unless if the following is included in config.xml:
 #### config.xml
-```
+
+```xml
 <allow-navigation href="http://localhost:8080/*"/>
 <feature name="CDVWKWebViewEngine">
   <param name="ios-package" value="CDVWKWebViewEngine" />
@@ -96,6 +97,24 @@ WKWebView may not fully launch (the deviceready event may not fire) unless if th
 
 <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
 ```
+
+Bind hostname
+--------------
+
+By default, the server binds to "localhost" which becomes the hostname for the running app instance. To configure this, set `WKBind` to a different value.
+
+For example, to use `127.0.0.1` instead of `localhost` (which may fix some VPN issues with MDM solutions, set this in your `config.xml`:
+
+```xml
+<preference name="WKBind" value="127.0.0.1" />
+```
+
+The plugin adds `127.0.0.1` as an allowed navigation by default, but if that's not working, set it manually using
+
+```xml
+<allow-navigation href="http://127.0.0.1:8080/*"/>
+```
+
 
 Webserver port
 --------------

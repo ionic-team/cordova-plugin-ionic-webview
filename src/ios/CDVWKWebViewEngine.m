@@ -125,9 +125,6 @@
             return nil;
         }
 
-        //Set default Server String
-        self.CDV_LOCAL_SERVER = @"http://localhost:8080";
-
         // add to keyWindow to ensure it is 'active'
         [UIApplication.sharedApplication.keyWindow addSubview:self.engineWebView];
 
@@ -137,20 +134,27 @@
 }
 - (void)initWebServer:(NSDictionary*)settings
 {
-        [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
-        self.webServer = [[GCDWebServer alloc] init];
-        [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
-    int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
-    if(portNumber != 8080){
-        self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://localhost:%d", portNumber];
+    [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
+    self.webServer = [[GCDWebServer alloc] init];
+    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
+  
+    NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
+    if (bind == nil) {
+      bind = @"localhost";
     }
-        NSDictionary *options = @{
-                                  GCDWebServerOption_Port: @(portNumber),
-                                  GCDWebServerOption_BindToLocalhost: @(YES),
-                                  GCDWebServerOption_ServerName: @"Ionic"
-                                  };
+  
+    int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
+  
+    //Set default Server String
+    self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
+
+    NSDictionary *options = @{
+                              GCDWebServerOption_Port: @(portNumber),
+                              GCDWebServerOption_BindToLocalhost: @(YES),
+                              GCDWebServerOption_ServerName: @"Ionic"
+                            };
     
-        [self.webServer startWithOptions:options error:nil];
+    [self.webServer startWithOptions:options error:nil];
 }
 
 - (WKWebViewConfiguration*) createConfigurationFromSettings:(NSDictionary*)settings
