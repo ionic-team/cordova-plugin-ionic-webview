@@ -236,7 +236,8 @@
     // re-create WKWebView, since we need to update configuration
     // remove from keyWindow before recreating
     [self.engineWebView removeFromSuperview];
-    WKWebView* wkWebView = [[WKWebView alloc] initWithFrame:self.frame configuration:configuration];
+    CGRect fullframe = [[UIScreen mainScreen] bounds];
+    WKWebView* wkWebView = [[WKWebView alloc] initWithFrame:fullframe configuration:configuration];
 
     #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
     if (@available(iOS 11.0, *)) {
