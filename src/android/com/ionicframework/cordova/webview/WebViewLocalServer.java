@@ -22,6 +22,8 @@ import android.util.Log;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 
+import org.apache.cordova.ConfigXmlParser;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -67,6 +69,7 @@ public class WebViewLocalServer {
   private boolean isAsset;
   // Whether to route all requests to paths without extensions back to `index.html`
   private final boolean html5mode;
+  private ConfigXmlParser parser;
 
   public String getAuthority() { return authority; }
 
@@ -170,9 +173,10 @@ public class WebViewLocalServer {
     }
   }
 
-  WebViewLocalServer(Context context, String authority, boolean html5mode) {
+  WebViewLocalServer(Context context, String authority, boolean html5mode, ConfigXmlParser parser) {
     uriMatcher = new UriMatcher(null);
     this.html5mode = html5mode;
+    this.parser = parser;
     this.protocolHandler = new AndroidProtocolHandler(context.getApplicationContext());
     if (authority != null) {
       this.authority = authority;
@@ -235,8 +239,10 @@ public class WebViewLocalServer {
     String path = request.getUrl().getPath();
     if (path.equals("/") || (!request.getUrl().getLastPathSegment().contains(".") && html5mode)) {
       InputStream stream;
+      String launchURL = parser.getLaunchUrl();
+      String launchFile = launchURL.substring(launchURL.lastIndexOf("/") + 1, launchURL.length());
       try {
-        String startPath = this.basePath + "/index.html";
+        String startPath = this.basePath + "/" + launchFile;
         if (isAsset) {
           stream = protocolHandler.openAsset(startPath, "");
         } else {
@@ -244,7 +250,7 @@ public class WebViewLocalServer {
         }
 
       } catch (IOException e) {
-        Log.e(TAG, "Unable to open index.html", e);
+        Log.e(TAG, "Unable to open " + launchFile, e);
         return null;
       }
 
