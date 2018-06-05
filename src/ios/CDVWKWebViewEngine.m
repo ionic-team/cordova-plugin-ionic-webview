@@ -137,8 +137,9 @@
     [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
     self.webServer = [[GCDWebServer alloc] init];
     NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
-    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:wwwPath indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:0 allowRangeRequests:YES];
   
+    [self setServerBasePath:wwwPath];
+
     NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
     if (bind == nil) {
       bind = @"localhost";
@@ -149,12 +150,19 @@
     //Set default Server String
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
 
+    [self startServer];
+
+}
+
+-(void)startServer
+{
+    int portNumber = [self.commandDelegate.settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
     NSDictionary *options = @{
                               GCDWebServerOption_Port: @(portNumber),
                               GCDWebServerOption_BindToLocalhost: @(YES),
                               GCDWebServerOption_ServerName: @"Ionic"
-                            };
-    
+                              };
+
     [self.webServer startWithOptions:options error:nil];
 }
 
@@ -702,6 +710,18 @@ static void * KVOContext = &KVOContext;
         }
     } else {
         decisionHandler(WKNavigationActionPolicyCancel);
+    }
+}
+
+-(void)setServerBasePath:(NSString *) path
+{
+    BOOL restart = [self.webServer isRunning];
+    if (restart) {
+        [self.webServer stop];
+    }
+    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:path indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:0 allowRangeRequests:YES];
+    if (restart) {
+        [self startServer];
     }
 }
 
