@@ -137,7 +137,7 @@
     [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
     self.webServer = [[GCDWebServer alloc] init];
     NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
-    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:wwwPath indexFilename:@"index.html" cacheAge:3600 allowRangeRequests:YES];
+    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:wwwPath indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:3600 allowRangeRequests:YES];
   
     NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
     if (bind == nil) {
