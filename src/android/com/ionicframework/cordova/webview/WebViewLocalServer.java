@@ -569,7 +569,11 @@ public class WebViewLocalServer {
       public InputStream handle(Uri url) {
         InputStream stream;
         try {
-          stream = protocolHandler.openFile(basePath + url.getPath());
+          if (url.getPath().startsWith("/_file_/")) {
+            stream = protocolHandler.openFile( url.getPath().replace("/_file_/", ""));
+          } else {
+            stream = protocolHandler.openFile(basePath + url.getPath());
+          }
         } catch (IOException e) {
           Log.e(TAG, "Unable to open asset URL: " + url);
           return null;
