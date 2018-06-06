@@ -27,12 +27,12 @@ public class AndroidProtocolHandler {
   }
 
   public InputStream openAsset(String path, String assetPath) throws IOException {
-    if (path.startsWith(assetPath + "/_capacitor_")) {
+    if (path.startsWith(assetPath + "/_file_")) {
       if (path.contains("content://")) {
-        String contentPath = path.replace(assetPath + "/_capacitor_/", "content://");
+        String contentPath = path.replace(assetPath + "/_file_/", "content://");
         return context.getContentResolver().openInputStream(Uri.parse(contentPath));
       } else {
-        String filePath = path.replace(assetPath + "/_capacitor_/", "");
+        String filePath = path.replace(assetPath + "/_file_/", "");
         return new FileInputStream(new File(filePath));
       }
     } else {
