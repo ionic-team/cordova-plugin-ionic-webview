@@ -136,9 +136,6 @@
 {
     [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
     self.webServer = [[GCDWebServer alloc] init];
-    NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
-  
-    [self setServerBasePath:wwwPath];
 
     NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
     if (bind == nil) {
@@ -146,9 +143,11 @@
     }
 
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
-  
     //Set default Server String
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
+
+    NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
+    [self setServerBasePath:wwwPath];
 
     [self startServer];
 
@@ -719,7 +718,20 @@ static void * KVOContext = &KVOContext;
     if (restart) {
         [self.webServer stop];
     }
+    NSString *serverUrl = self.CDV_LOCAL_SERVER;
     [self.webServer addGETHandlerForBasePath:@"/" directoryPath:path indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:0 allowRangeRequests:YES];
+    [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_file_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
+        NSString *urlToRemove = [serverUrl stringByAppendingString:@"/_file_"];
+        NSString *absUrl = [[[request URL] absoluteString] stringByReplacingOccurrencesOfString:urlToRemove withString:@""];
+
+        NSRange range = [absUrl rangeOfString:@"?"];
+        if (range.location != NSNotFound) {
+            absUrl = [absUrl substringToIndex:range.location];
+        }
+
+        GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
+        completionBlock(response);
+    }];
     if (restart) {
         [self startServer];
     }
