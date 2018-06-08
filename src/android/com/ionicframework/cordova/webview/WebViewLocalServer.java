@@ -180,7 +180,7 @@ public class WebViewLocalServer {
     this.protocolHandler = new AndroidProtocolHandler(context.getApplicationContext());
     if (authority != null) {
       this.authority = authority;
-      if (authority.equals("localhost:8080")) {
+      if (authority.startsWith("localhost")) {
         this.isLocal = true;
       } else {
         this.isLocal = false;

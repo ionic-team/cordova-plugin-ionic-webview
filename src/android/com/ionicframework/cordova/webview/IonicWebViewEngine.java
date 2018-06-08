@@ -24,6 +24,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
   public static final String TAG = "IonicWebViewEngine";
 
   private WebViewLocalServer localServer;
+  private String CDV_LOCAL_SERVER;
 
   /** Used when created via reflection. */
   public IonicWebViewEngine(Context context, CordovaPreferences preferences) {
@@ -48,7 +49,10 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     ConfigXmlParser parser = new ConfigXmlParser();
     parser.parse(cordova.getContext());
 
-    localServer = new WebViewLocalServer(cordova.getActivity(), "localhost:8080", true, parser);
+    String port = preferences.getString("WKPort", "8080");
+    CDV_LOCAL_SERVER = "http://localhost:" + port;
+
+    localServer = new WebViewLocalServer(cordova.getActivity(), "localhost:" + port, true, parser);
     WebViewLocalServer.AssetHostingDetails ahd = localServer.hostAssets("www");
 
     webView.setWebViewClient(new ServerClient(this, parser));
@@ -75,8 +79,16 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
       super.onPageStarted(view, url, favicon);
       if (url.equals(parser.getLaunchUrl())) {
         view.stopLoading();
-        view.loadUrl("http://localhost:8080/");
+        view.loadUrl(CDV_LOCAL_SERVER);
       }
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+      super.onPageFinished(view, url);
+      view.loadUrl("javascript:(function() { " +
+              "window.WEBVIEW_SERVER_URL = '" + CDV_LOCAL_SERVER + "'" +
+              "})()");
     }
   }
 
