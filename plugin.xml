@@ -29,13 +29,18 @@
 	<engines>
         <engine name="cordova-ios" version=">=4.0.0-dev"/>
         <engine name="apple-ios" version=">=9.0"/>
+        <engine name="cordova-android" version=">=6.0.0"/>
 	</engines>
 
   <platform name="android">
     <config-file target="config.xml" parent="/*">
+      <allow-navigation href="http://localhost:8080/*"/>
       <preference name="webView" value="com.ionicframework.cordova.webview.IonicWebViewEngine" />
     </config-file>
     <source-file src="src/android/com/ionicframework/cordova/webview/IonicWebViewEngine.java" target-dir="src/com/ionicframework/cordova/webview" />
+    <source-file src="src/android/com/ionicframework/cordova/webview/AndroidProtocolHandler.java" target-dir="src/com/ionicframework/cordova/webview" />
+    <source-file src="src/android/com/ionicframework/cordova/webview/UriMatcher.java" target-dir="src/com/ionicframework/cordova/webview" />
+    <source-file src="src/android/com/ionicframework/cordova/webview/WebViewLocalServer.java" target-dir="src/com/ionicframework/cordova/webview" />
   </platform>
 
   <!-- ios -->
