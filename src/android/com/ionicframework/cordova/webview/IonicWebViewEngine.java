@@ -47,7 +47,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
                    CordovaResourceApi resourceApi, PluginManager pluginManager,
                    NativeToJsMessageQueue nativeToJsMessageQueue) {
     ConfigXmlParser parser = new ConfigXmlParser();
-    parser.parse(cordova.getContext());
+    parser.parse(cordova.getActivity());
 
     String port = preferences.getString("WKPort", "8080");
     CDV_LOCAL_SERVER = "http://localhost:" + port;

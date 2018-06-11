@@ -107,7 +107,7 @@ public class WebViewLocalServer {
       this.reasonPhrase = reasonPhrase;
       Map<String, String> tempResponseHeaders;
       if (responseHeaders == null) {
-        tempResponseHeaders = new HashMap<>();
+        tempResponseHeaders = new HashMap<String, String>();
       } else {
         tempResponseHeaders = responseHeaders;
       }
@@ -552,7 +552,7 @@ public class WebViewLocalServer {
     return hostFiles(basePath, true, true);
   }
 
-  public AssetHostingDetails hostFiles(String basePath, boolean enableHttp,
+  public AssetHostingDetails hostFiles(final String basePath, boolean enableHttp,
                                        boolean enableHttps) {
     this.isAsset = false;
     this.basePath = basePath;
