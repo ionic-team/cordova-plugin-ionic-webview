@@ -31,6 +31,10 @@
         <engine name="apple-ios" version=">=9.0"/>
 	</engines>
 
+    <js-module src="src/www/util.js">
+        <runs/>
+    </js-module>
+
     <!-- ios -->
     <platform name="ios">
         <js-module src="src/www/ios/ios-wkwebview-exec.js" name="ios-wkwebview-exec">
