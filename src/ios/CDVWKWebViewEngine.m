@@ -105,6 +105,12 @@
 @property (nonatomic, readwrite) NSString *CDV_LOCAL_SERVER;
 @end
 
+// expose private configuration value required for background operation
+@interface WKWebViewConfiguration ()
+
+@property (setter=_setAlwaysRunsAtForegroundPriority:, nonatomic) bool _alwaysRunsAtForegroundPriority;
+
+@end
 
 
 // see forwardingTargetForSelector: selector comment for the reason for this pragma
@@ -182,6 +188,8 @@
     if (settings == nil) {
         return configuration;
     }
+    //required to stop wkwebview suspending in background too eagerly (as used in background mode plugin)
+    configuration._alwaysRunsAtForegroundPriority = [settings cordovaBoolSettingForKey:@"WKEnableBackground" defaultValue:NO];
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     configuration.allowsAirPlayForMediaPlayback = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
