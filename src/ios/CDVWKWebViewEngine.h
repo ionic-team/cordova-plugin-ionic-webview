@@ -24,4 +24,6 @@
 
 @property (nonatomic, strong, readonly) id <WKUIDelegate> uiDelegate;
 
+-(void)setServerBasePath:(NSString *) path;
+
 @end

@@ -32,6 +32,10 @@
         <engine name="cordova-android" version=">=6.0.0"/>
 	</engines>
 
+  <js-module src="src/www/util.js">
+      <runs/>
+  </js-module>
+
   <platform name="android">
     <config-file target="config.xml" parent="/*">
       <allow-navigation href="http://localhost:8080/*"/>
@@ -42,7 +46,6 @@
     <source-file src="src/android/com/ionicframework/cordova/webview/UriMatcher.java" target-dir="src/com/ionicframework/cordova/webview" />
     <source-file src="src/android/com/ionicframework/cordova/webview/WebViewLocalServer.java" target-dir="src/com/ionicframework/cordova/webview" />
   </platform>
-
 
   <!-- ios -->
   <platform name="ios">

@@ -9,22 +9,13 @@
   window.Ionic = window.Ionic || {};
 
   function normalizeURL(url) {
-    if (!url) {
-      return url;
-    }
-    if (!url.startsWith("file://")) {
-      return url;
-    }
-    url = url.substr(7); // len("file://") == 7
-    if (url.length == 0 || url[0] !== '/') { // ensure the new URL starts with /
-      url = '/' + url;
-    }
-    return 'http://localhost:8080' + url;
+    console.warn('normalizeURL is deprecated, use window.convertFileSrc');
+    return window.convertFileSrc(url);
   }
   if (typeof window.wkRewriteURL === 'undefined') {
     window.wkRewriteURL = function (url) {
-      console.warn('wkRewriteURL is deprecated, use normalizeURL instead');
-      return normalizeURL(url);
+      console.warn('wkRewriteURL is deprecated, use window.convertFileSrc instead');
+      return window.convertFileSrc(url);
     }
   }
   window.Ionic.normalizeURL = normalizeURL;

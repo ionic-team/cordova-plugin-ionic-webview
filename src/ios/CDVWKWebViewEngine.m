@@ -142,24 +142,32 @@
 {
     [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
     self.webServer = [[GCDWebServer alloc] init];
-    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
-  
+
     NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
     if (bind == nil) {
       bind = @"localhost";
     }
-  
+
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
-  
     //Set default Server String
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
 
+    NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
+    [self setServerBasePath:wwwPath];
+
+    [self startServer];
+
+}
+
+-(void)startServer
+{
+    int portNumber = [self.commandDelegate.settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
     NSDictionary *options = @{
                               GCDWebServerOption_Port: @(portNumber),
                               GCDWebServerOption_BindToLocalhost: @(YES),
                               GCDWebServerOption_ServerName: @"Ionic"
-                            };
-    
+                              };
+
     [self.webServer startWithOptions:options error:nil];
 }
 
@@ -369,7 +377,12 @@ static void * KVOContext = &KVOContext;
 - (id)loadRequest:(NSURLRequest *)request
 {
     if (request.URL.fileURL) {
+        NSURL* startURL = [NSURL URLWithString:((CDVViewController *)self.viewController).startPage];
+        NSString* startFilePath = [self.commandDelegate pathForResource:[startURL path]];
         NSURL *url = [[NSURL URLWithString:self.CDV_LOCAL_SERVER] URLByAppendingPathComponent:request.URL.path];
+        if ([request.URL.path isEqualToString:startFilePath]) {
+            url = [NSURL URLWithString:self.CDV_LOCAL_SERVER];
+        }
         if(request.URL.query) {
             url = [NSURL URLWithString:[@"?" stringByAppendingString:request.URL.query] relativeToURL:url];
         }
@@ -482,6 +495,7 @@ static void * KVOContext = &KVOContext;
         NSLog(@"CDVWKWebViewEngine: WK plugin can not be loaded: %@", error);
         return nil;
     }
+    source = [source stringByAppendingString:[NSString stringWithFormat:@"window.WEBVIEW_SERVER_URL = '%@';", self.CDV_LOCAL_SERVER]];
 
     return [[WKUserScript alloc] initWithSource:source
                                   injectionTime:WKUserScriptInjectionTimeAtDocumentStart
@@ -704,6 +718,31 @@ static void * KVOContext = &KVOContext;
         }
     } else {
         decisionHandler(WKNavigationActionPolicyCancel);
+    }
+}
+
+-(void)setServerBasePath:(NSString *) path
+{
+    BOOL restart = [self.webServer isRunning];
+    if (restart) {
+        [self.webServer stop];
+    }
+    NSString *serverUrl = self.CDV_LOCAL_SERVER;
+    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:path indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:0 allowRangeRequests:YES];
+    [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_file_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
+        NSString *urlToRemove = [serverUrl stringByAppendingString:@"/_file_"];
+        NSString *absUrl = [[[request URL] absoluteString] stringByReplacingOccurrencesOfString:urlToRemove withString:@""];
+
+        NSRange range = [absUrl rangeOfString:@"?"];
+        if (range.location != NSNotFound) {
+            absUrl = [absUrl substringToIndex:range.location];
+        }
+
+        GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
+        completionBlock(response);
+    }];
+    if (restart) {
+        [self startServer];
     }
 }
 
