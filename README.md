@@ -30,7 +30,7 @@ This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and gr
 ### Requirements
 
 * **iOS**: iOS 10+ and `cordova-ios` 4+
-* **Android**: Android 5.0+ and `cordova-android` 7+
+* **Android**: Android 5.0+ and `cordova-android` 6.4+
 
 ### Migrating to 2.x
 
