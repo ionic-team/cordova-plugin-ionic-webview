@@ -20,15 +20,6 @@
   }
   window.Ionic.normalizeURL = normalizeURL;
 
-  var xhrPrototype = window.XMLHttpRequest.prototype;
-  var originalOpen = xhrPrototype.open;
-
-  xhrPrototype.open = function _wk_open(method, url) {
-    arguments[1] = normalizeURL(url);
-    originalOpen.apply(this, arguments);
-  }
-  console.debug("XHR polyfill injected!");
-
   var stopScrollHandler = window.webkit.messageHandlers.stopScroll;
   if (!stopScrollHandler) {
     console.error('Can not find stopScroll handler');
