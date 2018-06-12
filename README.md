@@ -37,9 +37,9 @@ This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and gr
 TODO
 
 <!--
-```
-cordova plugin rm cordova-plugin-ionic-webview
-```
+- cordova plugin rm/add commands
+- add ionic-native wrapper
+- remove usages of normalizeURL in favor of ionic-native plugin
 -->
 
 [ionic-homepage]: https://ionicframework.com
