@@ -22,7 +22,7 @@
   "author": "Ionic Team",
   "license": "Apache-2.0",
   "devDependencies": {
-    "np": "^2.16.0",
+    "np": "^3.0.4",
     "sync-cordova-xml": "^0.4.0"
   },
   "engines": {
