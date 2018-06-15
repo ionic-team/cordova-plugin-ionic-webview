@@ -24,6 +24,7 @@
 
 @property (nonatomic, strong, readonly) id <WKUIDelegate> uiDelegate;
 
--(void)setServerBasePath:(NSString *) path;
+-(void)setServerPath:(NSString *) path;
+-(void)setServerBasePath:(CDVInvokedUrlCommand*)command;
 
 @end

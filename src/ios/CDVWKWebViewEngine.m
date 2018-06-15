@@ -153,7 +153,7 @@
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
 
     NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
-    [self setServerBasePath:wwwPath];
+    [self setServerPath:wwwPath];
 
     [self startServer];
 
@@ -721,7 +721,13 @@ static void * KVOContext = &KVOContext;
     }
 }
 
--(void)setServerBasePath:(NSString *) path
+- (void)setServerBasePath:(CDVInvokedUrlCommand*)command {
+  NSString * path = [command argumentAtIndex:0];
+  [self setServerPath:path];
+  [(WKWebView*)_engineWebView reload];
+}
+
+-(void)setServerPath:(NSString *) path
 {
     BOOL restart = [self.webServer isRunning];
     if (restart) {
