@@ -23,7 +23,7 @@ The Web View plugin for Cordova that is specialized for Ionic apps.
 
 This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and greatest features and may not work with all apps. See [Requirements](#requirements) and [Migrating to 2.x](#migrating-to-2x).
 
-:book: **Documentation**: [https://ionicframework.com/docs/building/webview][ionic-webview-docs]
+:book: **Documentation**: [https://beta.ionicframework.com/docs/building/webview][ionic-webview-docs]
 
 :mega: **Support/Questions?** Please see our [Support Page][ionic-support] for general support questions. The issues on GitHub should be reserved for bug reports and feature requests.
 
@@ -44,5 +44,5 @@ TODO
 
 [ionic-homepage]: https://ionicframework.com
 [ionic-docs]: https://ionicframework.com/docs
-[ionic-webview-docs]: https://ionicframework.com/docs/building/webview
+[ionic-webview-docs]: https://beta.ionicframework.com/docs/building/webview
 [ionic-support]: https://ionicframework.com/support
