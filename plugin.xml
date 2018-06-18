@@ -33,7 +33,7 @@
 	</engines>
 
   <js-module src="src/www/util.js" name="IonicWebView">
-      <clobbers target="window.Ionic.WebView"/>
+      <clobbers target="Ionic.WebView"/>
   </js-module>
 
   <platform name="android">

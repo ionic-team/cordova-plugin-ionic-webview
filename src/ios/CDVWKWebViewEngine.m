@@ -721,7 +721,7 @@ static void * KVOContext = &KVOContext;
     }
 }
 
--(void)getBasePath:(CDVInvokedUrlCommand*)command
+-(void)getServerBasePath:(CDVInvokedUrlCommand*)command
 {
   [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:self.basePath]  callbackId:command.callbackId];
 }

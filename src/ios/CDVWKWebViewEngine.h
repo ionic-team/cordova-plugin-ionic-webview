@@ -27,6 +27,6 @@
 
 -(void)setServerPath:(NSString *) path;
 -(void)setServerBasePath:(CDVInvokedUrlCommand*)command;
--(void)getBasePath:(CDVInvokedUrlCommand*)command;
+-(void)getServerBasePath:(CDVInvokedUrlCommand*)command;
 
 @end

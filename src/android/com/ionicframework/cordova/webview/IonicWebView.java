@@ -18,7 +18,7 @@ public class IonicWebView extends CordovaPlugin  {
         }
       });
       return true;
-    } else if (action.equals("getBasePath")) {
+    } else if (action.equals("getServerBasePath")) {
       callbackContext.success(((IonicWebViewEngine)webView.getEngine()).getServerBasePath());
     }
     return false;

@@ -17,8 +17,8 @@ var WebView = {
   setServerBasePath: function(path) {
     exec(null, null, 'IonicWebView', 'setServerBasePath', [path]);
   },
-  getBasePath: function(callback) {
-    exec(callback, null, 'IonicWebView', 'getBasePath', []);
+  getServerBasePath: function(callback) {
+    exec(callback, null, 'IonicWebView', 'getServerBasePath', []);
   }
 }
 
