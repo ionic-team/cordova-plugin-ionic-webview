@@ -22,6 +22,9 @@ Please create a pull request for the `master` branch.
 
 ## Publishing
 
-```
-npm run deploy -- 2.0.0-beta.x --tag=beta
-```
+1. Add changes to `CHANGELOG.md`.
+1. Deploy:
+
+    ```
+    npm run deploy -- 2.0.0-beta.x --tag=beta
+    ```

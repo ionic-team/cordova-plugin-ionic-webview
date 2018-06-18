@@ -45,6 +45,10 @@ This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and gr
     cordova plugin add cordova-plugin-ionic-webview@beta
     ```
 
+1. Apps are now served from HTTP on Android.
+
+    * The origin for requests from the Web View is `http://localhost:8080`.
+
 1. Replace any usages of `window.Ionic.normalizeURL()` with `window.Ionic.WebView.convertFileSrc()`.
 
     * For Ionic Angular projects, there is an [Ionic Native wrapper](https://beta.ionicframework.com/docs/native/ionic-webview):
