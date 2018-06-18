@@ -17,6 +17,8 @@
 #         under the License.
 -->
 
+<!-- TODO: remove beta in README.md and CONTRIBUTING.md when 2.0 is latest -->
+
 # Ionic Web View
 
 The Web View plugin for Cordova that is specialized for Ionic apps.
@@ -27,6 +29,8 @@ This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and gr
 
 :mega: **Support/Questions?** Please see our [Support Page][ionic-support] for general support questions. The issues on GitHub should be reserved for bug reports and feature requests.
 
+:sparkling_heart: **Want to contribute?** Please see [CONTRIBUTING.md](https://github.com/ionic-team/cordova-plugin-ionic-webview/blob/master/CONTRIBUTING.md).
+
 ### Requirements
 
 * **iOS**: iOS 10+ and `cordova-ios` 4+
@@ -34,13 +38,20 @@ This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and gr
 
 ### Migrating to 2.x
 
-TODO
+1. Remove and re-add the Web View plugin:
 
-<!--
-- cordova plugin rm/add commands
-- add ionic-native wrapper
-- remove usages of normalizeURL in favor of ionic-native plugin
--->
+    ```
+    cordova plugin rm cordova-plugin-ionic-webview
+    cordova plugin add cordova-plugin-ionic-webview@beta
+    ```
+
+1. Replace any usages of `window.Ionic.normalizeURL()` with `window.Ionic.WebView.convertFileSrc()`.
+
+    * For Ionic Angular projects, there is an [Ionic Native wrapper](https://beta.ionicframework.com/docs/native/ionic-webview):
+
+        ```
+        npm install @ionic-native/ionic-webview
+        ```
 
 [ionic-homepage]: https://ionicframework.com
 [ionic-docs]: https://ionicframework.com/docs
