@@ -95,5 +95,9 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
   public void setServerBasePath(String path){
     localServer.hostFiles(path);
   }
+
+  public String getServerBasePath() {
+    return this.localServer.getBasePath();
+  }
 }
 

@@ -721,7 +721,13 @@ static void * KVOContext = &KVOContext;
     }
 }
 
-- (void)setServerBasePath:(CDVInvokedUrlCommand*)command {
+-(void)getBasePath:(CDVInvokedUrlCommand*)command
+{
+  [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:self.basePath]  callbackId:command.callbackId];
+}
+
+-(void)setServerBasePath:(CDVInvokedUrlCommand*)command
+{
   NSString * path = [command argumentAtIndex:0];
   [self setServerPath:path];
   [(WKWebView*)_engineWebView reload];
@@ -729,6 +735,7 @@ static void * KVOContext = &KVOContext;
 
 -(void)setServerPath:(NSString *) path
 {
+    self.basePath = path;
     BOOL restart = [self.webServer isRunning];
     if (restart) {
         [self.webServer stop];
