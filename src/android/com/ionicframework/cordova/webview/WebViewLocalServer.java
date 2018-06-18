@@ -671,4 +671,8 @@ public class WebViewLocalServer {
       return handler.handle(request);
     }
   }
+
+  public String getBasePath(){
+    return this.basePath;
+  }
 }

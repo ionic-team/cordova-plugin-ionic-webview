@@ -23,7 +23,10 @@
 @interface CDVWKWebViewEngine : CDVPlugin <CDVWebViewEngineProtocol, WKScriptMessageHandler, WKNavigationDelegate>
 
 @property (nonatomic, strong, readonly) id <WKUIDelegate> uiDelegate;
+@property (nonatomic, strong) NSString * basePath;
 
--(void)setServerBasePath:(NSString *) path;
+-(void)setServerPath:(NSString *) path;
+-(void)setServerBasePath:(CDVInvokedUrlCommand*)command;
+-(void)getServerBasePath:(CDVInvokedUrlCommand*)command;
 
 @end
