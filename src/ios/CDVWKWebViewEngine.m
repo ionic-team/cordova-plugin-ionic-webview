@@ -169,6 +169,7 @@
 
     //extend default connection coalescing time when background enabled
     if(!suspendInBackground){
+        NSLog(@"CDVWKWebViewEngine: Suspend in background disabled");
         waitTime = 60;
     }
     
