@@ -22,9 +22,8 @@ iOS add config.xml options:
 * iOS update HTTP server to restart sockets with error state when resuming from background
 * iOS enable HTTP server to continue running in background if the webview is running.
 * iOS enable Webview to continue running in background. Requires background mode capability enabled in xcode + valid use case as per app store requirements. If your app is not performing valid background tasks it will still be suspended by the OS as usual. As long as valid background tasks are running the webview will continue to function as expected.
-* iOS add config.xml options:
-    WKSuspendInBackground - defaults to true, if set to false then the webview and HTTP server will continue to run when the app is in the background or screen is locked
-    WKPort - defaults to 8080, define the port that the HTTP server will listen on
-    WKBind - defaults to localhost, if set to 127.0.0.1 then this IP will be used instead of the localhost hostname for the HTTP server
+* iOS add config.xml option WKSuspendInBackground - defaults to true, if set to false then the webview and HTTP server will continue to run when the app is in the background or screen is locked
+* iOS add config.xml option WKPort - defaults to 8080, define the port that the HTTP server will listen on
+* iOS add config.xml option WKBind - defaults to localhost, if set to 127.0.0.1 then this IP will be used instead of localhost for the HTTP server hostname.
 
 See [Github releases](https://github.com/ionic-team/cordova-plugin-ionic-webview/releases) for earlier changes.
