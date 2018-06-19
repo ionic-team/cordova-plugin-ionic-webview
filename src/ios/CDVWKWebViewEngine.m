@@ -146,7 +146,10 @@
     [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
     
     //bind to designated hostname or default to localhost
-    NSString *bind = [settings cordovaSettingForKey:@"WKBind" defaultValue:@"localhost"];
+    NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
+    if(bind == nil){
+        bind = @"localhost";
+    }
 
     //bind to designated port or default to 8080
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
@@ -163,18 +166,17 @@
     //enable suspend in background if set in config
     BOOL suspendInBackground = [settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
     int waitTime = 10;
-    
+
     //extend default connection coalescing time when background enabled
     if(!suspendInBackground){
-        int waitTime = 60;
+        waitTime = 60;
     }
-
     
     NSDictionary *options = @{
                               GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
                               GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
                               GCDWebServerOption_Port: @(portNumber),
-                              GCDWebServerOption_BindToLocalhost: @(allowRemote),
+                              GCDWebServerOption_BindToLocalhost: @(YES),
                               GCDWebServerOption_ServerName: @"Ionic"
                               };
     
@@ -198,8 +200,9 @@
     if (settings == nil) {
         return configuration;
     }
+
     //required to stop wkwebview suspending in background too eagerly (as used in background mode plugin)
-    configuration._alwaysRunsAtForegroundPriority = [settings cordovaBoolSettingForKey:@"WKEnableBackground" defaultValue:NO];
+    configuration._alwaysRunsAtForegroundPriority = ![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     configuration.allowsAirPlayForMediaPlayback = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
@@ -765,7 +768,8 @@ static void * KVOContext = &KVOContext;
         completionBlock(response);
     }];
     if (restart) {
-        [self startServer];
+        NSDictionary* settings = self.commandDelegate.settings;
+        [self initWebServer:settings];
     }
 }
 

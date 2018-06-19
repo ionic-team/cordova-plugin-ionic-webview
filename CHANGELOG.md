@@ -26,6 +26,5 @@ iOS add config.xml options:
     WKSuspendInBackground - defaults to true, if set to false then the webview and HTTP server will continue to run when the app is in the background or screen is locked
     WKPort - defaults to 8080, define the port that the HTTP server will listen on
     WKBind - defaults to localhost, if set to 127.0.0.1 then this IP will be used instead of the localhost hostname for the HTTP server
-    WKAllowRemoteConnect - defaults to false, if set to true the HTTP server will accept connections from remote sources
 
 See [Github releases](https://github.com/ionic-team/cordova-plugin-ionic-webview/releases) for earlier changes.
