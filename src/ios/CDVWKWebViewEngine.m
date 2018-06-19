@@ -138,36 +138,46 @@
     }
     return self;
 }
+
 - (void)initWebServer:(NSDictionary*)settings
 {
     [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
     self.webServer = [[GCDWebServer alloc] init];
+    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
+    
+    //bind to designated hostname or default to localhost
+    NSString *bind = [settings cordovaSettingForKey:@"WKBind" defaultValue:@"localhost"];
 
-    NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
-    if (bind == nil) {
-      bind = @"localhost";
-    }
-
+    //bind to designated port or default to 8080
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
-    //Set default Server String
+
+    //set the local server name
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
 
     NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
     [self setServerPath:wwwPath];
 
-    [self startServer];
+    //allow remote connections to the webserver if set in config
+    BOOL allowRemote = [settings cordovaBoolSettingForKey:@"WKAllowRemoteConnect" defaultValue:NO];
 
-}
+    //enable suspend in background if set in config
+    BOOL suspendInBackground = [settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
+    int waitTime = 10;
+    
+    //extend default connection coalescing time when background enabled
+    if(!suspendInBackground){
+        int waitTime = 60;
+    }
 
--(void)startServer
-{
-    int portNumber = [self.commandDelegate.settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
+    
     NSDictionary *options = @{
+                              GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
+                              GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
                               GCDWebServerOption_Port: @(portNumber),
-                              GCDWebServerOption_BindToLocalhost: @(YES),
+                              GCDWebServerOption_BindToLocalhost: @(allowRemote),
                               GCDWebServerOption_ServerName: @"Ionic"
                               };
-
+    
     [self.webServer startWithOptions:options error:nil];
 }
 
@@ -780,4 +790,3 @@ static void * KVOContext = &KVOContext;
 }
 
 @end
-
