@@ -139,12 +139,21 @@
     return self;
 }
 
-- (void)initWebServer:(NSDictionary*)settings
+- (void)initWebServer
 {
     [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
     self.webServer = [[GCDWebServer alloc] init];
-    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
-    
+
+    NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
+
+    [self setServerPath:wwwPath];
+
+    [self startServer];
+}
+
+-(void)startServer
+{
+    NSDictionary * settings = self.commandDelegate.settings;
     //bind to designated hostname or default to localhost
     NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
     if(bind == nil){
@@ -156,9 +165,6 @@
 
     //set the local server name
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
-
-    NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
-    [self setServerPath:wwwPath];
 
     //allow remote connections to the webserver if set in config
     BOOL allowRemote = [settings cordovaBoolSettingForKey:@"WKAllowRemoteConnect" defaultValue:NO];
@@ -172,7 +178,7 @@
         NSLog(@"CDVWKWebViewEngine: Suspend in background disabled");
         waitTime = 60;
     }
-    
+
     NSDictionary *options = @{
                               GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
                               GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
@@ -180,7 +186,7 @@
                               GCDWebServerOption_BindToLocalhost: @(YES),
                               GCDWebServerOption_ServerName: @"Ionic"
                               };
-    
+
     [self.webServer startWithOptions:options error:nil];
 }
 
@@ -214,7 +220,7 @@
 {
     // viewController would be available now. we attempt to set all possible delegates to it, by default
     NSDictionary* settings = self.commandDelegate.settings;
-    [self initWebServer:settings];
+    [self initWebServer];
 
     self.uiDelegate = [[CDVWKWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
 
@@ -677,7 +683,6 @@ static void * KVOContext = &KVOContext;
     return NO;
 }
 
-
 - (void) webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction*)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
     NSURL* url = [navigationAction.request URL];
@@ -715,7 +720,6 @@ static void * KVOContext = &KVOContext;
             [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
         }
     }
-
 
     if (shouldAllowRequest) {
         NSString *scheme = url.scheme;
@@ -769,8 +773,7 @@ static void * KVOContext = &KVOContext;
         completionBlock(response);
     }];
     if (restart) {
-        NSDictionary* settings = self.commandDelegate.settings;
-        [self initWebServer:settings];
+        [self startServer];
     }
 }
 
