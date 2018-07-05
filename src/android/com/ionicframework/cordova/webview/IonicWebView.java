@@ -10,7 +10,7 @@ public class IonicWebView extends CordovaPlugin  {
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
   
     if (action.equals("setServerBasePath")) {
-      String path = args.getString(0);
+      final String path = args.getString(0);
       cordova.getActivity().runOnUiThread(new Runnable() {
         public void run() {
           ((IonicWebViewEngine)webView.getEngine()).setServerBasePath(path);
