@@ -54,7 +54,7 @@ This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and gr
     * For Ionic Angular projects, there is an [Ionic Native wrapper](https://beta.ionicframework.com/docs/native/ionic-webview):
 
         ```
-        npm install @ionic-native/ionic-webview
+        npm install @ionic-native/ionic-webview@beta
         ```
 
 [ionic-homepage]: https://ionicframework.com
