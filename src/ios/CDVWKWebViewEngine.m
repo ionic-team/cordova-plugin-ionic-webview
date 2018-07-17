@@ -166,9 +166,6 @@
     //set the local server name
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
 
-    //allow remote connections to the webserver if set in config
-    BOOL allowRemote = [settings cordovaBoolSettingForKey:@"WKAllowRemoteConnect" defaultValue:NO];
-
     //enable suspend in background if set in config
     BOOL suspendInBackground = [settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
     int waitTime = 10;
