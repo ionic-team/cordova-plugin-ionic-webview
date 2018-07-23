@@ -26,5 +26,5 @@ Please create a pull request for the `master` branch.
 1. Deploy:
 
     ```
-    npm run deploy -- 2.0.0-beta.x --tag=beta
+    npm run deploy -- <version>
     ```

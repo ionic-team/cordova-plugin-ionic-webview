@@ -17,7 +17,7 @@
 #         under the License.
 -->
 
-<!-- TODO: remove beta in README.md and CONTRIBUTING.md when 2.0 is latest -->
+<!-- TODO: remove beta in README.md and CONTRIBUTING.md -->
 
 # Ionic Web View
 
@@ -42,7 +42,7 @@ This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and gr
 
     ```
     cordova plugin rm cordova-plugin-ionic-webview
-    cordova plugin add cordova-plugin-ionic-webview@beta
+    cordova plugin add cordova-plugin-ionic-webview@latest
     ```
 
 1. Apps are now served from HTTP on Android.
