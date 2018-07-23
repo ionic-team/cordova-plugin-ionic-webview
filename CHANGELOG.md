@@ -1,7 +1,7 @@
 # Changelog
 
 <a name="2.0.0"></a>
-### 2.0.0 (PENDING)
+### 2.0.0 (2018-07-23)
 
 * **BREAKING**: HTTP server now runs for iOS **and** Android, instead of just iOS. The server is configured the same for both platforms.
 * **BREAKING**: HTTP server now loads the app from a base href of `/`. The app URL behaves like `http://localhost:8080/index.html` instead of `http://localhost:8080/Users/.../index.html`.
