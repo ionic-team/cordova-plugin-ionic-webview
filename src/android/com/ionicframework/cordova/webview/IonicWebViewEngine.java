@@ -94,6 +94,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
 
   public void setServerBasePath(String path){
     localServer.hostFiles(path);
+    webView.loadUrl(CDV_LOCAL_SERVER);
   }
 
   public String getServerBasePath() {
