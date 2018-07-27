@@ -745,7 +745,7 @@ static void * KVOContext = &KVOContext;
 {
   NSString * path = [command argumentAtIndex:0];
   [self setServerPath:path];
-  [(WKWebView*)_engineWebView reload];
+  [(WKWebView*)_engineWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.CDV_LOCAL_SERVER]]];
 }
 
 -(void)setServerPath:(NSString *) path

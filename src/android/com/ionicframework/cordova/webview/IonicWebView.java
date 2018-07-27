@@ -14,7 +14,6 @@ public class IonicWebView extends CordovaPlugin  {
       cordova.getActivity().runOnUiThread(new Runnable() {
         public void run() {
           ((IonicWebViewEngine)webView.getEngine()).setServerBasePath(path);
-          webView.loadUrl(webView.getUrl());
         }
       });
       return true;
