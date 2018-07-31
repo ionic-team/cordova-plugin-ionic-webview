@@ -145,7 +145,7 @@
     self.webServer = [[GCDWebServer alloc] init];
 
     NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
-    
+
     [self updateBindPath];
     [self setServerPath:wwwPath];
 
@@ -160,10 +160,10 @@
     if(bind == nil){
         bind = @"localhost";
     }
-    
+ 
     //bind to designated port or default to 8080
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
-    
+
     //set the local server name
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
 }
@@ -171,7 +171,7 @@
 -(void)startServer
 {
     NSDictionary * settings = self.commandDelegate.settings;
-    
+
     //bind to designated port or default to 8080
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
 
@@ -764,7 +764,7 @@ static void * KVOContext = &KVOContext;
     if (restart) {
         [self.webServer stop];
     }
-    
+
     __block NSString* basePath = self.CDV_LOCAL_SERVER;
     [self.webServer addGETHandlerForBasePath:@"/" directoryPath:path indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:0 allowRangeRequests:YES];
     [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_file_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
