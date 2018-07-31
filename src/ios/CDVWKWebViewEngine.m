@@ -160,7 +160,7 @@
     if(bind == nil){
         bind = @"localhost";
     }
- 
+
     //bind to designated port or default to 8080
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
 
