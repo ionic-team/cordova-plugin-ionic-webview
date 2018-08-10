@@ -19,17 +19,12 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 
 import org.apache.cordova.ConfigXmlParser;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.SequenceInputStream;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -113,10 +108,6 @@ public class WebViewLocalServer {
       }
       tempResponseHeaders.put("Cache-Control", "no-cache");
       this.responseHeaders = tempResponseHeaders;
-    }
-
-    public InputStream handle(WebResourceRequest request) {
-      return handle(request.getUrl());
     }
 
     abstract public InputStream handle(Uri url);
@@ -208,6 +199,14 @@ public class WebViewLocalServer {
     }
     return uri;
   }
+  
+  private static WebResourceResponse createWebResourceResponse(String mimeType, String encoding, int statusCode, String reasonPhrase, Map<String, String> responseHeaders, InputStream data) {
+    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      return new WebResourceResponse(mimeType, encoding, statusCode, reasonPhrase, responseHeaders, data);
+    } else {
+      return new WebResourceResponse(mimeType, encoding, data);
+    }
+  }
 
   /**
    * Attempt to retrieve the WebResourceResponse associated with the given <code>request</code>.
@@ -215,29 +214,29 @@ public class WebViewLocalServer {
    * {@link android.webkit.WebViewClient#shouldInterceptRequest(android.webkit.WebView,
    * android.webkit.WebResourceRequest)}.
    *
-   * @param request the request to process.
+   * @param uri the request Uri to process.
    * @return a response if the request URL had a matching handler, null if no handler was found.
    */
-  public WebResourceResponse shouldInterceptRequest(WebResourceRequest request) {
+  public WebResourceResponse shouldInterceptRequest(Uri uri) {
     PathHandler handler;
     synchronized (uriMatcher) {
-      handler = (PathHandler) uriMatcher.match(request.getUrl());
+      handler = (PathHandler) uriMatcher.match(uri);
     }
     if (handler == null) {
       return null;
     }
 
     if (this.isLocal) {
-      Log.d("SERVER", "Handling local request: " + request.getUrl().toString());
-      return handleLocalRequest(request, handler);
+      Log.d("SERVER", "Handling local request: " + uri.toString());
+      return handleLocalRequest(uri, handler);
     } else {
-      return handleProxyRequest(request, handler);
+      return handleProxyRequest(uri, handler);
     }
   }
 
-  private WebResourceResponse handleLocalRequest(WebResourceRequest request, PathHandler handler) {
-    String path = request.getUrl().getPath();
-    if (path.equals("/") || (!request.getUrl().getLastPathSegment().contains(".") && html5mode)) {
+  private WebResourceResponse handleLocalRequest(Uri uri, PathHandler handler) {
+    String path = uri.getPath();
+    if (path.equals("/") || (!uri.getLastPathSegment().contains(".") && html5mode)) {
       InputStream stream;
       String launchURL = parser.getLaunchUrl();
       String launchFile = launchURL.substring(launchURL.lastIndexOf("/") + 1, launchURL.length());
@@ -254,21 +253,21 @@ public class WebViewLocalServer {
         return null;
       }
 
-      return new WebResourceResponse("text/html", handler.getEncoding(),
-        handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
+      return createWebResourceResponse("text/html", handler.getEncoding(),
+                handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
     }
 
     int periodIndex = path.lastIndexOf(".");
     if (periodIndex >= 0) {
       String ext = path.substring(path.lastIndexOf("."), path.length());
 
-      InputStream responseStream = new LollipopLazyInputStream(handler, request);
+      InputStream responseStream = new LollipopLazyInputStream(handler, uri);
       InputStream stream = responseStream;
 
       String mimeType = getMimeType(path, stream);
 
-      return new WebResourceResponse(mimeType, handler.getEncoding(),
-        handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
+      return createWebResourceResponse(mimeType, handler.getEncoding(),
+              handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
     }
 
     return null;
@@ -277,14 +276,14 @@ public class WebViewLocalServer {
   /**
    * Instead of reading files from the filesystem/assets, proxy through to the URL
    * and let an external server handle it.
-   * @param request
+   * @param uri
    * @param handler
    * @return
    */
-  private WebResourceResponse handleProxyRequest(WebResourceRequest request, PathHandler handler) {
+  private WebResourceResponse handleProxyRequest(Uri uri, PathHandler handler) {
     try {
-      String path = request.getUrl().getPath();
-      URL url = new URL(request.getUrl().toString());
+      String path = uri.getPath();
+      URL url = new URL(uri.toString());
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.setRequestMethod("GET");
       conn.setReadTimeout(30 * 1000);
@@ -292,9 +291,9 @@ public class WebViewLocalServer {
 
       InputStream stream = conn.getInputStream();
 
-      if (path.equals("/") || (!request.getUrl().getLastPathSegment().contains(".") && html5mode)) {
-        return new WebResourceResponse("text/html", handler.getEncoding(),
-          handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
+      if (path.equals("/") || (!uri.getLastPathSegment().contains(".") && html5mode)) {
+        return createWebResourceResponse("text/html", handler.getEncoding(),
+                  handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
       }
 
       int periodIndex = path.lastIndexOf(".");
@@ -307,12 +306,12 @@ public class WebViewLocalServer {
 
         String mimeType = getMimeType(path, stream);
 
-        return new WebResourceResponse(mimeType, handler.getEncoding(),
-          handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
+        return createWebResourceResponse(mimeType, handler.getEncoding(),
+              handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
       }
 
-      return new WebResourceResponse("", handler.getEncoding(),
-        handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), conn.getInputStream());
+      return createWebResourceResponse("", handler.getEncoding(),
+                handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
 
     } catch (SocketTimeoutException ex) {
       // bridge.handleAppUrlLoadError(ex);
@@ -390,7 +389,7 @@ public class WebViewLocalServer {
   public AssetHostingDetails hostAssets(final String assetPath, final String virtualAssetPath,
                                         boolean enableHttp, boolean enableHttps) {
     return hostAssets(authority, assetPath, virtualAssetPath, enableHttp,
-      enableHttps);
+            enableHttps);
   }
 
   /**
@@ -421,7 +420,7 @@ public class WebViewLocalServer {
     }
     if (virtualAssetPath.indexOf('*') != -1) {
       throw new IllegalArgumentException(
-        "virtualAssetPath cannot contain the '*' character.");
+              "virtualAssetPath cannot contain the '*' character.");
     }
 
     Uri httpPrefix = null;
@@ -500,7 +499,7 @@ public class WebViewLocalServer {
                                            boolean enableHttps) {
     if (virtualResourcesPath.indexOf('*') != -1) {
       throw new IllegalArgumentException(
-        "virtualResourcesPath cannot contain the '*' character.");
+              "virtualResourcesPath cannot contain the '*' character.");
     }
 
     Uri.Builder uriBuilder = new Uri.Builder();
@@ -658,17 +657,17 @@ public class WebViewLocalServer {
 
   // For L and above.
   private static class LollipopLazyInputStream extends LazyInputStream {
-    private WebResourceRequest request;
+    private Uri uri;
     private InputStream is;
 
-    public LollipopLazyInputStream(PathHandler handler, WebResourceRequest request) {
+    public LollipopLazyInputStream(PathHandler handler, Uri uri) {
       super(handler);
-      this.request = request;
+      this.uri = uri;
     }
 
     @Override
     protected InputStream handle() {
-      return handler.handle(request);
+      return handler.handle(uri);
     }
   }
 

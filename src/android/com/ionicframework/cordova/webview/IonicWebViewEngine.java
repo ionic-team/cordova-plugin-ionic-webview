@@ -4,19 +4,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
-
 import org.apache.cordova.ConfigXmlParser;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPreferences;
 import org.apache.cordova.CordovaResourceApi;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CordovaWebViewEngine;
-
 import org.apache.cordova.NativeToJsMessageQueue;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.engine.SystemWebViewClient;
@@ -31,8 +33,9 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
   private static final String LAST_BINARY_VERSION_CODE = "lastBinaryVersionCode";
   private static final String LAST_BINARY_VERSION_NAME = "lastBinaryVersionName";
 
-
-  /** Used when created via reflection. */
+  /**
+   * Used when created via reflection.
+   */
   public IonicWebViewEngine(Context context, CordovaPreferences preferences) {
     super(new SystemWebView(context), preferences);
     Log.d(TAG, "Ionic Web View Engine Starting Right Up 1...");
@@ -97,8 +100,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     return false;
   }
 
-  private class ServerClient extends SystemWebViewClient
-  {
+  private class ServerClient extends SystemWebViewClient {
     private ConfigXmlParser parser;
 
     public ServerClient(SystemWebViewEngine parentEngine, ConfigXmlParser parser) {
@@ -106,9 +108,16 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
       this.parser = parser;
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-      return localServer.shouldInterceptRequest(request);
+      return localServer.shouldInterceptRequest(request.getUrl());
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+      return localServer.shouldInterceptRequest(Uri.parse(url));
     }
 
     @Override
@@ -129,7 +138,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     }
   }
 
-  public void setServerBasePath(String path){
+  public void setServerBasePath(String path) {
     localServer.hostFiles(path);
     webView.loadUrl(CDV_LOCAL_SERVER);
   }
@@ -138,4 +147,3 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     return this.localServer.getBasePath();
   }
 }
-
