@@ -765,10 +765,10 @@ static void * KVOContext = &KVOContext;
         [self.webServer stop];
     }
 
-    __block NSString* basePath = self.CDV_LOCAL_SERVER;
+    __block NSString* serverUrl = self.CDV_LOCAL_SERVER;
     [self.webServer addGETHandlerForBasePath:@"/" directoryPath:path indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:0 allowRangeRequests:YES];
     [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_file_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
-        NSString *urlToRemove = [basePath stringByAppendingString:@"/_file_"];
+        NSString *urlToRemove = [serverUrl stringByAppendingString:@"/_file_"];
         NSString *absUrl = [[[request URL] absoluteString] stringByReplacingOccurrencesOfString:urlToRemove withString:@""];
 
         NSRange range = [absUrl rangeOfString:@"?"];
