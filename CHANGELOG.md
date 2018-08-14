@@ -1,5 +1,21 @@
 # Changelog
 
+<a name="2.0.3"></a>
+### 2.0.3 (2018-08-14)
+
+* Fix nil reference by setting up the server URL before routes are set up. ([#135](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/135)) [@matejkramny](https://github.com/matejkramny)
+* Resolve issue when app is launched in background. ([#124](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/124)) [@ghenry22](https://github.com/ghenry22)
+
+<a name="2.0.2"></a>
+### 2.0.2 (2018-07-30)
+
+* Immediately load new server base path upon setting it. ([#132](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/132))
+
+<a name="2.0.1"></a>
+### 2.0.1 (2018-07-25)
+
+* Avoid "not modified" response on iOS by always overriding last modified date. ([#127](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/127))
+
 <a name="2.0.0"></a>
 ### 2.0.0 (2018-07-23)
 
