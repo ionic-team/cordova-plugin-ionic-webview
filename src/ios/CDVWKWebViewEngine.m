@@ -146,12 +146,13 @@
 
     NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
 
+    [self updateBindPath];
     [self setServerPath:wwwPath];
 
     [self startServer];
 }
 
--(void)startServer
+-(void)updateBindPath
 {
     NSDictionary * settings = self.commandDelegate.settings;
     //bind to designated hostname or default to localhost
@@ -165,6 +166,14 @@
 
     //set the local server name
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
+}
+
+-(void)startServer
+{
+    NSDictionary * settings = self.commandDelegate.settings;
+
+    //bind to designated port or default to 8080
+    int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
 
     //enable suspend in background if set in config
     BOOL suspendInBackground = [settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
@@ -755,7 +764,8 @@ static void * KVOContext = &KVOContext;
     if (restart) {
         [self.webServer stop];
     }
-    NSString *serverUrl = self.CDV_LOCAL_SERVER;
+
+    __block NSString* serverUrl = self.CDV_LOCAL_SERVER;
     [self.webServer addGETHandlerForBasePath:@"/" directoryPath:path indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:0 allowRangeRequests:YES];
     [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_file_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
         NSString *urlToRemove = [serverUrl stringByAppendingString:@"/_file_"];
