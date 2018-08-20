@@ -1,6 +1,8 @@
 package com.ionicframework.cordova.webview;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.webkit.WebResourceRequest;
@@ -58,6 +60,11 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     webView.setWebViewClient(new ServerClient(this, parser));
 
     super.init(parentWebView, cordova, client, resourceApi, pluginManager, nativeToJsMessageQueue);
+    SharedPreferences prefs = cordova.getContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
+    String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
+    if (path != null) {
+      setServerBasePath(path);
+    }
   }
 
   private class ServerClient extends SystemWebViewClient

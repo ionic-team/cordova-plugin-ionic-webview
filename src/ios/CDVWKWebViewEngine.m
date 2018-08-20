@@ -31,6 +31,7 @@
 
 #define CDV_BRIDGE_NAME @"cordova"
 #define CDV_IONIC_STOP_SCROLL @"stopScroll"
+#define CDV_SERVER_PATH @"serverBasePath"
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
 
@@ -145,6 +146,12 @@
     self.webServer = [[GCDWebServer alloc] init];
 
     NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
+
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString * persistedPath = [userDefaults objectForKey:CDV_SERVER_PATH];
+    if (persistedPath && ![persistedPath isEqualToString:@""]) {
+        wwwPath = persistedPath;
+    }
 
     [self updateBindPath];
     [self setServerPath:wwwPath];
@@ -782,6 +789,13 @@ static void * KVOContext = &KVOContext;
     if (restart) {
         [self startServer];
     }
+}
+
+-(void)persistServerBasePath:(CDVInvokedUrlCommand*)command
+{
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:self.basePath forKey:CDV_SERVER_PATH];
+    [userDefaults synchronize];
 }
 
 @end

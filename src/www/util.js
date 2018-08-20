@@ -19,6 +19,9 @@ var WebView = {
   },
   getServerBasePath: function(callback) {
     exec(callback, null, 'IonicWebView', 'getServerBasePath', []);
+  },
+  persistServerBasePath: function() {
+    exec(null, null, 'IonicWebView', 'persistServerBasePath', []);
   }
 }
 
