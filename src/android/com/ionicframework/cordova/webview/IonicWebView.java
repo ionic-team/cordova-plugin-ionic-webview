@@ -28,7 +28,7 @@ public class IonicWebView extends CordovaPlugin  {
       return true;
     } else if (action.equals("persistServerBasePath")) {
       String path = ((IonicWebViewEngine)webView.getEngine()).getServerBasePath();
-      SharedPreferences prefs = cordova.getContext().getSharedPreferences(WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
+      SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
       SharedPreferences.Editor editor = prefs.edit();
       editor.putString(CDV_SERVER_PATH, path);
       editor.apply();
