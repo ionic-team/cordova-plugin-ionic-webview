@@ -60,7 +60,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     webView.setWebViewClient(new ServerClient(this, parser));
 
     super.init(parentWebView, cordova, client, resourceApi, pluginManager, nativeToJsMessageQueue);
-    SharedPreferences prefs = cordova.getContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
+    SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
     String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
     if (path != null) {
       setServerBasePath(path);
