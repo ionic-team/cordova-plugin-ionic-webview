@@ -764,6 +764,32 @@ static void * KVOContext = &KVOContext;
   [(WKWebView*)_engineWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.CDV_LOCAL_SERVER]]];
 }
 
+// -(void)setServerPath:(NSString *) path
+// {
+//     self.basePath = path;
+//     BOOL restart = [self.webServer isRunning];
+//     if (restart) {
+//         [self.webServer stop];
+//     }
+
+//     __block NSString* serverUrl = self.CDV_LOCAL_SERVER;
+//     [self.webServer addGETHandlerForBasePath:@"/" directoryPath:path indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:0 allowRangeRequests:YES];
+//     [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_file_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
+//         NSString *urlToRemove = [serverUrl stringByAppendingString:@"/_file_"];
+//         NSString *absUrl = [[[request URL] absoluteString] stringByReplacingOccurrencesOfString:urlToRemove withString:@""];
+
+//         NSRange range = [absUrl rangeOfString:@"?"];
+//         if (range.location != NSNotFound) {
+//             absUrl = [absUrl substringToIndex:range.location];
+//         }
+
+//         GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
+//         completionBlock(response);
+//     }];
+//     if (restart) {
+//         [self startServer];
+//     }
+// }
 -(void)setServerPath:(NSString *) path
 {
     self.basePath = path;
@@ -771,10 +797,12 @@ static void * KVOContext = &KVOContext;
     if (restart) {
         [self.webServer stop];
     }
-
-    __block NSString* serverUrl = self.CDV_LOCAL_SERVER;
+//    NSString *serverUrl = self.CDV_LOCAL_SERVER;
+    CDVWKWebViewEngine* engine = self;
+    
     [self.webServer addGETHandlerForBasePath:@"/" directoryPath:path indexFilename:((CDVViewController *)self.viewController).startPage cacheAge:0 allowRangeRequests:YES];
     [self.webServer addHandlerForMethod:@"GET" pathRegex:@"_file_/" requestClass:GCDWebServerFileRequest.class asyncProcessBlock:^(__kindof GCDWebServerRequest * _Nonnull request, GCDWebServerCompletionBlock  _Nonnull completionBlock) {
+        NSString *serverUrl = engine.CDV_LOCAL_SERVER;
         NSString *urlToRemove = [serverUrl stringByAppendingString:@"/_file_"];
         NSString *absUrl = [[[request URL] absoluteString] stringByReplacingOccurrencesOfString:urlToRemove withString:@""];
 
@@ -782,15 +810,25 @@ static void * KVOContext = &KVOContext;
         if (range.location != NSNotFound) {
             absUrl = [absUrl substringToIndex:range.location];
         }
-
-        GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
-        completionBlock(response);
+        
+        if (
+            [absUrl hasSuffix:@".mp4"] || 
+            [absUrl hasSuffix:@".mov"] || 
+            [absUrl hasSuffix:@".wav"] || 
+            [absUrl hasSuffix:@".mp3"] || 
+        ) {
+            GCDWebServerResponse* response = [GCDWebServerFileResponse responseWithFile: absUrl byteRange:request.byteRange];
+            [response setValue:@"bytes" forAdditionalHeader:@"Accept-Ranges"];
+            completionBlock(response);
+        } else {
+            GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
+            completionBlock(response);
+        }
     }];
     if (restart) {
         [self startServer];
     }
 }
-
 -(void)persistServerBasePath:(CDVInvokedUrlCommand*)command
 {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
