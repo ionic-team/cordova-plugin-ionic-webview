@@ -806,7 +806,7 @@ static void * KVOContext = &KVOContext;
         NSString *urlToRemove = [serverUrl stringByAppendingString:@"/_file_"];
         NSString *absUrl = [[[request URL] absoluteString] stringByReplacingOccurrencesOfString:urlToRemove withString:@""];
 
-        NSRange range = [absUrl rangeOfString:@"?"];
+            NSRange range = [absUrl rangeOfString:@"?"];
         if (range.location != NSNotFound) {
             absUrl = [absUrl substringToIndex:range.location];
         }
