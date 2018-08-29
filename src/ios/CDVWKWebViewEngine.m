@@ -783,7 +783,8 @@ static void * KVOContext = &KVOContext;
             absUrl = [absUrl substringToIndex:range.location];
         }
 
-        GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl];
+        GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl byteRange:request.byteRange];
+        [response setValue:@"bytes" forAdditionalHeader:@"Accept-Ranges"];
         completionBlock(response);
     }];
     if (restart) {
