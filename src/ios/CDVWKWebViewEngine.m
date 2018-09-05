@@ -32,6 +32,8 @@
 #define CDV_BRIDGE_NAME @"cordova"
 #define CDV_IONIC_STOP_SCROLL @"stopScroll"
 #define CDV_SERVER_PATH @"serverBasePath"
+#define LAST_BINARY_VERSION_CODE @"lastBinaryVersionCode"
+#define LAST_BINARY_VERSION_NAME @"lastBinaryVersionName"
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
 
@@ -149,7 +151,7 @@
 
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString * persistedPath = [userDefaults objectForKey:CDV_SERVER_PATH];
-    if (persistedPath && ![persistedPath isEqualToString:@""]) {
+    if (![self isNewBinary] && persistedPath && ![persistedPath isEqualToString:@""]) {
         wwwPath = persistedPath;
     }
 
@@ -157,6 +159,23 @@
     [self setServerPath:wwwPath];
 
     [self startServer];
+}
+
+-(BOOL) isNewBinary
+{
+    NSString * versionCode = [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"];
+    NSString * versionName = [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
+    NSUserDefaults * prefs = [NSUserDefaults standardUserDefaults];
+    NSString * lastVersionCode = [prefs stringForKey:LAST_BINARY_VERSION_CODE];
+    NSString * lastVersionName = [prefs stringForKey:LAST_BINARY_VERSION_NAME];
+    if (![versionCode isEqualToString:lastVersionCode] || ![versionName isEqualToString:lastVersionName]) {
+        [prefs setObject:versionCode forKey:LAST_BINARY_VERSION_CODE];
+        [prefs setObject:versionName forKey:LAST_BINARY_VERSION_NAME];
+        [prefs setObject:@"" forKey:CDV_SERVER_PATH];
+        [prefs synchronize];
+        return YES;
+    }
+    return NO;
 }
 
 -(void)updateBindPath
