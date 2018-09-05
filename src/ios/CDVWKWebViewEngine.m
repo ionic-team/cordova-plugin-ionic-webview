@@ -782,10 +782,15 @@ static void * KVOContext = &KVOContext;
         if (range.location != NSNotFound) {
             absUrl = [absUrl substringToIndex:range.location];
         }
-
-        GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl byteRange:request.byteRange];
-        [response setValue:@"bytes" forAdditionalHeader:@"Accept-Ranges"];
-        completionBlock(response);
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        if (![fileManager fileExistsAtPath:absUrl]) {
+            GCDWebServerResponse* response = [GCDWebServerResponse responseWithStatusCode:kGCDWebServerHTTPStatusCode_NotFound];;
+            completionBlock(response);
+        } else {
+            GCDWebServerFileResponse *response = [GCDWebServerFileResponse responseWithFile:absUrl byteRange:request.byteRange];
+            [response setValue:@"bytes" forAdditionalHeader:@"Accept-Ranges"];
+            completionBlock(response);
+        }
     }];
     if (restart) {
         [self startServer];
