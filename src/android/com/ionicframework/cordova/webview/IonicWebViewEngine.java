@@ -3,6 +3,7 @@ package com.ionicframework.cordova.webview;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.webkit.WebResourceRequest;
@@ -27,6 +28,9 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
 
   private WebViewLocalServer localServer;
   private String CDV_LOCAL_SERVER;
+  private static final String LAST_BINARY_VERSION_CODE = "lastBinaryVersionCode";
+  private static final String LAST_BINARY_VERSION_NAME = "lastBinaryVersionName";
+
 
   /** Used when created via reflection. */
   public IonicWebViewEngine(Context context, CordovaPreferences preferences) {
@@ -62,9 +66,35 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     super.init(parentWebView, cordova, client, resourceApi, pluginManager, nativeToJsMessageQueue);
     SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
     String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
-    if (path != null) {
+    if (!isNewBinary() && path != null && !path.isEmpty()) {
       setServerBasePath(path);
     }
+  }
+
+  private boolean isNewBinary() {
+    String versionCode = "";
+    String versionName = "";
+    SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
+    String lastVersionCode = prefs.getString(LAST_BINARY_VERSION_CODE, null);
+    String lastVersionName = prefs.getString(LAST_BINARY_VERSION_NAME, null);
+
+    try {
+      PackageInfo pInfo = this.cordova.getActivity().getPackageManager().getPackageInfo(this.cordova.getActivity().getPackageName(), 0);
+      versionCode = Integer.toString(pInfo.versionCode);
+      versionName = pInfo.versionName;
+    } catch(Exception ex) {
+      Log.e(TAG, "Unable to get package info", ex);
+    }
+
+    if (!versionCode.equals(lastVersionCode) || !versionName.equals(lastVersionName)) {
+      SharedPreferences.Editor editor = prefs.edit();
+      editor.putString(LAST_BINARY_VERSION_CODE, versionCode);
+      editor.putString(LAST_BINARY_VERSION_NAME, versionName);
+      editor.putString(IonicWebView.CDV_SERVER_PATH, "");
+      editor.apply();
+      return true;
+    }
+    return false;
   }
 
   private class ServerClient extends SystemWebViewClient
