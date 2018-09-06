@@ -152,7 +152,10 @@
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString * persistedPath = [userDefaults objectForKey:CDV_SERVER_PATH];
     if (![self isNewBinary] && persistedPath && ![persistedPath isEqualToString:@""]) {
-        wwwPath = persistedPath;
+        NSString *libPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+        NSString * cordovaDataDirectory = [libPath stringByAppendingPathComponent:@"NoCloud"];
+        NSString * snapshots = [cordovaDataDirectory stringByAppendingPathComponent:@"ionic_built_snapshots"];
+        wwwPath = [snapshots stringByAppendingPathComponent:[persistedPath lastPathComponent]];
     }
 
     [self updateBindPath];
@@ -819,7 +822,7 @@ static void * KVOContext = &KVOContext;
 -(void)persistServerBasePath:(CDVInvokedUrlCommand*)command
 {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:self.basePath forKey:CDV_SERVER_PATH];
+    [userDefaults setObject:[self.basePath lastPathComponent] forKey:CDV_SERVER_PATH];
     [userDefaults synchronize];
 }
 
