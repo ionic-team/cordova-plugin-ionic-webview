@@ -434,7 +434,7 @@ static void * KVOContext = &KVOContext;
     if (request.URL.fileURL) {
         NSURL* startURL = [NSURL URLWithString:((CDVViewController *)self.viewController).startPage];
         NSString* startFilePath = [self.commandDelegate pathForResource:[startURL path]];
-        NSURL *url = [[NSURL URLWithString:self.CDV_LOCAL_SERVER] URLByAppendingPathComponent:request.URL.path];
+        NSURL *url = [[NSURL URLWithString:self.CDV_LOCAL_SERVER] URLByAppendingPathComponent:[NSString stringWithFormat:@"/_file_%@", request.URL.path]];
         if ([request.URL.path isEqualToString:startFilePath]) {
             url = [NSURL URLWithString:self.CDV_LOCAL_SERVER];
         }
