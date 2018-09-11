@@ -1,5 +1,32 @@
 # Changelog
 
+<a name="2.2.0"></a>
+### 2.2.0 (PENDING)
+
+* Add kitkat support (API 19) ([#144](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/144)) [@leo6104](https://github.com/leo6104)
+
+<a name="2.1.3"></a>
+### 2.1.3 (2018-09-06)
+
+* Make server path relative ([#164](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/164))
+
+<a name="2.1.2"></a>
+### 2.1.2 (2018-09-05)
+
+* Return 404 response when file doesn't exist ([#162](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/162))
+* Load local assets if the app is a freshly installed binary ([#155](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/155))
+* Reset stored server path on new binary ([#161](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/161))
+
+<a name="2.1.1"></a>
+### 2.1.1 (2018-09-04)
+
+* Allow range requests for local files ([#154](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/154))
+
+<a name="2.1.0"></a>
+### 2.1.0 (2018-08-23)
+
+* Add support for `cordova-android` 6 ([#150](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/150))
+
 <a name="2.0.3"></a>
 ### 2.0.3 (2018-08-14)
 
