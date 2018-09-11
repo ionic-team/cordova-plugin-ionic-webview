@@ -4,6 +4,7 @@
 ### 2.2.0 (PENDING)
 
 * Add kitkat support (API 19) ([#144](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/144)) [@leo6104](https://github.com/leo6104)
+* Fix issue where local server was being used if launch URL is external ([#169](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/169))
 
 <a name="2.1.3"></a>
 ### 2.1.3 (2018-09-06)
