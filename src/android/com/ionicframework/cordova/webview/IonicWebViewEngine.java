@@ -123,7 +123,8 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
       super.onPageStarted(view, url, favicon);
-      if (url.equals(parser.getLaunchUrl())) {
+      String launchUrl = parser.getLaunchUrl();
+      if (!launchUrl.contains("http") && url.equals(launchUrl)) {
         view.stopLoading();
         view.loadUrl(CDV_LOCAL_SERVER);
       }
