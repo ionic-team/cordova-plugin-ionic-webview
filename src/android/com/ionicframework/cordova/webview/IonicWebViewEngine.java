@@ -120,6 +120,32 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
       return localServer.shouldInterceptRequest(Uri.parse(url));
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+      if (!isLocalServerUrl(request.getUrl())) {
+        return super.shouldOverrideUrlLoading(view, request);
+      }
+
+      view.loadUrl(request.getUrl().toString());
+      return true;
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+      if (!isLocalServerUrl(Uri.parse(url))) {
+        return super.shouldOverrideUrlLoading(view, url);
+      }
+
+      view.loadUrl(url);
+      return true;
+    }
+
+    private boolean isLocalServerUrl(Uri url) {
+      return url.getHost().equals("localhost") && Integer.toString(url.getPort()).equals(preferences.getString("WKPort", "8080"));
+    }
+
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
       super.onPageStarted(view, url, favicon);
