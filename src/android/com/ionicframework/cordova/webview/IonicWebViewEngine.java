@@ -69,7 +69,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     super.init(parentWebView, cordova, client, resourceApi, pluginManager, nativeToJsMessageQueue);
     SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
     String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
-    if (!isNewBinary() && path != null && !path.isEmpty()) {
+    if (!isDeployDisabled() && !isNewBinary() && path != null && !path.isEmpty()) {
       setServerBasePath(path);
     }
   }
@@ -100,6 +100,9 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     return false;
   }
 
+  private boolean isDeployDisabled() {
+    return preferences.getBoolean("DisableDeploy", false);
+  }
   private class ServerClient extends SystemWebViewClient {
     private ConfigXmlParser parser;
 

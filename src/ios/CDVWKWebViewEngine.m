@@ -151,7 +151,7 @@
 
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString * persistedPath = [userDefaults objectForKey:CDV_SERVER_PATH];
-    if (![self isNewBinary] && persistedPath && ![persistedPath isEqualToString:@""]) {
+    if (![self isDeployDisabled] && ![self isNewBinary] && persistedPath && ![persistedPath isEqualToString:@""]) {
         NSString *libPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
         NSString * cordovaDataDirectory = [libPath stringByAppendingPathComponent:@"NoCloud"];
         NSString * snapshots = [cordovaDataDirectory stringByAppendingPathComponent:@"ionic_built_snapshots"];
@@ -179,6 +179,10 @@
         return YES;
     }
     return NO;
+}
+
+-(BOOL) isDeployDisabled {
+    return [[self.commandDelegate.settings objectForKey:[@"DisableDeploy" lowercaseString]] boolValue];
 }
 
 -(void)updateBindPath
