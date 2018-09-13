@@ -6,6 +6,11 @@
 * Add kitkat support (API 19) ([#144](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/144)) [@leo6104](https://github.com/leo6104)
 * Fix issue where local server was being used if launch URL is external ([#169](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/169))
 
+<a name="2.1.4"></a>
+### 2.1.4 (2018-09-13)
+
+* Allow Ionic Deploy `DisableDeploy` preference to disable loading of deploy updates ([#172](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/172))
+
 <a name="2.1.3"></a>
 ### 2.1.3 (2018-09-06)
 
