@@ -35,7 +35,7 @@
 #define LAST_BINARY_VERSION_CODE @"lastBinaryVersionCode"
 #define LAST_BINARY_VERSION_NAME @"lastBinaryVersionName"
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+#if (__IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 && __IPHONE_OS_VERSION_MAX_ALLOWED < 120000) || (__IPAD_OS_VERSION_MAX_ALLOWED >= 110000 && __IPAD_OS_VERSION_MAX_ALLOWED < 120000)
 
 @implementation UIScrollView (BugIOS11)
 
@@ -233,7 +233,7 @@
 {
     WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
     configuration.processPool = [[CDVWKProcessPoolFactory sharedFactory] sharedProcessPool];
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+#if (__IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 && __IPHONE_OS_VERSION_MAX_ALLOWED < 120000) || (__IPAD_OS_VERSION_MAX_ALLOWED >= 110000 && __IPAD_OS_VERSION_MAX_ALLOWED < 120000)
     if(@available(iOS 10.0, *)) {
         configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
     }else{
@@ -305,7 +305,7 @@
     [self.engineWebView removeFromSuperview];
     WKWebView* wkWebView = [[WKWebView alloc] initWithFrame:self.frame configuration:configuration];
 
-    #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+    #if (__IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 && __IPHONE_OS_VERSION_MAX_ALLOWED < 120000) || (__IPAD_OS_VERSION_MAX_ALLOWED >= 110000 && __IPAD_OS_VERSION_MAX_ALLOWED < 120000)
     if (@available(iOS 11.0, *)) {
       [wkWebView.scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
     }
