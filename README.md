@@ -21,15 +21,53 @@
 
 # Ionic Web View
 
-The Web View plugin for Cordova that is specialized for Ionic apps.
+A Web View plugin for Cordova, focused on Ionic apps (but can be used with any Cordova app).
 
-This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and greatest features and may not work with all apps. See [Requirements](#requirements) and [Migrating to 2.x](#migrating-to-2x).
+The repo and document are for `cordova-plugin-ionic-webview` @ `2.x`, which uses the new features that may not work with all apps. See [Requirements](#requirements) and [Migrating to 2.x](#migrating-to-2x).
 
 :book: **Documentation**: [https://beta.ionicframework.com/docs/building/webview][ionic-webview-docs]
 
 :mega: **Support/Questions?** Please see our [Support Page][ionic-support] for general support questions. The issues on GitHub should be reserved for bug reports and feature requests.
 
 :sparkling_heart: **Want to contribute?** Please see [CONTRIBUTING.md](https://github.com/ionic-team/cordova-plugin-ionic-webview/blob/master/CONTRIBUTING.md).
+
+### Configuration
+
+This plugin has several configuration options that can be set in `config.xml`. Important: some configuration options should be adjusted for production apps, especially `WKPort`:
+
+#### WKSuspendInBackground
+
+```xml
+<preference name="WKSuspendInBackground" value="false" />
+```
+
+Whether to try to keep the server running when the app is backgrounded. Note: the server will likely be suspended by the OS after a few minutes. In particular, long-lived background tasks are not allowed on iOS outside of select audio and geolocation tasks.
+
+#### WKPort 
+
+```xml
+<preference name="WKPort" value="8080" />
+```
+
+The default port the server will listen on. _You should change this to a random port number!_
+
+#### WKBind
+
+```xml
+<preference name="WKBind" value="localhost" />
+```
+
+The hostname the server will bind to. There aren't a lot of other valid options, but some prefer binding to "127.0.0.1"
+
+#### WKInternalConnectionsOnly (New in 2.1.5)
+
+```xml
+<preference name="WKInternalConnectionsOnly" value="true" />
+```
+
+Whether to restrict access to this server to the app itself. Previous versions of this plugin did not restrict access to the app itself. In 2.1.5 and above,
+the plugin now restricts access to only the app itself.
+
 
 ### Requirements
 
