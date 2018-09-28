@@ -19,11 +19,14 @@
 
 <!-- TODO: remove beta in README.md and CONTRIBUTING.md -->
 
-# Ionic Web View
+# Ionic Web View for Cordova
 
-A Web View plugin for Cordova, focused on Ionic apps (but can be used with any Cordova app).
+A Web View plugin for Cordova, focused on providing the highest performance experience for Ionic apps (but can be used with any Cordova app).
 
-The repo and document are for `cordova-plugin-ionic-webview` @ `2.x`, which uses the new features that may not work with all apps. See [Requirements](#requirements) and [Migrating to 2.x](#migrating-to-2x).
+This plugin defaults to using WKWebView on iOS and the latest evergreen webview on Android. Additionally, this plugin makes it easy to use HTML5 style routing
+that web developers expect for building single-page apps.
+
+Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `2.x`, which uses the new features that may not work with all apps. See [Requirements](#requirements) and [Migrating to 2.x](#migrating-to-2x).
 
 :book: **Documentation**: [https://beta.ionicframework.com/docs/building/webview][ionic-webview-docs]
 
@@ -31,7 +34,7 @@ The repo and document are for `cordova-plugin-ionic-webview` @ `2.x`, which uses
 
 :sparkling_heart: **Want to contribute?** Please see [CONTRIBUTING.md](https://github.com/ionic-team/cordova-plugin-ionic-webview/blob/master/CONTRIBUTING.md).
 
-### Configuration
+## Configuration
 
 This plugin has several configuration options that can be set in `config.xml`. Important: some configuration options should be adjusted for production apps, especially `WKPort`:
 
@@ -69,12 +72,12 @@ Whether to restrict access to this server to the app itself. Previous versions o
 the plugin now restricts access to only the app itself.
 
 
-### Requirements
+## Plugin Requirements
 
 * **iOS**: iOS 10+ and `cordova-ios` 4+
 * **Android**: Android 5.0+ and `cordova-android` 6.4+
 
-### Migrating to 2.x
+## Migrating to 2.x
 
 1. Remove and re-add the Web View plugin:
 
