@@ -78,6 +78,13 @@
     <source-file src="src/ios/CDVWKProcessPoolFactory.m"/>
     <asset src="src/ios/wk-plugin.js" target="wk-plugin.js"/>
 
+    <!--A0SimpleKeychain -->
+    <header-file src="src/ios/SimpleKeychain/SimpleKeychain.h" />
+    <header-file src="src/ios/SimpleKeychain/A0SimpleKeychain+KeyPair.h" />
+    <source-file src="src/ios/SimpleKeychain/A0SimpleKeychain+KeyPair.m" />
+    <header-file src="src/ios/SimpleKeychain/A0SimpleKeychain.h" />
+    <source-file src="src/ios/SimpleKeychain/A0SimpleKeychain.m" />
+
     <!--GCDWebServer headers-->
     <header-file src="src/ios/GCDWebServer/Core/GCDWebServer.h"/>
     <header-file src="src/ios/GCDWebServer/Core/GCDWebServerConnection.h"/>

@@ -131,6 +131,11 @@ extern NSString* const GCDWebServerOption_MaxPendingConnections;
 extern NSString* const GCDWebServerOption_ServerName;
 
 /**
+ *  The authentication crednetial used by the GCDWebServer for basic auth
+ */
+extern NSString* const GCDWebServerOption_AuthenticationBasicCredentials;
+
+/**
  *  The authentication method used by the GCDWebServer
  *  (one of "GCDWebServerAuthenticationMethod_...").
  *

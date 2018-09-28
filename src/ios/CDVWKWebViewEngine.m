@@ -23,6 +23,8 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 
+#import "SimpleKeychain.h"
+
 #import "CDVWKWebViewEngine.h"
 #import "CDVWKWebViewUIDelegate.h"
 #import "CDVWKProcessPoolFactory.h"
@@ -224,18 +226,18 @@
     NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 
     NSMutableDictionary *options = [@{
-                              GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
-                              GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
-                              GCDWebServerOption_Port: @(portNumber),
-                              GCDWebServerOption_BindToLocalhost: @(YES),
-                              GCDWebServerOption_ServerName: @"Ionic"
-                              } mutableCopy];
+                                      GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
+                                      GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
+                                      GCDWebServerOption_Port: @(portNumber),
+                                      GCDWebServerOption_BindToLocalhost: @(YES),
+                                      GCDWebServerOption_ServerName: @"Ionic"
+                                   } mutableCopy];
   
     // If only allowing connections in the app, require our secure header to be used
     if (internalConnectionsOnly) {
-      NSString *secret = [self getBasicAuthCredentials];
-      [options setObject:secret forKey:GCDWebServerOption_AuthenticationBasicCredentials];
-      [options setObject:GCDWebServerAuthenticationMethod_Basic forKey:GCDWebServerOption_AuthenticationMethod];
+        NSString *secret = [self getBasicAuthCredentials];
+        [options setObject:secret forKey:GCDWebServerOption_AuthenticationBasicCredentials];
+        [options setObject:GCDWebServerAuthenticationMethod_Basic forKey:GCDWebServerOption_AuthenticationMethod];
     }
   
     [self.webServer startWithOptions:options error:nil];
@@ -389,7 +391,20 @@
 }
 
 - (NSString*)getBasicAuthCredentials {
-  return @"REALLY_SECRET";
+  NSString *cred = [[A0SimpleKeychain keychain] stringForKey:@"ionic-wkwebview-basic-creds"];
+  if (cred == nil) {
+    cred = [self generateRandomString:32];
+    [[A0SimpleKeychain keychain] setString:cred forKey:@"ionic-wkwebview-basic-creds"];
+  }
+  return cred;
+}
+
+- (NSString*)generateRandomString:(int)num {
+    NSMutableString* string = [NSMutableString stringWithCapacity:num];
+    for (int i = 0; i < num; i++) {
+        [string appendFormat:@"%C", (unichar)('a' + arc4random_uniform(26))];
+    }
+    return string;
 }
 
 - (void)onReset
