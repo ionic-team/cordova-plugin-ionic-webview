@@ -59,6 +59,7 @@ NSString* const GCDWebServerOption_MaxPendingConnections = @"MaxPendingConnectio
 NSString* const GCDWebServerOption_ServerName = @"ServerName";
 NSString* const GCDWebServerOption_AuthenticationMethod = @"AuthenticationMethod";
 NSString* const GCDWebServerOption_AuthenticationRealm = @"AuthenticationRealm";
+NSString* const GCDWebServerOption_AuthenticationBasicCredentials = @"AuthenticationBasicCredentials";
 NSString* const GCDWebServerOption_AuthenticationAccounts = @"AuthenticationAccounts";
 NSString* const GCDWebServerOption_ConnectionClass = @"ConnectionClass";
 NSString* const GCDWebServerOption_AutomaticallyMapHEADToGET = @"AutomaticallyMapHEADToGET";
@@ -149,6 +150,7 @@ static void _ExecuteMainThreadRunLoopSources() {
   NSDictionary* _options;
   NSMutableDictionary* _authenticationBasicAccounts;
   NSMutableDictionary* _authenticationDigestAccounts;
+  NSString *_authenticationBasicCredentials;
   Class _connectionClass;
   CFTimeInterval _disconnectDelay;
   dispatch_source_t _source4;
@@ -556,6 +558,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
   if ([authenticationMethod isEqualToString:GCDWebServerAuthenticationMethod_Basic]) {
     _authenticationRealm = [_GetOption(_options, GCDWebServerOption_AuthenticationRealm, _serverName) copy];
     _authenticationBasicAccounts = [[NSMutableDictionary alloc] init];
+    _authenticationBasicCredentials = [_GetOption(_options, GCDWebServerOption_AuthenticationBasicCredentials, nil) copy];
     NSDictionary* accounts = _GetOption(_options, GCDWebServerOption_AuthenticationAccounts, @{});
     [accounts enumerateKeysAndObjectsUsingBlock:^(NSString* username, NSString* password, BOOL* stop) {
       [_authenticationBasicAccounts setObject:_EncodeBase64([NSString stringWithFormat:@"%@:%@", username, password]) forKey:username];
@@ -689,6 +692,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
   _authenticationRealm = nil;
   _authenticationBasicAccounts = nil;
   _authenticationDigestAccounts = nil;
+  _authenticationBasicCredentials = nil;
 
   dispatch_async(dispatch_get_main_queue(), ^{
     if (_disconnectTimer) {

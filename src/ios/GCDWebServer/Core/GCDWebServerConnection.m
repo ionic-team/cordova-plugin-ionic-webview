@@ -734,7 +734,19 @@ static inline NSUInteger _ScanHexNumber(const void* bytes, NSUInteger size) {
 - (GCDWebServerResponse*)preflightRequest:(GCDWebServerRequest*)request {
   GWS_LOG_DEBUG(@"Connection on socket %i preflighting request \"%@ %@\" with %lu bytes body", _socket, _virtualHEAD ? @"HEAD" : _request.method, _request.path, (unsigned long)_totalBytesRead);
   GCDWebServerResponse* response = nil;
-  if (_server.authenticationBasicAccounts) {
+  if (_server.authenticationBasicCredentials) {
+    __block BOOL authenticated = NO;
+    NSString* authorizationHeader = [request.headers objectForKey:@"Authorization"];
+    if ([authorizationHeader hasPrefix:@"Basic "]) {
+      NSString* basicCredentials = [authorizationHeader substringFromIndex:6];
+      if ([basicCredentials isEqualToString:_server.authenticationBasicCredentials]) {
+        authenticated = YES;
+      } else {
+        response = [GCDWebServerResponse responseWithStatusCode:kGCDWebServerHTTPStatusCode_Unauthorized];
+        [response setValue:[NSString stringWithFormat:@"Basic realm=\"%@\"", _server.authenticationRealm] forAdditionalHeader:@"WWW-Authenticate"];
+      }
+    }
+  } else if (_server.authenticationBasicAccounts) {
     __block BOOL authenticated = NO;
     NSString* authorizationHeader = [request.headers objectForKey:@"Authorization"];
     if ([authorizationHeader hasPrefix:@"Basic "]) {

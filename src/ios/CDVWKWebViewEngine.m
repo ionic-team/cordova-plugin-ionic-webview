@@ -104,6 +104,7 @@
 @property (nonatomic, strong, readwrite) id <WKUIDelegate> uiDelegate;
 @property (nonatomic, weak) id <WKScriptMessageHandler> weakScriptMessageHandler;
 @property (nonatomic, strong) GCDWebServer *webServer;
+@property (nonatomic, assign) BOOL internalConnectionsOnly;
 @property (nonatomic, readwrite) CGRect frame;
 @property (nonatomic, readwrite) NSString *CDV_LOCAL_SERVER;
 @end
@@ -210,6 +211,8 @@
 
     //enable suspend in background if set in config
     BOOL suspendInBackground = [settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
+    BOOL internalConnectionsOnly = [settings cordovaBoolSettingForKey:@"WKInternalConnectionsOnly" defaultValue:YES];
+    self.internalConnectionsOnly = internalConnectionsOnly;
     int waitTime = 10;
 
     //extend default connection coalescing time when background enabled
@@ -217,15 +220,24 @@
         NSLog(@"CDVWKWebViewEngine: Suspend in background disabled");
         waitTime = 60;
     }
+  
+    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 
-    NSDictionary *options = @{
+    NSMutableDictionary *options = [@{
                               GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
                               GCDWebServerOption_ConnectedStateCoalescingInterval: @(waitTime),
                               GCDWebServerOption_Port: @(portNumber),
                               GCDWebServerOption_BindToLocalhost: @(YES),
                               GCDWebServerOption_ServerName: @"Ionic"
-                              };
-
+                              } mutableCopy];
+  
+    // If only allowing connections in the app, require our secure header to be used
+    if (internalConnectionsOnly) {
+      NSString *secret = [self getBasicAuthCredentials];
+      [options setObject:secret forKey:GCDWebServerOption_AuthenticationBasicCredentials];
+      [options setObject:GCDWebServerAuthenticationMethod_Basic forKey:GCDWebServerOption_AuthenticationMethod];
+    }
+  
     [self.webServer startWithOptions:options error:nil];
 }
 
@@ -376,6 +388,10 @@
     }
 }
 
+- (NSString*)getBasicAuthCredentials {
+  return @"REALLY_SECRET";
+}
+
 - (void)onReset
 {
     [self addURLObserver];
@@ -448,7 +464,14 @@ static void * KVOContext = &KVOContext;
         if(request.URL.fragment) {
             url = [NSURL URLWithString:[@"#" stringByAppendingString:request.URL.fragment] relativeToURL:url];
         }
-        request = [NSURLRequest requestWithURL:url];
+
+        if (self.internalConnectionsOnly) {
+          NSString *secret = [self getBasicAuthCredentials];
+          NSString *auth = [@"Basic " stringByAppendingString:secret];
+          NSMutableURLRequest *modifiedRequest = [NSMutableURLRequest requestWithURL:url];
+          [modifiedRequest addValue:auth forHTTPHeaderField:@"Authorization"];
+          request = modifiedRequest;
+        }
     }
     return [(WKWebView*)_engineWebView loadRequest:request];
 }
