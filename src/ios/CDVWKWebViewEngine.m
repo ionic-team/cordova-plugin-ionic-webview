@@ -23,8 +23,6 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 
-#import "SimpleKeychain.h"
-
 #import "CDVWKWebViewEngine.h"
 #import "CDVWKWebViewUIDelegate.h"
 #import "CDVWKProcessPoolFactory.h"
@@ -106,6 +104,7 @@
 @property (nonatomic, strong, readwrite) id <WKUIDelegate> uiDelegate;
 @property (nonatomic, weak) id <WKScriptMessageHandler> weakScriptMessageHandler;
 @property (nonatomic, strong) GCDWebServer *webServer;
+@property (nonatomic, strong) NSString *basicCreds;
 @property (nonatomic, assign) BOOL internalConnectionsOnly;
 @property (nonatomic, readwrite) CGRect frame;
 @property (nonatomic, readwrite) NSString *CDV_LOCAL_SERVER;
@@ -391,12 +390,10 @@
 }
 
 - (NSString*)getBasicAuthCredentials {
-  NSString *cred = [[A0SimpleKeychain keychain] stringForKey:@"ionic-wkwebview-basic-creds"];
-  if (cred == nil) {
-    cred = [self generateRandomString:32];
-    [[A0SimpleKeychain keychain] setString:cred forKey:@"ionic-wkwebview-basic-creds"];
+  if (self.basicCreds == nil) {
+    self.basicCreds = [self generateRandomString:32];
   }
-  return cred;
+  return self.basicCreds;
 }
 
 - (NSString*)generateRandomString:(int)num {

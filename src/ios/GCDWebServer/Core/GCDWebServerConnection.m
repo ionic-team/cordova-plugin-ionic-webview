@@ -736,11 +736,22 @@ static inline NSUInteger _ScanHexNumber(const void* bytes, NSUInteger size) {
   GCDWebServerResponse* response = nil;
   if (_server.authenticationBasicCredentials) {
     __block BOOL authenticated = NO;
+    
+    NSURL *url = request.URL;
+    
     NSString* authorizationHeader = [request.headers objectForKey:@"Authorization"];
-    if ([authorizationHeader hasPrefix:@"Basic "]) {
-      NSString* basicCredentials = [authorizationHeader substringFromIndex:6];
-      if ([basicCredentials isEqualToString:_server.authenticationBasicCredentials]) {
-        authenticated = YES;
+    
+    // Enforce basic auth field for the root URL
+    if ([url.lastPathComponent isEqualToString:@"/"]) {
+      
+      if ([authorizationHeader hasPrefix:@"Basic "]) {
+        NSString* basicCredentials = [authorizationHeader substringFromIndex:6];
+        if ([basicCredentials isEqualToString:_server.authenticationBasicCredentials]) {
+          authenticated = YES;
+        } else {
+          response = [GCDWebServerResponse responseWithStatusCode:kGCDWebServerHTTPStatusCode_Unauthorized];
+          [response setValue:[NSString stringWithFormat:@"Basic realm=\"%@\"", _server.authenticationRealm] forAdditionalHeader:@"WWW-Authenticate"];
+        }
       } else {
         response = [GCDWebServerResponse responseWithStatusCode:kGCDWebServerHTTPStatusCode_Unauthorized];
         [response setValue:[NSString stringWithFormat:@"Basic realm=\"%@\"", _server.authenticationRealm] forAdditionalHeader:@"WWW-Authenticate"];
