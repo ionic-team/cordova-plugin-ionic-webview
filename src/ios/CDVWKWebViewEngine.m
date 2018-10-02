@@ -822,6 +822,16 @@ static void * KVOContext = &KVOContext;
 {
   NSString * path = [command argumentAtIndex:0];
   [self setServerPath:path];
+  
+  if (self.internalConnectionsOnly) {
+    NSString *secret = [self getBasicAuthCredentials];
+    NSString *auth = [@"Basic " stringByAppendingString:secret];
+    NSMutableURLRequest *modifiedRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.CDV_LOCAL_SERVER]];
+    [modifiedRequest addValue:auth forHTTPHeaderField:@"Authorization"];
+    [(WKWebView*)_engineWebView loadRequest:modifiedRequest];
+    return;
+  }
+  
   [(WKWebView*)_engineWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.CDV_LOCAL_SERVER]]];
 }
 
