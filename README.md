@@ -62,13 +62,13 @@ The default port the server will listen on. _You should change this to a random 
 
 The hostname the server will bind to. There aren't a lot of other valid options, but some prefer binding to "127.0.0.1"
 
-#### WKInternalConnectionsOnly (New in 2.1.5)
+#### WKInternalConnectionsOnly (New in 2.2.0)
 
 ```xml
 <preference name="WKInternalConnectionsOnly" value="true" />
 ```
 
-Whether to restrict access to this server to the app itself. Previous versions of this plugin did not restrict access to the app itself. In 2.1.5 and above,
+Whether to restrict access to this server to the app itself. Previous versions of this plugin did not restrict access to the app itself. In 2.2.0 and above,
 the plugin now restricts access to only the app itself.
 
 
