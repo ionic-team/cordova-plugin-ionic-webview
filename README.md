@@ -38,13 +38,9 @@ Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `
 
 This plugin has several configuration options that can be set in `config.xml`. Important: some configuration options should be adjusted for production apps, especially `WKPort`:
 
-#### WKSuspendInBackground
+### iOS and Android Preferences
 
-```xml
-<preference name="WKSuspendInBackground" value="false" />
-```
-
-Whether to try to keep the server running when the app is backgrounded. Note: the server will likely be suspended by the OS after a few minutes. In particular, long-lived background tasks are not allowed on iOS outside of select audio and geolocation tasks.
+Preferences available for both iOS and Android platforms
 
 #### WKPort 
 
@@ -53,6 +49,18 @@ Whether to try to keep the server running when the app is backgrounded. Note: th
 ```
 
 The default port the server will listen on. _You should change this to a random port number!_
+
+### iOS Preferences
+
+Preferences only available for iOS platform
+
+#### WKSuspendInBackground
+
+```xml
+<preference name="WKSuspendInBackground" value="false" />
+```
+
+Whether to try to keep the server running when the app is backgrounded. Note: the server will likely be suspended by the OS after a few minutes. In particular, long-lived background tasks are not allowed on iOS outside of select audio and geolocation tasks.
 
 #### WKBind
 
@@ -75,7 +83,7 @@ the plugin now restricts access to only the app itself.
 ## Plugin Requirements
 
 * **iOS**: iOS 10+ and `cordova-ios` 4+
-* **Android**: Android 5.0+ and `cordova-android` 6.4+
+* **Android**: Android 4.4+ and `cordova-android` 6.4+
 
 ## Migrating to 2.x
 
