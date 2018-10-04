@@ -19,11 +19,14 @@
 
 <!-- TODO: remove beta in README.md and CONTRIBUTING.md -->
 
-# Ionic Web View
+# Ionic Web View for Cordova
 
-The Web View plugin for Cordova that is specialized for Ionic apps.
+A Web View plugin for Cordova, focused on providing the highest performance experience for Ionic apps (but can be used with any Cordova app).
 
-This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and greatest features and may not work with all apps. See [Requirements](#requirements) and [Migrating to 2.x](#migrating-to-2x).
+This plugin defaults to using WKWebView on iOS and the latest evergreen webview on Android. Additionally, this plugin makes it easy to use HTML5 style routing
+that web developers expect for building single-page apps.
+
+Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `2.x`, which uses the new features that may not work with all apps. See [Requirements](#requirements) and [Migrating to 2.x](#migrating-to-2x).
 
 :book: **Documentation**: [https://beta.ionicframework.com/docs/building/webview][ionic-webview-docs]
 
@@ -31,12 +34,58 @@ This is for `cordova-plugin-ionic-webview` @ `2.x`, which uses the latest and gr
 
 :sparkling_heart: **Want to contribute?** Please see [CONTRIBUTING.md](https://github.com/ionic-team/cordova-plugin-ionic-webview/blob/master/CONTRIBUTING.md).
 
-### Requirements
+## Configuration
+
+This plugin has several configuration options that can be set in `config.xml`. Important: some configuration options should be adjusted for production apps, especially `WKPort`:
+
+### iOS and Android Preferences
+
+Preferences available for both iOS and Android platforms
+
+#### WKPort 
+
+```xml
+<preference name="WKPort" value="8080" />
+```
+
+The default port the server will listen on. _You should change this to a random port number!_
+
+### iOS Preferences
+
+Preferences only available for iOS platform
+
+#### WKSuspendInBackground
+
+```xml
+<preference name="WKSuspendInBackground" value="false" />
+```
+
+Whether to try to keep the server running when the app is backgrounded. Note: the server will likely be suspended by the OS after a few minutes. In particular, long-lived background tasks are not allowed on iOS outside of select audio and geolocation tasks.
+
+#### WKBind
+
+```xml
+<preference name="WKBind" value="localhost" />
+```
+
+The hostname the server will bind to. There aren't a lot of other valid options, but some prefer binding to "127.0.0.1"
+
+#### WKInternalConnectionsOnly (New in 2.2.0)
+
+```xml
+<preference name="WKInternalConnectionsOnly" value="true" />
+```
+
+Whether to restrict access to this server to the app itself. Previous versions of this plugin did not restrict access to the app itself. In 2.2.0 and above,
+the plugin now restricts access to only the app itself.
+
+
+## Plugin Requirements
 
 * **iOS**: iOS 10+ and `cordova-ios` 4+
-* **Android**: Android 5.0+ and `cordova-android` 6.4+
+* **Android**: Android 4.4+ and `cordova-android` 6.4+
 
-### Migrating to 2.x
+## Migrating to 2.x
 
 1. Remove and re-add the Web View plugin:
 
