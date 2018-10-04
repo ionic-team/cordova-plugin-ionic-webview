@@ -3,6 +3,7 @@
 <a name="2.2.0"></a>
 ### 2.2.0 (PENDING)
 
+* Fix issue where two apps running on the same port could conflict with each other ([#169](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/165) & [#186](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/186))
 * Add kitkat support (API 19) ([#144](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/144)) [@leo6104](https://github.com/leo6104)
 * Fix issue where local server was being used if launch URL is external ([#169](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/169))
 
