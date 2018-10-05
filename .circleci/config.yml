@@ -42,8 +42,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
-      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: npm run publish:ci -- --yes
+      - run: npx semantic-release
 
 
 workflows:
