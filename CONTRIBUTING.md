@@ -16,15 +16,17 @@ Please familiarize yourself with [Cordova plugin development](https://cordova.ap
 
 You can use `cordova plugin add` with a local directory to copy and compile plugin changes into a test project.
 
-### Pull Requests
+### Workflow
 
-Please create a pull request for the `master` branch.
+This repo uses [semantic-release](https://github.com/semantic-release/semantic-release), so it's important to follow a strict workflow to ensure properly automated releases.
 
-## Publishing
+* Work off of `master` branch (create new branch or fork)
+* Make changes
+* Use `npm run cz` (or `git cz` if [commitizen](https://github.com/commitizen/cz-cli) is installed globally) to make commits
+* Create a pull request
+    * Pull requests will be approved and squashed into the `master` branch
+    * Try to make pull requests with a single objective (don't have multiple features in one PR, don't mix fixes and features in one PR, etc.)
 
-1. Add changes to `CHANGELOG.md`.
-1. Deploy:
+### Publishing
 
-    ```
-    npm run deploy -- <version>
-    ```
+Releases are automated in CI using [semantic-release](https://github.com/semantic-release/semantic-release) when the `stable` branch is pushed to Github. Rebase `master` with `stable`. Commits in `master` should be appropriately formatted from the PR workflow (see [Workflow](#workflow)).

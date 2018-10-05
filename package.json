@@ -6,7 +6,7 @@
   "scripts": {
     "sync_plugin_xml": "sync-cordova-xml package.json plugin.xml --output=plugin.xml",
     "version": "npm run sync_plugin_xml && git add plugin.xml",
-    "deploy": "np"
+    "cz": "git-cz"
   },
   "repository": {
     "type": "git",
@@ -21,16 +21,51 @@
   ],
   "author": "Ionic Team",
   "license": "Apache-2.0",
-  "devDependencies": {
-    "np": "^3.0.4",
-    "sync-cordova-xml": "^0.4.0"
-  },
   "engines": {
     "cordovaDependencies": {
       "2.0.0": {
         "cordova-android": ">=6.4.0",
         "cordova-ios": ">=4.0.0-dev"
       }
+    }
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^3.0.0",
+    "@semantic-release/git": "^7.0.4",
+    "@semantic-release/github": "^5.0.6",
+    "@semantic-release/npm": "^5.0.4",
+    "commitizen": "^3.0.2",
+    "cz-conventional-changelog": "^2.1.0",
+    "semantic-release": "^15.9.17",
+    "sync-cordova-xml": "^0.4.0"
+  },
+  "release": {
+    "branch": "stable",
+    "verifyConditions": [
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/github",
+      "@semantic-release/git"
+    ],
+    "prepare": [
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git"
+    ],
+    "publish": [
+      "@semantic-release/github",
+      "@semantic-release/npm"
+    ],
+    "success": [
+      "@semantic-release/github"
+    ],
+    "fail": [
+      "@semantic-release/github"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
     }
   }
 }
