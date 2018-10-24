@@ -354,6 +354,11 @@
      selector:@selector(onAppWillEnterForeground:)
      name:UIApplicationWillEnterForegroundNotification object:nil];
 
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(keyboardWillHide)
+     name:UIKeyboardWillHideNotification object:nil];
+
     NSLog(@"Using Ionic WKWebView");
 
     [self addURLObserver];
@@ -428,6 +433,19 @@ static void * KVOContext = &KVOContext;
     if ([self shouldReloadWebView]) {
         NSLog(@"%@", @"CDVWKWebViewEngine reloading!");
         [(WKWebView*)_engineWebView reload];
+    }
+}
+
+-(void)keyboardWillHide
+{
+    if (@available(iOS 12.0, *)) {
+        WKWebView *webview = (WKWebView*) self.webView;
+        for (UIView* v in webview.subviews ){
+            if ([v isKindOfClass:NSClassFromString(@"WKScrollView")]) {
+                UIScrollView *scrollView = (UIScrollView*)v;
+                [scrollView setContentOffset:CGPointMake(0, 0)];
+            }
+        }
     }
 }
 
