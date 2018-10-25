@@ -125,6 +125,8 @@
 
 @synthesize engineWebView = _engineWebView;
 
+NSTimer *timer;
+
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super init];
@@ -359,6 +361,12 @@
      selector:@selector(keyboardWillHide)
      name:UIKeyboardWillHideNotification object:nil];
 
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(keyboardWillShow)
+     name:UIKeyboardWillShowNotification object:nil];
+
+
     NSLog(@"Using Ionic WKWebView");
 
     [self addURLObserver];
@@ -439,14 +447,32 @@ static void * KVOContext = &KVOContext;
 -(void)keyboardWillHide
 {
     if (@available(iOS 12.0, *)) {
-        WKWebView *webview = (WKWebView*) self.webView;
-        for (UIView* v in webview.subviews ){
-            if ([v isKindOfClass:NSClassFromString(@"WKScrollView")]) {
-                UIScrollView *scrollView = (UIScrollView*)v;
-                [scrollView setContentOffset:CGPointMake(0, 0)];
-            }
+        timer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
+        [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    }
+}
+
+-(void)keyboardWillShow
+{
+    if (timer != nil) {
+        [timer invalidate];
+    }
+}
+
+-(void)keyboardDisplacementFix
+{
+    WKWebView *webview = (WKWebView*) self.webView;
+    for (UIView* v in webview.subviews ){
+        if ([v isKindOfClass:NSClassFromString(@"WKScrollView")]) {
+            UIScrollView *scrollView = (UIScrollView*)v;
+
+            // https://stackoverflow.com/a/9637807/824966
+            [UIView animateWithDuration:.25 animations:^{
+                scrollView.contentOffset = CGPointMake(0, 0);
+            }];
         }
     }
+
 }
 
 - (BOOL)shouldReloadWebView
