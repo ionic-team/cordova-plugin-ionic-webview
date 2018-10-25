@@ -461,18 +461,10 @@ static void * KVOContext = &KVOContext;
 
 -(void)keyboardDisplacementFix
 {
-    WKWebView *webview = (WKWebView*) self.webView;
-    for (UIView* v in webview.subviews ){
-        if ([v isKindOfClass:NSClassFromString(@"WKScrollView")]) {
-            UIScrollView *scrollView = (UIScrollView*)v;
-
-            // https://stackoverflow.com/a/9637807/824966
-            [UIView animateWithDuration:.25 animations:^{
-                scrollView.contentOffset = CGPointMake(0, 0);
-            }];
-        }
-    }
-
+    // https://stackoverflow.com/a/9637807/824966
+    [UIView animateWithDuration:.25 animations:^{
+        self.webView.scrollView.contentOffset = CGPointMake(0, 0);
+    }];
 }
 
 - (BOOL)shouldReloadWebView
