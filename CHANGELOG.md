@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.0...v2.2.1) (2018-11-07)
+
+
+### Bug Fixes
+
+* Show error page if server is not running ([#207](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/207)) ([6a2e07e](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/6a2e07e))
+
 # Changelog
 
 <a name="2.2.0"></a>
