@@ -41,26 +41,20 @@
   },
   "release": {
     "branch": "stable",
-    "verifyConditions": [
+    "plugins": [
       "@semantic-release/changelog",
-      "@semantic-release/npm",
-      "@semantic-release/github",
-      "@semantic-release/git"
-    ],
-    "prepare": [
-      "@semantic-release/changelog",
-      "@semantic-release/npm",
-      "@semantic-release/git"
-    ],
-    "publish": [
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json",
+            "plugin.xml"
+          ]
+        }
+      ],
       "@semantic-release/github",
       "@semantic-release/npm"
-    ],
-    "success": [
-      "@semantic-release/github"
-    ],
-    "fail": [
-      "@semantic-release/github"
     ]
   },
   "config": {
