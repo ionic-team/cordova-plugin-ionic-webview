@@ -472,7 +472,20 @@ static void * KVOContext = &KVOContext;
         }
         request = [NSURLRequest requestWithURL:url];
     }
-    return [(WKWebView*)_engineWebView loadRequest:request];
+    if ([self.webServer isRunning]) {
+        return [(WKWebView*)_engineWebView loadRequest:request];
+    } else {
+        NSString* errorHtml = [NSString stringWithFormat:
+                               @"<html>"
+                               @"<head><title>Error</title></head>"
+                               @"   <div style='font-size:2em'>"
+                               @"       <p>The App Server is not running.</p>"
+                               @"       <p>Close other apps and try again.</p>"
+                               @"   </div>"
+                               @"</html>"
+                               ];
+        return [self loadHTMLString:errorHtml baseURL:request.URL];
+    }
 }
 
 - (id)loadHTMLString:(NSString *)string baseURL:(NSURL*)baseURL
