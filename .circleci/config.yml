@@ -3,16 +3,16 @@ version: 2
 aliases:
   - &restore-cache
       keys:
-        - dependency-cache-{{ checksum "package.json" }}
+        - dependency-cache-{{ checksum "package.json" }}-1
 
   - &save-cache
-      key: dependency-cache-{{ checksum "package.json" }}
+      key: dependency-cache-{{ checksum "package.json" }}-1
       paths:
         - node_modules
 
 defaults: &defaults
   docker:
-    - image: circleci/node:latest
+    - image: circleci/node:10
   working_directory: /tmp/workspace
 
 jobs:

@@ -30,7 +30,6 @@
   },
   "devDependencies": {
     "@semantic-release/changelog": "^3.0.0",
-    "@semantic-release/commit-analyzer": "^6.1.0",
     "@semantic-release/exec": "^3.3.0",
     "@semantic-release/git": "^7.0.4",
     "@semantic-release/github": "^5.0.6",
@@ -42,28 +41,29 @@
   },
   "release": {
     "branch": "stable",
-    "plugins": [
-      "@semantic-release/commit-analyzer",
+    "verifyConditions": [
       "@semantic-release/changelog",
       "@semantic-release/npm",
-      [
-        "@semantic-release/exec",
-        {
-          "prepareCmd": "npm run version"
-        }
-      ],
-      [
-        "@semantic-release/git",
-        {
-          "assets": [
-            "CHANGELOG.md",
-            "package.json",
-            "plugin.xml"
-          ]
-        }
-      ],
+      "@semantic-release/git",
       "@semantic-release/github"
-    ]
+    ],
+    "prepare": [
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/exec",
+      "@semantic-release/git"
+    ],
+    "publish": [
+      "@semantic-release/github",
+      "@semantic-release/npm"
+    ],
+    "success": [
+      "@semantic-release/github"
+    ],
+    "failure": [
+      "@semantic-release/github"
+    ],
+    "prepareCmd": "npm run version"
   },
   "config": {
     "commitizen": {
