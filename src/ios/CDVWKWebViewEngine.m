@@ -107,6 +107,7 @@
 @property (nonatomic, readwrite) CGRect frame;
 @property (nonatomic, strong) NSString *userAgentCreds;
 @property (nonatomic, assign) BOOL internalConnectionsOnly;
+
 @property (nonatomic, readwrite) NSString *CDV_LOCAL_SERVER;
 @end
 
@@ -353,6 +354,14 @@
      addObserver:self
      selector:@selector(onAppWillEnterForeground:)
      name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(onSocketError:)
+     name:@"socketUnknownError" object:nil];
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(onSocketError:)
+     name:@"socketInUseError" object:nil];
 
     NSLog(@"Using Ionic WKWebView");
 
@@ -417,7 +426,11 @@ static void * KVOContext = &KVOContext;
     if (context == KVOContext) {
         if (object == [self webView] && [keyPath isEqualToString: @"URL"] && [object valueForKeyPath:keyPath] == nil){
             NSLog(@"URL is nil. Reloading WKWebView");
-            [(WKWebView*)_engineWebView reload];
+            if ([self.webServer isRunning]) {
+                [(WKWebView*)_engineWebView reload];
+            } else {
+                [self loadErrorPage:nil];
+            }
         }
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -426,9 +439,17 @@ static void * KVOContext = &KVOContext;
 
 - (void)onAppWillEnterForeground:(NSNotification *)notification {
     if ([self shouldReloadWebView]) {
-        NSLog(@"%@", @"CDVWKWebViewEngine reloading!");
-        [(WKWebView*)_engineWebView reload];
+        if ([self.webServer isRunning]) {
+            NSLog(@"%@", @"CDVWKWebViewEngine reloading!");
+            [(WKWebView*)_engineWebView reload];
+        } else {
+            [self loadErrorPage:nil];
+        }
     }
+}
+
+- (void)onSocketError:(NSNotification *)notification {
+    [self loadErrorPage:nil];
 }
 
 - (BOOL)shouldReloadWebView
@@ -475,17 +496,25 @@ static void * KVOContext = &KVOContext;
     if ([self.webServer isRunning]) {
         return [(WKWebView*)_engineWebView loadRequest:request];
     } else {
-        NSString* errorHtml = [NSString stringWithFormat:
-                               @"<html>"
-                               @"<head><title>Error</title></head>"
-                               @"   <div style='font-size:2em'>"
-                               @"       <p>The App Server is not running.</p>"
-                               @"       <p>Close other apps and try again.</p>"
-                               @"   </div>"
-                               @"</html>"
-                               ];
-        return [self loadHTMLString:errorHtml baseURL:request.URL];
+        return [self loadErrorPage:request];
     }
+}
+
+- (id)loadErrorPage:(NSURLRequest *)request
+{
+    if (!request) {
+        request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.CDV_LOCAL_SERVER]];
+    }
+    NSString* errorHtml = [NSString stringWithFormat:
+                           @"<html>"
+                           @"<head><title>Error</title></head>"
+                           @"   <div style='font-size:2em'>"
+                           @"       <p><b>Error</b></p>"
+                           @"       <p>Unable to load app.</p>"
+                           @"   </div>"
+                           @"</html>"
+                           ];
+    return [self loadHTMLString:errorHtml baseURL:request.URL];
 }
 
 - (id)loadHTMLString:(NSString *)string baseURL:(NSURL*)baseURL
@@ -744,7 +773,11 @@ static void * KVOContext = &KVOContext;
 
 - (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
 {
-    [webView reload];
+    if ([self.webServer isRunning]) {
+        [webView reload];
+    } else {
+        [self loadErrorPage:nil];
+    }
 }
 
 - (BOOL)defaultResourcePolicyForURL:(NSURL*)url
@@ -815,14 +848,19 @@ static void * KVOContext = &KVOContext;
 
 -(void)getServerBasePath:(CDVInvokedUrlCommand*)command
 {
-  [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:self.basePath]  callbackId:command.callbackId];
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:self.basePath]  callbackId:command.callbackId];
 }
 
 -(void)setServerBasePath:(CDVInvokedUrlCommand*)command
 {
-  NSString * path = [command argumentAtIndex:0];
-  [self setServerPath:path];
-  [(WKWebView*)_engineWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.CDV_LOCAL_SERVER]]];
+    NSString * path = [command argumentAtIndex:0];
+    [self setServerPath:path];
+    NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.CDV_LOCAL_SERVER]];
+    if ([self.webServer isRunning]) {
+        [(WKWebView*)_engineWebView loadRequest:request];
+    } else {
+        [self loadErrorPage:request];
+    }
 }
 
 -(void)setServerPath:(NSString *) path

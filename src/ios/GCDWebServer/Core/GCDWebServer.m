@@ -461,6 +461,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
         *error = GCDWebServerMakePosixError(errno);
       }
       GWS_LOG_ERROR(@"Failed binding %s listening socket: %s (%i)", useIPv6 ? "IPv6" : "IPv4", strerror(errno), errno);
+      [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"socketInUseError" object:nil]];
       close(listeningSocket);
     }
 
@@ -713,18 +714,36 @@ static inline NSString* _EncodeBase64(NSString* string) {
   int error = 0;
   socklen_t len = sizeof(error);
   int retval = getsockopt(socket, SOL_SOCKET, SO_ERROR, &error, &len);
-    
+
   if (retval != 0 ) {
     /* there was a problem getting the error code */
     GWS_LOG_ERROR(@"error getting socket error code: %s\n", strerror(retval));
     return YES;
   }
-   
+
   if (error != 0) {
     GWS_LOG_INFO(@"Socket error: %s on socket %d\n", strerror(error), socket);
     return YES;
   }
   return NO;
+}
+
+- (int)socketError:(int)socket {
+    int error = 0;
+    socklen_t len = sizeof(error);
+    int retval = getsockopt(socket, SOL_SOCKET, SO_ERROR, &error, &len);
+
+    if (retval != 0 ) {
+        /* there was a problem getting the error code */
+        GWS_LOG_ERROR(@"error getting socket error code: %s\n", strerror(retval));
+        return retval;
+    }
+
+    if (error != 0) {
+        GWS_LOG_INFO(@"Socket error: %s on socket %d\n", strerror(error), socket);
+        return error;
+    }
+    return 0;
 }
 
 - (void)_didEnterBackground:(NSNotification*)notification {
@@ -744,8 +763,14 @@ static inline NSString* _EncodeBase64(NSString* string) {
   }
  
   if ([self isRunning] && ([self hasSocketError:ipv4ListeningSocket] || [self hasSocketError:ipv6ListeningSocket])) {
-    [self _stop];
-    [self _start:nil];
+    // If error is -1 (unknown) its probably because of port being used by other app, so don't restart in this case as it will fail
+    if ([self socketError:ipv4ListeningSocket] != -1 && [self socketError:ipv6ListeningSocket] != -1) {
+      [self _stop];
+      [self _start:nil];
+    } else {
+      _options = nil;
+      [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:@"socketUnknownError" object:nil]];
+    }
   }
 }
 
