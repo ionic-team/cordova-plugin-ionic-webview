@@ -1,3 +1,10 @@
+## [2.2.3](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.2...v2.2.3) (2018-11-09)
+
+
+### Bug Fixes
+
+* Remove main and fix description ([d52db66](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/d52db66))
+
 ## [2.2.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.1...v2.2.2) (2018-11-09)
 
 ### Bug Fixes
