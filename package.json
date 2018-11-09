@@ -1,8 +1,7 @@
 {
   "name": "cordova-plugin-ionic-webview",
   "version": "2.2.2",
-  "description": "The official Ionic's WKWebView Engine Plugin",
-  "main": "index.js",
+  "description": "Ionic Web View Engine Plugin",
   "scripts": {
     "sync_plugin_xml": "sync-cordova-xml package.json plugin.xml --output=plugin.xml",
     "version": "npm run sync_plugin_xml && git add plugin.xml",
