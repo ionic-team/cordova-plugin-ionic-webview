@@ -1,3 +1,17 @@
+## [2.2.5](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.4...v2.2.5) (2018-11-20)
+
+
+### Bug Fixes
+
+* Add option for Dark keyboard appearance ([#44](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/44)) ([6c0fe56](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/6c0fe56))
+
+## [2.2.4](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.3...v2.2.4) (2018-11-20)
+
+
+### Bug Fixes
+
+* fix keyboard displacement bug in iOS 12 WKWebView ([#201](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/201)) ([a670568](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/a670568))
+
 ## [2.2.3](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.2...v2.2.3) (2018-11-09)
 
 
