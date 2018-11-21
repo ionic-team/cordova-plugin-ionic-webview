@@ -83,6 +83,13 @@ The hostname the server will bind to. There aren't a lot of other valid options,
 Whether to restrict access to this server to the app itself. Previous versions of this plugin did not restrict access to the app itself. In 2.2.0 and above,
 the plugin now restricts access to only the app itself.
 
+#### KeyboardAppearanceDark
+
+```xml
+<preference name="KeyboardAppearanceDark" value="false" />
+```
+
+Whether to use a dark styled keyboard on iOS
 
 ## Plugin Requirements
 
