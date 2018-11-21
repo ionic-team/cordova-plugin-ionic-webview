@@ -348,6 +348,10 @@ NSTimer *timer;
     [self keyboardDisplayDoesNotRequireUserAction];
     //}
 
+    if ([settings cordovaBoolSettingForKey:@"KeyboardAppearanceDark" defaultValue:NO]) {
+        [self setKeyboardAppearanceDark];
+    }
+
     [self updateSettings:settings];
 
     // check if content thread has died on resume
@@ -418,6 +422,22 @@ NSTimer *timer;
         [string appendFormat:@"%C", (unichar)('a' + arc4random_uniform(26))];
     }
     return string;
+}
+
+- (void)setKeyboardAppearanceDark
+{
+    IMP darkImp = imp_implementationWithBlock(^(id _s) {
+        return UIKeyboardAppearanceDark;
+    });
+    for (NSString* classString in @[@"WKContentView", @"UITextInputTraits"]) {
+        Class c = NSClassFromString(classString);
+        Method m = class_getInstanceMethod(c, @selector(keyboardAppearance));
+        if (m != NULL) {
+            method_setImplementation(m, darkImp);
+        } else {
+            class_addMethod(c, @selector(keyboardAppearance), darkImp, "l@:");
+        }
+    }
 }
 
 - (void)onReset
