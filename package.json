@@ -1,8 +1,7 @@
 {
   "name": "cordova-plugin-ionic-webview",
-  "version": "2.2.0",
-  "description": "The official Ionic's WKWebView Engine Plugin",
-  "main": "index.js",
+  "version": "2.2.3",
+  "description": "Ionic Web View Engine Plugin",
   "scripts": {
     "sync_plugin_xml": "sync-cordova-xml package.json plugin.xml --output=plugin.xml",
     "version": "npm run sync_plugin_xml && git add plugin.xml",
@@ -31,6 +30,7 @@
   },
   "devDependencies": {
     "@semantic-release/changelog": "^3.0.0",
+    "@semantic-release/exec": "^3.3.0",
     "@semantic-release/git": "^7.0.4",
     "@semantic-release/github": "^5.0.6",
     "@semantic-release/npm": "^5.0.4",
@@ -44,12 +44,13 @@
     "verifyConditions": [
       "@semantic-release/changelog",
       "@semantic-release/npm",
-      "@semantic-release/github",
-      "@semantic-release/git"
+      "@semantic-release/git",
+      "@semantic-release/github"
     ],
     "prepare": [
       "@semantic-release/changelog",
       "@semantic-release/npm",
+      "@semantic-release/exec",
       "@semantic-release/git"
     ],
     "publish": [
@@ -59,9 +60,10 @@
     "success": [
       "@semantic-release/github"
     ],
-    "fail": [
+    "failure": [
       "@semantic-release/github"
-    ]
+    ],
+    "prepareCmd": "npm run version"
   },
   "config": {
     "commitizen": {

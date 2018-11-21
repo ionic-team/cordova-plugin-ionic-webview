@@ -1,7 +1,25 @@
-# Changelog
+## [2.2.3](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.2...v2.2.3) (2018-11-09)
+
+
+### Bug Fixes
+
+* Remove main and fix description ([d52db66](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/d52db66))
+
+## [2.2.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.1...v2.2.2) (2018-11-09)
+
+### Bug Fixes
+
+* Add more server checks before loading urls or reloading ([#211](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/211)) ([60eff2f](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/60eff2f))
+
+## [2.2.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.0...v2.2.1) (2018-11-07)
+
+
+### Bug Fixes
+
+* Show error page if server is not running ([#207](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/207)) ([6a2e07e](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/6a2e07e))
 
 <a name="2.2.0"></a>
-### 2.2.0 (PENDING)
+### 2.2.0 (2018-10-04)
 
 * Fix issue where two apps running on the same port could conflict with each other ([#169](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/165) & [#186](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/186))
 * Add kitkat support (API 19) ([#144](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/144)) [@leo6104](https://github.com/leo6104)
