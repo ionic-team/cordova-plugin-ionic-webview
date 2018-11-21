@@ -76,6 +76,8 @@
     <source-file src="src/ios/CDVWKWebViewUIDelegate.m"/>
     <header-file src="src/ios/CDVWKProcessPoolFactory.h"/>
     <source-file src="src/ios/CDVWKProcessPoolFactory.m"/>
+    <header-file src="src/ios/IONAssetHandler.h"/>
+    <source-file src="src/ios/IONAssetHandler.m"/>
     <asset src="src/ios/wk-plugin.js" target="wk-plugin.js"/>
 
     <!--GCDWebServer headers-->
