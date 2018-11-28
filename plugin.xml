@@ -36,6 +36,8 @@
       <clobbers target="Ionic.WebView"/>
   </js-module>
 
+  <dependency id="cordova-plugin-add-swift-support" version=">=1.7.2" />
+
   <platform name="android">
     <config-file target="config.xml" parent="/*">
       <allow-navigation href="http://localhost:8080/*"/>
@@ -76,6 +78,9 @@
     <source-file src="src/ios/CDVWKWebViewUIDelegate.m"/>
     <header-file src="src/ios/CDVWKProcessPoolFactory.h"/>
     <source-file src="src/ios/CDVWKProcessPoolFactory.m"/>
+    <header-file src="src/ios/GCDWebServer-Bridging-Header.h"/>
+    <source-file src="src/ios/CDVWKCorsProxy.h"/>
+    <source-file src="src/ios/CDVWKCorsProxy.swift"/>
     <asset src="src/ios/wk-plugin.js" target="wk-plugin.js"/>
 
     <!--GCDWebServer headers-->

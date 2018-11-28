@@ -28,6 +28,7 @@
 #import "CDVWKProcessPoolFactory.h"
 #import "GCDWebServer.h"
 #import "GCDWebServerPrivate.h"
+#import "CDVWKCorsProxy.h"
 
 #define CDV_BRIDGE_NAME @"cordova"
 #define CDV_IONIC_STOP_SCROLL @"stopScroll"
@@ -104,6 +105,7 @@
 @property (nonatomic, strong, readwrite) id <WKUIDelegate> uiDelegate;
 @property (nonatomic, weak) id <WKScriptMessageHandler> weakScriptMessageHandler;
 @property (nonatomic, strong) GCDWebServer *webServer;
+@property (nonatomic, strong) CDVWKCorsProxy *corsProxy;
 @property (nonatomic, readwrite) CGRect frame;
 @property (nonatomic, strong) NSString *userAgentCreds;
 @property (nonatomic, assign) BOOL internalConnectionsOnly;
@@ -165,6 +167,8 @@ NSTimer *timer;
 
     [self updateBindPath];
     [self setServerPath:wwwPath];
+
+    self.corsProxy = [[CDVWKCorsProxy alloc] initWithWebserver: self.webServer];
 
     [self startServer];
 }

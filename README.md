@@ -91,6 +91,16 @@ the plugin now restricts access to only the app itself.
 
 Whether to use a dark styled keyboard on iOS
 
+#### Proxy requests to avoid CORS errors
+
+```xml
+<wkproxy path="/api/" proxyUrl="https://www.domain.com/api/" />
+```
+
+All requests which starts with `/api/` will be forwarder to proxyUrl
+(eg. https://www.domain.com/api/)
+
+
 ## Plugin Requirements
 
 * **iOS**: iOS 10+ and `cordova-ios` 4+
