@@ -76,7 +76,7 @@ import Foundation
             return self.sendError(error: "Invalid url")
         }
 
-        let request = NSMutableURLRequest(url: url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 320000)
+        let request = NSMutableURLRequest(url: url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 120)
 
         request.httpMethod = req.method
         request.allHTTPHeaderFields = req.headers as? [String: String]
