@@ -236,6 +236,14 @@ public class WebViewLocalServer {
 
   private WebResourceResponse handleLocalRequest(Uri uri, PathHandler handler) {
     String path = uri.getPath();
+    if (path.startsWith("/_file_")) {
+      InputStream responseStream = new LollipopLazyInputStream(handler, uri);
+      InputStream stream = responseStream;
+      String mimeType = getMimeType(path, stream);
+      return createWebResourceResponse(mimeType, handler.getEncoding(),
+        handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), stream);
+    }
+    
     if (path.equals("/") || (!uri.getLastPathSegment().contains(".") && html5mode)) {
       InputStream stream;
       String launchURL = parser.getLaunchUrl();
