@@ -91,7 +91,7 @@ the plugin now restricts access to only the app itself.
 
 Whether to use a dark styled keyboard on iOS
 
-#### Proxy requests to avoid CORS errors
+#### Proxy requests to avoid CORS errors (iOS only) (BETA)
 
 ```xml
 <wkproxy path="/api/" proxyUrl="https://www.domain.com/api/" sslCheck="default" useCertificates="mycert.der,mycert2.der" clearCookies="yes" />
