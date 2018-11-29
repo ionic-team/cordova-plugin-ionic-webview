@@ -22,33 +22,37 @@ import Foundation
 
     }
 
-    func setHandlers(urlPrefix: String, serverUrl: String) {
+    func setHandlers(urlPrefix: String?, serverUrl: String?, sslCheck: String?, useCertificates: [String]?) {
 
-        let pattern = "^" + NSRegularExpression.escapedPattern(for: urlPrefix) + ".*"
+        if (urlPrefix == nil || serverUrl == nil) {
+            print("ERROR SETTING PROXY. missing path or proxyUrl")
 
-        webserver.addHandler(forMethod: "GET", pathRegex: pattern, request: GCDWebServerDataRequest.self, processBlock: { req in
-            return self.sendProxyResult(urlPrefix, serverUrl, req)
-        })
+            return
+        }
 
-        webserver.addHandler(forMethod: "POST", pathRegex: pattern, request: GCDWebServerDataRequest.self, processBlock:{ req in
-            return self.sendProxyResult(urlPrefix, serverUrl, req)
-        })
+        let pattern = "^" + NSRegularExpression.escapedPattern(for: urlPrefix!) + ".*"
 
-        webserver.addHandler(forMethod: "PUT", pathRegex: pattern, request: GCDWebServerDataRequest.self, processBlock:{ req in
-            return self.sendProxyResult(urlPrefix, serverUrl, req)
-        })
+        let sslCheck = sslCheck ?? "default"
 
-        webserver.addHandler(forMethod: "PATCH", pathRegex: pattern, request: GCDWebServerDataRequest.self, processBlock:{ req in
-            return self.sendProxyResult(urlPrefix, serverUrl, req)
-        })
+        print("Setting proxy path", urlPrefix!, "to address", serverUrl!, "with ssl check mode", sslCheck)
 
-        webserver.addHandler(forMethod: "DELETE", pathRegex: pattern, request: GCDWebServerDataRequest.self, processBlock:{ req in
-            return self.sendProxyResult(urlPrefix, serverUrl, req)
-        })
+        var sslTrust: URLSessionDelegate?
+
+        if (sslCheck == "nocheck") {
+            sslTrust = SSLTrustAny()
+        } else if (sslCheck == "pinned") {
+            sslTrust = SSLPinned(useCertificates)
+        }
+
+        for method in ["GET", "POST", "PUT", "PATCH", "DELETE"] {
+            webserver.addHandler(forMethod: method, pathRegex: pattern, request: GCDWebServerDataRequest.self, processBlock: { req in
+                return self.sendProxyResult(urlPrefix!, serverUrl!, req, sslTrust)
+            })
+        }
 
     }
 
-    private func sendProxyResult(_ prefix: String, _ serverUrl: String, _ req: GCDWebServerRequest) -> GCDWebServerResponse? {
+    private func sendProxyResult(_ prefix: String, _ serverUrl: String, _ req: GCDWebServerRequest, _ sslTrust: URLSessionDelegate?) -> GCDWebServerResponse? {
 
         let query = req.url.query == nil ? "" : "?" + req.url.query!
         let url = URL(string: serverUrl + req.path.substring(from: prefix.endIndex) + query)
@@ -68,8 +72,15 @@ import Foundation
         }
 
         var finalResponse: GCDWebServerDataResponse? = nil
+        var session: URLSession!
 
-        let session = URLSession.shared
+        if (sslTrust != nil) {
+            let configuration = URLSessionConfiguration.default
+            session = URLSession(configuration: configuration, delegate: sslTrust, delegateQueue: OperationQueue.main)
+        } else {
+            session = URLSession.shared
+        }
+
 
         let task = session.dataTask(with: request as URLRequest) { data, urlResp, error in
             if (error != nil) {
@@ -144,12 +155,11 @@ import Foundation
 
             let path = attributeDict["path"]
             let proxyUrl = attributeDict["proxyUrl"]
+            let sslCheck = attributeDict["sslCheck"]
+            let useCertificates = attributeDict["useCertificates"]
 
             if (path != nil && proxyUrl != nil) {
-
-                print("Setting proxy path", path!, "to address", proxyUrl!)
-
-                self.setHandlers(urlPrefix: path!, serverUrl: proxyUrl!)
+                self.setHandlers(urlPrefix: path!, serverUrl: proxyUrl!, sslCheck: sslCheck, useCertificates: useCertificates?.components(separatedBy: ","))
             }
 
         }
@@ -158,3 +168,84 @@ import Foundation
 }
 
 
+class SSLTrustAny : NSObject, URLSessionDelegate {
+
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+
+        if (challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust) {
+            completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
+
+            return
+        }
+
+        completionHandler(URLSession.AuthChallengeDisposition.cancelAuthenticationChallenge, nil)
+    }
+
+}
+
+class SSLPinned : NSObject, URLSessionDelegate {
+
+    private var certificates: [Data] = []
+
+    init(_ useCertificates: [String]?) {
+        super.init()
+
+        let certsPath = URL(fileURLWithPath: Bundle.main.bundlePath + "/www/certificates", isDirectory: true)
+
+        let fileManager = FileManager.default
+
+        if let enumerator = fileManager.enumerator(atPath: certsPath.path) {
+            for file in enumerator {
+
+                let certFileName = file as! String
+
+                let fileUrl = URL(fileURLWithPath: certFileName, relativeTo: certsPath)
+
+                if (fileUrl.path.hasSuffix(".der") && (useCertificates == nil || useCertificates!.contains(certFileName))) {
+                    do {
+                        let certData = try Data(contentsOf: fileUrl)
+                        self.certificates.append(certData)
+                    } catch {
+                        print("ERROR to load certificate", fileUrl.path)
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Swift.Void) {
+
+        // Adapted from OWASP https://www.owasp.org/index.php/Certificate_and_Public_Key_Pinning#iOS
+
+        if (certificates.count > 0 && challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust) {
+            if let serverTrust = challenge.protectionSpace.serverTrust {
+                var secresult = SecTrustResultType.invalid
+                let status = SecTrustEvaluate(serverTrust, &secresult)
+
+                if(errSecSuccess == status) {
+                    if let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) {
+                        let serverCertificateData = SecCertificateCopyData(serverCertificate)
+                        let data = CFDataGetBytePtr(serverCertificateData);
+                        let size = CFDataGetLength(serverCertificateData);
+                        let certServer = Data(bytes: data!, count: size)
+
+                        for certData in self.certificates {
+                            if (certServer == certData) {
+                                completionHandler(URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust:serverTrust))
+
+                                return
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+        // Pinning failed
+        completionHandler(URLSession.AuthChallengeDisposition.cancelAuthenticationChallenge, nil)
+    }
+
+}

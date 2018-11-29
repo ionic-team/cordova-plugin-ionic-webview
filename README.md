@@ -94,11 +94,35 @@ Whether to use a dark styled keyboard on iOS
 #### Proxy requests to avoid CORS errors
 
 ```xml
-<wkproxy path="/api/" proxyUrl="https://www.domain.com/api/" />
+<wkproxy path="/api/" proxyUrl="https://www.domain.com/api/" sslCheck="default" useCertificates="mycert.der,mycert2.der" />
 ```
 
 All requests which starts with `/api/` will be forwarder to proxyUrl
 (eg. https://www.domain.com/api/)
+
+* `path` - path which will be proxied (all starts with that path)
+* `proxyUrl` - where to forward
+* `sslCheck` - (optional) mode of ssl `nocheck`, `default`, `pinned`
+* `useCertificates` - (optional) comma separated `.der` files to use for the pining
+
+##### Proxy SSL Pining
+
+There are 3 modes which can be set for the sslCheck
+
+* `default` - (used by default). Check will be by iOS
+* `nocheck` - will accept all certificates, even self-signed
+* `pinned` - will accept connections only with provided DER certificates
+
+The certificate files should be provided in the `www/certificates` directory
+
+It is also possible to explicitly specify which certificates will be used by providing
+there's names (comma separated) in the `useCertificates` attribute of `wkproxy`. If the `useCertificates`
+is not provided, it will use all `.der` files.
+
+How to get DER certificate from my server?
+
+`openssl s_client -connect my-server.com:443 -showcerts < /dev/null | openssl x509 -outform DER > mycert.der`
+
 
 
 ## Plugin Requirements
