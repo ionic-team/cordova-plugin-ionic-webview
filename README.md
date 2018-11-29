@@ -94,7 +94,7 @@ Whether to use a dark styled keyboard on iOS
 #### Proxy requests to avoid CORS errors
 
 ```xml
-<wkproxy path="/api/" proxyUrl="https://www.domain.com/api/" sslCheck="default" useCertificates="mycert.der,mycert2.der" />
+<wkproxy path="/api/" proxyUrl="https://www.domain.com/api/" sslCheck="default" useCertificates="mycert.der,mycert2.der" clearCookies="yes" />
 ```
 
 All requests which starts with `/api/` will be forwarder to proxyUrl
@@ -104,6 +104,7 @@ All requests which starts with `/api/` will be forwarder to proxyUrl
 * `proxyUrl` - where to forward
 * `sslCheck` - (optional) mode of ssl `nocheck`, `default`, `pinned`
 * `useCertificates` - (optional) comma separated `.der` files to use for the pining
+* `clearCookies` - (optional) default `no`. If `yes` all cookies will be removed on app start
 
 ##### Proxy SSL Pining
 
@@ -122,6 +123,11 @@ is not provided, it will use all `.der` files.
 How to get DER certificate from my server?
 
 `openssl s_client -connect my-server.com:443 -showcerts < /dev/null | openssl x509 -outform DER > mycert.der`
+
+
+##### Cookies
+
+Cookies are stored on the native system and are not forwarded to the WKWebView.
 
 
 

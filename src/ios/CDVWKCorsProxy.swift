@@ -11,7 +11,7 @@ import Foundation
 
     var webserver: GCDWebServer
 
-    private var skipHeaders = ["content-encoding", "content-security-policy"]
+    private var skipHeaders = ["content-encoding", "content-security-policy", "set-cookie"]
 
     init(webserver: GCDWebServer) {
         self.webserver = webserver
@@ -20,12 +20,13 @@ import Foundation
 
         self.getConfig();
 
+
     }
 
-    func setHandlers(urlPrefix: String?, serverUrl: String?, sslCheck: String?, useCertificates: [String]?) {
+    func setHandlers(urlPrefix: String?, serverUrl: String?, sslCheck: String?, useCertificates: [String]?, clearCookies: String?) {
 
         if (urlPrefix == nil || serverUrl == nil) {
-            print("ERROR SETTING PROXY. missing path or proxyUrl")
+            print("WK PROXY: ERROR SETTING PROXY. missing path or proxyUrl")
 
             return
         }
@@ -34,7 +35,7 @@ import Foundation
 
         let sslCheck = sslCheck ?? "default"
 
-        print("Setting proxy path", urlPrefix!, "to address", serverUrl!, "with ssl check mode", sslCheck)
+        print("WK PROXY: Setting proxy path", urlPrefix!, "to address", serverUrl!, "with ssl check mode", sslCheck)
 
         var sslTrust: URLSessionDelegate?
 
@@ -43,6 +44,20 @@ import Foundation
         } else if (sslCheck == "pinned") {
             sslTrust = SSLPinned(useCertificates)
         }
+
+
+        if (clearCookies == "yes") {
+
+            let cookieStore = HTTPCookieStorage.shared
+
+            print("WK PROXY: Clearing cookies")
+
+            for cookie in cookieStore.cookies ?? [] {
+                cookieStore.deleteCookie(cookie)
+            }
+
+        }
+
 
         for method in ["GET", "POST", "PUT", "PATCH", "DELETE"] {
             webserver.addHandler(forMethod: method, pathRegex: pattern, request: GCDWebServerDataRequest.self, processBlock: { req in
@@ -74,11 +89,11 @@ import Foundation
         var finalResponse: GCDWebServerDataResponse? = nil
         var session: URLSession!
 
-        if (sslTrust != nil) {
+        if (sslTrust == nil) {
+            session = URLSession.shared
+        } else {
             let configuration = URLSessionConfiguration.default
             session = URLSession(configuration: configuration, delegate: sslTrust, delegateQueue: OperationQueue.main)
-        } else {
-            session = URLSession.shared
         }
 
 
@@ -157,9 +172,10 @@ import Foundation
             let proxyUrl = attributeDict["proxyUrl"]
             let sslCheck = attributeDict["sslCheck"]
             let useCertificates = attributeDict["useCertificates"]
+            let clearCookies = attributeDict["clearCookies"]
 
             if (path != nil && proxyUrl != nil) {
-                self.setHandlers(urlPrefix: path!, serverUrl: proxyUrl!, sslCheck: sslCheck, useCertificates: useCertificates?.components(separatedBy: ","))
+                self.setHandlers(urlPrefix: path!, serverUrl: proxyUrl!, sslCheck: sslCheck, useCertificates: useCertificates?.components(separatedBy: ","), clearCookies: clearCookies)
             }
 
         }
@@ -206,7 +222,7 @@ class SSLPinned : NSObject, URLSessionDelegate {
                         let certData = try Data(contentsOf: fileUrl)
                         self.certificates.append(certData)
                     } catch {
-                        print("ERROR to load certificate", fileUrl.path)
+                        print("WK PROXY: ERROR to load certificate", fileUrl.path)
                     }
                 }
 
@@ -232,6 +248,7 @@ class SSLPinned : NSObject, URLSessionDelegate {
                         let certServer = Data(bytes: data!, count: size)
 
                         for certData in self.certificates {
+
                             if (certServer == certData) {
                                 completionHandler(URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust:serverTrust))
 
