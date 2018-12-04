@@ -269,17 +269,21 @@ NSTimer *timer;
 
 - (void)pluginInitialize
 {
+    // viewController would be available now. we attempt to set all possible delegates to it, by default
+    NSDictionary* settings = self.commandDelegate.settings;
     if (@available(iOS 11.0, *)) {
-        self.useScheme = YES;
+        self.useScheme = [settings cordovaBoolSettingForKey:@"UseScheme" defaultValue:NO];
     } else {
         self.useScheme = NO;
     }
 
-    // viewController would be available now. we attempt to set all possible delegates to it, by default
-    NSDictionary* settings = self.commandDelegate.settings;
     self.internalConnectionsOnly = [settings cordovaBoolSettingForKey:@"WKInternalConnectionsOnly" defaultValue:YES];
     if (self.useScheme) {
-        self.CDV_LOCAL_SERVER = @"ionic://app";
+        NSString *bind = [settings cordovaSettingForKey:@"HostName"];
+        if(bind == nil){
+            bind = @"app";
+        }
+        self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"ionic://%@", bind];
     } else {
         [self initWebServer];
     }
@@ -324,10 +328,12 @@ NSTimer *timer;
     configuration.userContentController = userContentController;
 
     if (@available(iOS 11.0, *)) {
-        self.handler = [[IONAssetHandler alloc] init];
-        [self.handler setAssetPath:[self getStartPath]];
-        [configuration setURLSchemeHandler:self.handler forURLScheme:@"ionic"];
-        [configuration setURLSchemeHandler:self.handler forURLScheme:@"ionic-asset"];
+        if (self.useScheme) {
+            self.handler = [[IONAssetHandler alloc] init];
+            [self.handler setAssetPath:[self getStartPath]];
+            [configuration setURLSchemeHandler:self.handler forURLScheme:@"ionic"];
+            [configuration setURLSchemeHandler:self.handler forURLScheme:@"ionic-asset"];
+        }
     }
 
     // re-create WKWebView, since we need to update configuration

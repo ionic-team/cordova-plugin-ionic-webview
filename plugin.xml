@@ -62,6 +62,7 @@
     <config-file target="config.xml" parent="/*">
         <allow-navigation href="http://localhost:8080/*"/>
         <allow-navigation href="http://127.0.0.1:8080/*"/>
+        <allow-navigation href="ionic://*" />
         <feature name="IonicWebView">
             <param name="ios-package" value="CDVWKWebViewEngine"/>
         </feature>
