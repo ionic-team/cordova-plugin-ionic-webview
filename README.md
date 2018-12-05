@@ -94,7 +94,7 @@ Whether to use a dark styled keyboard on iOS
 #### Proxy requests to avoid CORS errors (iOS only) (BETA)
 
 ```xml
-<wkproxy path="/api/" proxyUrl="https://www.domain.com/api/" sslCheck="default" useCertificates="mycert.der,mycert2.der" clearCookies="yes" />
+<wkproxy path="/api/" proxyUrl="https://www.domain.com/api/" sslCheck="pinned" sslCheckChain="yes" useCertificates="mycert.cer,mycert2.cer" clearCookies="yes" />
 ```
 
 All requests which starts with `/api/` will be forwarder to proxyUrl
@@ -103,7 +103,8 @@ All requests which starts with `/api/` will be forwarder to proxyUrl
 * `path` - path which will be proxied (all starts with that path)
 * `proxyUrl` - where to forward
 * `sslCheck` - (optional) mode of ssl `nocheck`, `default`, `pinned`
-* `useCertificates` - (optional) comma separated `.der` files to use for the pining
+* `sslCheckChain` - (optional) if "yes" then it will compare all certificates in the chain in order to pin your intermediate certificate
+* `useCertificates` - (optional) comma separated `.cer` files to use for the pining
 * `clearCookies` - (optional) default `no`. If `yes` all cookies will be removed on app start
 
 ##### Proxy SSL Pining
@@ -112,17 +113,30 @@ There are 3 modes which can be set for the sslCheck
 
 * `default` - (used by default). Check will be by iOS
 * `nocheck` - will accept all certificates, even self-signed
-* `pinned` - will accept connections only with provided DER certificates
+* `pinned` - will accept connections only with provided DER certificates with `.cer` extension
 
 The certificate files should be provided in the `www/certificates` directory
 
 It is also possible to explicitly specify which certificates will be used by providing
 there's names (comma separated) in the `useCertificates` attribute of `wkproxy`. If the `useCertificates`
-is not provided, it will use all `.der` files.
+is not provided, it will use all `.cer` files.
 
 How to get DER certificate from my server?
 
-`openssl s_client -connect my-server.com:443 -showcerts < /dev/null | openssl x509 -outform DER > mycert.der`
+```bash
+# Leaf certificate
+openssl s_client -connect my-server.com:443 -showcerts < /dev/null | openssl x509 -outform DER > mycert.cer
+```
+
+```bash
+# List all certificate chain
+openssl s_client -connect my-server.com:443 -showcerts
+
+# Take (copy) one needed incliding "-----BEGIN CERTIFICATE-----" and "-----END CERTIFICATE-----"
+# Create file "certificate.pem" and add all into the file
+# Generate DER certificate from PEM with command
+openssl x509 -in certificate.pem -outform der -out certificate.cer
+```
 
 
 ##### Cookies

@@ -23,7 +23,7 @@ import Foundation
 
     }
 
-    func setHandlers(urlPrefix: String?, serverUrl: String?, sslCheck: String?, useCertificates: [String]?, clearCookies: String?) {
+    func setHandlers(urlPrefix: String?, serverUrl: String?, sslCheck: String?, useCertificates: [String]?, clearCookies: String?, checkSSLChain: Bool?) {
 
         if (urlPrefix == nil || serverUrl == nil) {
             print("WK PROXY: ERROR SETTING PROXY. missing path or proxyUrl")
@@ -42,7 +42,7 @@ import Foundation
         if (sslCheck == "nocheck") {
             sslTrust = SSLTrustAny()
         } else if (sslCheck == "pinned") {
-            sslTrust = SSLPinned(useCertificates)
+            sslTrust = SSLPinned(useCertificates, checkSSLChain)
         }
 
 
@@ -173,9 +173,10 @@ import Foundation
             let sslCheck = attributeDict["sslCheck"]
             let useCertificates = attributeDict["useCertificates"]
             let clearCookies = attributeDict["clearCookies"]
+            let checkSSLChain = attributeDict["sslCheckChain"] == "yes"
 
             if (path != nil && proxyUrl != nil) {
-                self.setHandlers(urlPrefix: path!, serverUrl: proxyUrl!, sslCheck: sslCheck, useCertificates: useCertificates?.components(separatedBy: ","), clearCookies: clearCookies)
+                self.setHandlers(urlPrefix: path!, serverUrl: proxyUrl!, sslCheck: sslCheck, useCertificates: useCertificates?.components(separatedBy: ","), clearCookies: clearCookies, checkSSLChain: checkSSLChain)
             }
 
         }
@@ -202,9 +203,14 @@ class SSLTrustAny : NSObject, URLSessionDelegate {
 class SSLPinned : NSObject, URLSessionDelegate {
 
     private var certificates: [Data] = []
+    private var checkInCertChain = false
 
-    init(_ useCertificates: [String]?) {
+    init(_ useCertificates: [String]?, _ checkInCertChain: Bool?) {
         super.init()
+
+        if (checkInCertChain != nil) {
+            self.checkInCertChain = checkInCertChain!
+        }
 
         let certsPath = URL(fileURLWithPath: Bundle.main.bundlePath + "/www/certificates", isDirectory: true)
 
@@ -217,7 +223,7 @@ class SSLPinned : NSObject, URLSessionDelegate {
 
                 let fileUrl = URL(fileURLWithPath: certFileName, relativeTo: certsPath)
 
-                if (fileUrl.path.hasSuffix(".der") && (useCertificates == nil || useCertificates!.contains(certFileName))) {
+                if (fileUrl.path.hasSuffix(".cer") && (useCertificates == nil || useCertificates!.contains(certFileName))) {
                     do {
                         let certData = try Data(contentsOf: fileUrl)
                         self.certificates.append(certData)
@@ -240,23 +246,30 @@ class SSLPinned : NSObject, URLSessionDelegate {
                 var secresult = SecTrustResultType.invalid
                 let status = SecTrustEvaluate(serverTrust, &secresult)
 
+                let count = self.checkInCertChain ? SecTrustGetCertificateCount(serverTrust) : 1
+
                 if(errSecSuccess == status) {
-                    if let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) {
-                        let serverCertificateData = SecCertificateCopyData(serverCertificate)
-                        let data = CFDataGetBytePtr(serverCertificateData);
-                        let size = CFDataGetLength(serverCertificateData);
-                        let certServer = Data(bytes: data!, count: size)
 
-                        for certData in self.certificates {
+                    for i in 0..<count {
+                        if let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, i) {
+                            let serverCertificateData = SecCertificateCopyData(serverCertificate)
+                            let data = CFDataGetBytePtr(serverCertificateData);
+                            let size = CFDataGetLength(serverCertificateData);
+                            let certServer = Data(bytes: data!, count: size)
 
-                            if (certServer == certData) {
-                                completionHandler(URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust:serverTrust))
+                            for certData in self.certificates {
 
-                                return
+                                if (certServer == certData) {
+                                    completionHandler(URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust:serverTrust))
+
+                                    return
+                                }
                             }
-                        }
 
+                        }
                     }
+
+
                 }
             }
         }
