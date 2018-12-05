@@ -29,6 +29,7 @@
 #import "GCDWebServer.h"
 #import "GCDWebServerPrivate.h"
 #import "CDVWKCorsProxy.h"
+#import "IONAssetHandler.h"
 
 #define CDV_BRIDGE_NAME @"cordova"
 #define CDV_IONIC_STOP_SCROLL @"stopScroll"
@@ -109,6 +110,8 @@
 @property (nonatomic, readwrite) CGRect frame;
 @property (nonatomic, strong) NSString *userAgentCreds;
 @property (nonatomic, assign) BOOL internalConnectionsOnly;
+@property (nonatomic, assign) BOOL useScheme;
+@property (nonatomic, strong) IONAssetHandler * handler;
 
 @property (nonatomic, readwrite) NSString *CDV_LOCAL_SERVER;
 @end
@@ -154,6 +157,15 @@ NSTimer *timer;
     [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
     self.webServer = [[GCDWebServer alloc] init];
 
+    [self updateBindPath];
+    [self setServerPath:[self getStartPath]];
+
+    self.corsProxy = [[CDVWKCorsProxy alloc] initWithWebserver: self.webServer];
+
+    [self startServer];
+}
+
+-(NSString *) getStartPath {
     NSString * wwwPath = [[NSBundle mainBundle] pathForResource:@"www" ofType: nil];
 
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -164,13 +176,8 @@ NSTimer *timer;
         NSString * snapshots = [cordovaDataDirectory stringByAppendingPathComponent:@"ionic_built_snapshots"];
         wwwPath = [snapshots stringByAppendingPathComponent:[persistedPath lastPathComponent]];
     }
-
-    [self updateBindPath];
-    [self setServerPath:wwwPath];
-
-    self.corsProxy = [[CDVWKCorsProxy alloc] initWithWebserver: self.webServer];
-
-    [self startServer];
+    self.basePath = wwwPath;
+    return wwwPath;
 }
 
 -(BOOL) isNewBinary
@@ -268,9 +275,22 @@ NSTimer *timer;
 {
     // viewController would be available now. we attempt to set all possible delegates to it, by default
     NSDictionary* settings = self.commandDelegate.settings;
-    self.internalConnectionsOnly = [settings cordovaBoolSettingForKey:@"WKInternalConnectionsOnly" defaultValue:YES];
+    if (@available(iOS 11.0, *)) {
+        self.useScheme = [settings cordovaBoolSettingForKey:@"UseScheme" defaultValue:NO];
+    } else {
+        self.useScheme = NO;
+    }
 
-    [self initWebServer];
+    self.internalConnectionsOnly = [settings cordovaBoolSettingForKey:@"WKInternalConnectionsOnly" defaultValue:YES];
+    if (self.useScheme) {
+        NSString *bind = [settings cordovaSettingForKey:@"HostName"];
+        if(bind == nil){
+            bind = @"app";
+        }
+        self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"ionic://%@", bind];
+    } else {
+        [self initWebServer];
+    }
 
     self.uiDelegate = [[CDVWKWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
 
@@ -310,6 +330,15 @@ NSTimer *timer;
 
     WKWebViewConfiguration* configuration = [self createConfigurationFromSettings:settings];
     configuration.userContentController = userContentController;
+
+    if (@available(iOS 11.0, *)) {
+        if (self.useScheme) {
+            self.handler = [[IONAssetHandler alloc] init];
+            [self.handler setAssetPath:[self getStartPath]];
+            [configuration setURLSchemeHandler:self.handler forURLScheme:@"ionic"];
+            [configuration setURLSchemeHandler:self.handler forURLScheme:@"ionic-asset"];
+        }
+    }
 
     // re-create WKWebView, since we need to update configuration
     // remove from keyWindow before recreating
@@ -463,7 +492,7 @@ static void * KVOContext = &KVOContext;
     if (context == KVOContext) {
         if (object == [self webView] && [keyPath isEqualToString: @"URL"] && [object valueForKeyPath:keyPath] == nil){
             NSLog(@"URL is nil. Reloading WKWebView");
-            if ([self.webServer isRunning]) {
+            if ([self isSafeToReload]) {
                 [(WKWebView*)_engineWebView reload];
             } else {
                 [self loadErrorPage:nil];
@@ -476,7 +505,7 @@ static void * KVOContext = &KVOContext;
 
 - (void)onAppWillEnterForeground:(NSNotification *)notification {
     if ([self shouldReloadWebView]) {
-        if ([self.webServer isRunning]) {
+        if ([self isSafeToReload]) {
             NSLog(@"%@", @"CDVWKWebViewEngine reloading!");
             [(WKWebView*)_engineWebView reload];
         } else {
@@ -520,6 +549,11 @@ static void * KVOContext = &KVOContext;
     return [self shouldReloadWebView:wkWebView.URL title:wkWebView.title];
 }
 
+- (BOOL)isSafeToReload
+{
+    return [self.webServer isRunning] || self.useScheme;
+}
+
 - (BOOL)shouldReloadWebView:(NSURL *)location title:(NSString*)title
 {
     BOOL title_is_nil = (title == nil);
@@ -555,7 +589,7 @@ static void * KVOContext = &KVOContext;
         }
         request = [NSURLRequest requestWithURL:url];
     }
-    if ([self.webServer isRunning]) {
+    if ([self isSafeToReload]) {
         return [(WKWebView*)_engineWebView loadRequest:request];
     } else {
         return [self loadErrorPage:request];
@@ -835,7 +869,7 @@ static void * KVOContext = &KVOContext;
 
 - (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
 {
-    if ([self.webServer isRunning]) {
+    if ([self isSafeToReload]) {
         [webView reload];
     } else {
         [self loadErrorPage:nil];
@@ -916,9 +950,15 @@ static void * KVOContext = &KVOContext;
 -(void)setServerBasePath:(CDVInvokedUrlCommand*)command
 {
     NSString * path = [command argumentAtIndex:0];
-    [self setServerPath:path];
+    if (self.useScheme) {
+        self.basePath = path;
+        [self.handler setAssetPath:path];
+    } else {
+        [self setServerPath:path];
+    }
+
     NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.CDV_LOCAL_SERVER]];
-    if ([self.webServer isRunning]) {
+    if ([self isSafeToReload]) {
         [(WKWebView*)_engineWebView loadRequest:request];
     } else {
         [self loadErrorPage:request];

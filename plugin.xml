@@ -64,6 +64,7 @@
     <config-file target="config.xml" parent="/*">
         <allow-navigation href="http://localhost:8080/*"/>
         <allow-navigation href="http://127.0.0.1:8080/*"/>
+        <allow-navigation href="ionic://*" />
         <feature name="IonicWebView">
             <param name="ios-package" value="CDVWKWebViewEngine"/>
         </feature>
@@ -81,6 +82,8 @@
     <header-file src="src/ios/GCDWebServer-Bridging-Header.h"/>
     <source-file src="src/ios/CDVWKCorsProxy.h"/>
     <source-file src="src/ios/CDVWKCorsProxy.swift"/>
+    <header-file src="src/ios/IONAssetHandler.h"/>
+    <source-file src="src/ios/IONAssetHandler.m"/>
     <asset src="src/ios/wk-plugin.js" target="wk-plugin.js"/>
 
     <!--GCDWebServer headers-->
