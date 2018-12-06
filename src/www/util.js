@@ -8,6 +8,9 @@ var WebView = {
     if (!url.startsWith('file://')) {
       return url;
     }
+    if (window.WEBVIEW_SERVER_URL.startsWith('ionic://')) {
+      return url.replace('file', 'ionic-asset');
+    }
     url = url.substr(7); // len("file://") == 7
     if (url.length === 0 || url[0] !== '/') { // ensure the new URL starts with /
       url = '/' + url;
