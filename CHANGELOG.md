@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.0...v2.3.1) (2018-12-06)
+
+
+### Bug Fixes
+
+* Handle convertFileSrc when using ionic:// scheme ([#236](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/236)) ([89ce899](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/89ce899))
+
 # [2.3.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.5...v2.3.0) (2018-12-05)
 
 
