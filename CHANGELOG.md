@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.5...v2.3.0) (2018-12-05)
+
+
+### Features
+
+* **ios:** Add URLSchemeHandler for iOS 11+ ([#221](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/221)) ([4a973f4](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/4a973f4))
+
 ## [2.2.5](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.4...v2.2.5) (2018-11-20)
 
 
