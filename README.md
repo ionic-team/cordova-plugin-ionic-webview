@@ -54,6 +54,23 @@ Preferences available for both iOS and Android platforms
 
 The default port the server will listen on. _You should change this to a random port number!_
 
+#### MixedContentMode
+
+
+```xml
+<preference name="MixedContentMode" value="2" />
+```
+
+Configures the WebView's behavior when an origin attempts to load a resource from a different origin.
+
+Default value is `0` (`MIXED_CONTENT_ALWAYS_ALLOW`), which allows loading resources from other origins.
+
+Other possible values are `1` (`MIXED_CONTENT_NEVER_ALLOW`) and `2` (`MIXED_CONTENT_COMPATIBILITY_MODE`)
+
+
+[Android documentation](https://developer.android.com/reference/android/webkit/WebSettings.html#setMixedContentMode(int))
+
+
 ### iOS Preferences
 
 Preferences only available for iOS platform

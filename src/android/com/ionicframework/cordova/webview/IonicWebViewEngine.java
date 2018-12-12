@@ -12,6 +12,7 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import org.apache.cordova.ConfigXmlParser;
 import org.apache.cordova.CordovaInterface;
@@ -67,6 +68,11 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     webView.setWebViewClient(new ServerClient(this, parser));
 
     super.init(parentWebView, cordova, client, resourceApi, pluginManager, nativeToJsMessageQueue);
+    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      final WebSettings settings = webView.getSettings();
+      int mode = preferences.getInteger("MixedContentMode", 0);
+      settings.setMixedContentMode(mode);
+    }
     SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
     String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
     if (!isDeployDisabled() && !isNewBinary() && path != null && !path.isEmpty()) {
