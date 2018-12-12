@@ -202,7 +202,15 @@ public class WebViewLocalServer {
   
   private static WebResourceResponse createWebResourceResponse(String mimeType, String encoding, int statusCode, String reasonPhrase, Map<String, String> responseHeaders, InputStream data) {
     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      return new WebResourceResponse(mimeType, encoding, statusCode, reasonPhrase, responseHeaders, data);
+      int finalStatusCode = statusCode;
+      try {
+        if (data.available() == 0) {
+          finalStatusCode = 404;
+        }
+      } catch (IOException e) {
+        finalStatusCode = 500;
+      }
+      return new WebResourceResponse(mimeType, encoding, finalStatusCode, reasonPhrase, responseHeaders, data);
     } else {
       return new WebResourceResponse(mimeType, encoding, data);
     }
