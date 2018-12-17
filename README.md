@@ -27,8 +27,7 @@
 
 A Web View plugin for Cordova, focused on providing the highest performance experience for Ionic apps (but can be used with any Cordova app).
 
-This plugin uses WKWebView on iOS and the latest evergreen webview on Android. Additionally, this plugin makes it easy to use HTML5 style routing
-that web developers expect for building single-page apps.
+This plugin uses WKWebView on iOS and the latest evergreen webview on Android. Additionally, this plugin makes it easy to use HTML5 style routing that web developers expect for building single-page apps.
 
 Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `3.x`, which uses the new features that may not work with all apps. See [Requirements](#requirements) and [Migrating to 3.x](#migrating-to-3x).
 
@@ -42,21 +41,26 @@ Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `
 
 This plugin has several configuration options that can be set in `config.xml`.
 
+### Android and iOS Preferences
+
+Preferences available for both iOS and Android
+
+#### Hostname
+
+`<preference name="Hostname" value="app" />`
+
+Default value is `localhost`.
+
+Example `ionic://app` on iOS, `http://app` on Android.
+
+If you change it, you'll need to add a new `allow-navigation` entry in the `config.xml` for the configured url (i.e `<allow-navigation href="http://app/*"/>` if `Hostname` is set to `app`).
+This is only needed for the Android url as it uses `http://`, all `ionic://` urls are whitelisted by the plugin.
+
 ### Android Preferences
 
 Preferences only available Android platform
 
-#### WKPort 
-
-```xml
-<preference name="WKPort" value="8080" />
-```
-
-The default port the server will listen on. If you change it, add an `allow-navigation`
- entry in the `config.xml` for the new url (i.e `<allow-navigation href="http://localhost:8888/*"/>` if `WKPort` is set to 8888)
-
 #### MixedContentMode
-
 
 ```xml
 <preference name="MixedContentMode" value="2" />
@@ -75,16 +79,6 @@ Other possible values are `1` (`MIXED_CONTENT_NEVER_ALLOW`) and `2` (`MIXED_CONT
 ### iOS Preferences
 
 Preferences only available for iOS platform
-
-#### HostName
-
-`<preference name="HostName" value="myHostName" />`
-
-Default value is `app`.
-
-If `UseScheme` is set to yes, it will use the `HostName` value as the host of the starting url.
-
-Example `ionic://app`
 
 #### WKSuspendInBackground
 
@@ -118,11 +112,11 @@ Whether to use a dark styled keyboard on iOS
 
 1. Apps are now served from HTTP on Android.
 
-    * The default origin for requests from the WebView is `http://localhost:8080`. If `WKPort` preference is set, then origin will be  `http://localhost:WKPortValue`.
+    * The default origin for requests from the Android WebView is `http://localhost`. If `Hostname` preference is set, then origin will be  `http://HostnameValue`.
 
 1. Apps are now served from `ionic://` scheme on iOS.
 
-    * The default origin for requests from the WebView is `ionic://app`. If `HostName` preference is set, then origin will be `ionic://HostNameValue`.
+    * The default origin for requests from the iOS WebView is `ionic://localhost`. If `Hostname` preference is set, then origin will be `ionic://HostnameValue`.
 
 1. Replace any usages of `window.Ionic.normalizeURL()` with `window.Ionic.WebView.convertFileSrc()`.
 

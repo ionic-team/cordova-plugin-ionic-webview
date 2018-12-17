@@ -1,5 +1,6 @@
 #import "IONAssetHandler.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "CDVWKWebViewEngine.h"
 
 @implementation IONAssetHandler
 
@@ -14,14 +15,14 @@
     NSString * stringToLoad = url.path;
     NSString * scheme = url.scheme;
 
-    if ([scheme isEqualToString:@"ionic"]) {
+    if ([scheme isEqualToString:IONIC_SCHEME]) {
         startPath = self.basePath;
         if ([stringToLoad isEqualToString:@""] || [url.pathExtension isEqualToString:@""]) {
             startPath = [startPath stringByAppendingString:@"/index.html"];
         } else {
             startPath = [startPath stringByAppendingString:stringToLoad];
         }
-    } else {
+    } else if ([scheme isEqualToString:IONIC_FILE_SCHEME]) {
         if (![stringToLoad isEqualToString:@""]) {
             startPath = stringToLoad;
         }

@@ -119,6 +119,9 @@
 
 NSTimer *timer;
 
+NSString * const IONIC_SCHEME = @"ionic";
+NSString * const IONIC_FILE_SCHEME = @"app-file";
+
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super init];
@@ -192,11 +195,11 @@ NSTimer *timer;
 {
     // viewController would be available now. we attempt to set all possible delegates to it, by default
     NSDictionary* settings = self.commandDelegate.settings;
-    NSString *bind = [settings cordovaSettingForKey:@"HostName"];
+    NSString *bind = [settings cordovaSettingForKey:@"Hostname"];
     if(bind == nil){
-        bind = @"app";
+        bind = @"localhost";
     }
-    self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"ionic://%@", bind];
+    self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"%@://%@",IONIC_SCHEME, bind];
 
     self.uiDelegate = [[CDVWKWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
 
@@ -239,8 +242,8 @@ NSTimer *timer;
 
     self.handler = [[IONAssetHandler alloc] init];
     [self.handler setAssetPath:[self getStartPath]];
-    [configuration setURLSchemeHandler:self.handler forURLScheme:@"ionic"];
-    [configuration setURLSchemeHandler:self.handler forURLScheme:@"ionic-asset"];
+    [configuration setURLSchemeHandler:self.handler forURLScheme:IONIC_SCHEME];
+    [configuration setURLSchemeHandler:self.handler forURLScheme:IONIC_FILE_SCHEME];
 
     // re-create WKWebView, since we need to update configuration
     // remove from keyWindow before recreating
@@ -521,7 +524,7 @@ NSTimer *timer;
         NSLog(@"CDVWKWebViewEngine: WK plugin can not be loaded: %@", error);
         return nil;
     }
-    source = [source stringByAppendingString:[NSString stringWithFormat:@"window.WEBVIEW_SERVER_URL = '%@';", self.CDV_LOCAL_SERVER]];
+    source = [source stringByAppendingString:[NSString stringWithFormat:@"window.WEBVIEW_SERVER_URL = '%@';window.WEBVIEW_FILE_PREFIX = '%@';", self.CDV_LOCAL_SERVER, IONIC_FILE_SCHEME]];
 
     return [[WKUserScript alloc] initWithSource:source
                                   injectionTime:WKUserScriptInjectionTimeAtDocumentStart
