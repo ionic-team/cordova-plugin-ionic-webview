@@ -75,7 +75,7 @@ public class AndroidProtocolHandler {
   public InputStream openContentUrl(Uri uri)  throws IOException {
     InputStream stream = null;
     try {
-      stream = context.getContentResolver().openInputStream(Uri.parse(uri.toString().replace("ionic-content:///", "content://")));
+      stream = context.getContentResolver().openInputStream(Uri.parse(uri.toString().replace(WebViewLocalServer.ionicContentScheme + ":///", "content://")));
     } catch (SecurityException e) {
       Log.e(TAG, "Unable to open content URL: " + uri, e);
     }

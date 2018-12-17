@@ -6,10 +6,10 @@ var WebView = {
       return url;
     }
     if (url.startsWith('file://')) {
-      return url.replace('file', 'ionic-file');;
+      return url.replace('file', window.WEBVIEW_FILE_PREFIX);
     }
     if (url.startsWith('content://')) {
-        return url.replace('content://', 'ionic-content:///');;
+        return url.replace('content://', window.WEBVIEW_CONTENT_PREFIX + ':///');
     }
 
     return url;

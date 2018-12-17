@@ -50,15 +50,14 @@ public class WebViewLocalServer {
   private String basePath;
   private final static String httpScheme = "http";
   private final static String httpsScheme = "https";
-  private final static String ionicFileScheme = "ionic-file";
-  private final static String ionicContentScheme = "ionic-content";
+  public final static String ionicFileScheme = "app-file";
+  public final static String ionicContentScheme = "app-content";
 
   private final UriMatcher uriMatcher;
   private final AndroidProtocolHandler protocolHandler;
   private final String authority;
   // Whether we're serving local files or proxying (for example, when doing livereload on a
   // non-local endpoint (will be false in that case)
-  private final boolean isLocal;
   private boolean isAsset;
   // Whether to route all requests to paths without extensions back to `index.html`
   private final boolean html5mode;
@@ -168,11 +167,6 @@ public class WebViewLocalServer {
     this.parser = parser;
     this.protocolHandler = new AndroidProtocolHandler(context.getApplicationContext());
     this.authority = authority;
-    if (authority.startsWith("localhost")) {
-      this.isLocal = true;
-    } else {
-      this.isLocal = false;
-    }
   }
 
   private static Uri parseAndVerifyUrl(String url) {
@@ -226,7 +220,7 @@ public class WebViewLocalServer {
       return null;
     }
 
-    if (this.isLocal) {
+    if (isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {
       Log.d("SERVER", "Handling local request: " + uri.toString());
       return handleLocalRequest(uri, handler);
     } else {
@@ -234,10 +228,16 @@ public class WebViewLocalServer {
     }
   }
 
+  private boolean isLocalFile(Uri uri) {
+    if (uri.getScheme().equals(ionicContentScheme) || uri.getScheme().equals(ionicFileScheme)) {
+      return true;
+    }
+    return false;
+  }
   private WebResourceResponse handleLocalRequest(Uri uri, PathHandler handler) {
     String path = uri.getPath();
 
-    if (uri.getScheme().equals(ionicContentScheme) || uri.getScheme().equals(ionicFileScheme)) {
+    if (isLocalFile(uri)) {
       InputStream responseStream = new LollipopLazyInputStream(handler, uri);
       String mimeType = getMimeType(path, responseStream);
       return createWebResourceResponse(mimeType, handler.getEncoding(),
@@ -410,7 +410,7 @@ public class WebViewLocalServer {
           path = basePath + url.getPath();
         }
         try {
-          if ((url.getScheme().equals(httpScheme) || url.getScheme().equals(httpsScheme))&& isAsset) {
+          if ((url.getScheme().equals(httpScheme) || url.getScheme().equals(httpsScheme)) && isAsset) {
             stream = protocolHandler.openAsset(assetPath + path);
           } else if (url.getScheme().equals(ionicFileScheme) || !isAsset) {
             stream = protocolHandler.openFile(path);
