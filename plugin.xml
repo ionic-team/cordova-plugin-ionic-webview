@@ -38,7 +38,7 @@
 
   <platform name="android">
     <config-file target="config.xml" parent="/*">
-      <allow-navigation href="http://localhost:8080/*"/>
+      <allow-navigation href="http://localhost/*"/>
       <preference name="webView" value="com.ionicframework.cordova.webview.IonicWebViewEngine"/>
       <feature name="IonicWebView">
           <param name="android-package" value="com.ionicframework.cordova.webview.IonicWebView"/>

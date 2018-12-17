@@ -59,11 +59,11 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     ConfigXmlParser parser = new ConfigXmlParser();
     parser.parse(cordova.getActivity());
 
-    String port = preferences.getString("WKPort", "8080");
-    CDV_LOCAL_SERVER = "http://localhost:" + port;
+    String hostname = preferences.getString("Hostname", "localhost");
+    CDV_LOCAL_SERVER = "http://" + hostname;
 
-    localServer = new WebViewLocalServer(cordova.getActivity(), "localhost:" + port, true, parser);
-    WebViewLocalServer.AssetHostingDetails ahd = localServer.hostAssets("www");
+    localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser);
+    localServer.hostAssets("www");
 
     webView.setWebViewClient(new ServerClient(this, parser));
 
@@ -143,7 +143,9 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     public void onPageFinished(WebView view, String url) {
       super.onPageFinished(view, url);
       view.loadUrl("javascript:(function() { " +
-              "window.WEBVIEW_SERVER_URL = '" + CDV_LOCAL_SERVER + "'" +
+              "window.WEBVIEW_SERVER_URL = '" + CDV_LOCAL_SERVER + "';" +
+              "window.WEBVIEW_FILE_PREFIX = '" + WebViewLocalServer.ionicFileScheme + "';" +
+              "window.WEBVIEW_CONTENT_PREFIX = '" + WebViewLocalServer.ionicContentScheme + "';" +
               "})()");
     }
   }

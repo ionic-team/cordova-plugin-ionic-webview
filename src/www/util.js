@@ -5,17 +5,14 @@ var WebView = {
     if (!url) {
       return url;
     }
-    if (!url.startsWith('file://')) {
-      return url;
+    if (url.startsWith('file://')) {
+      return url.replace('file', window.WEBVIEW_FILE_PREFIX);
     }
-    if (window.WEBVIEW_SERVER_URL.startsWith('ionic://')) {
-      return url.replace('file', 'ionic-asset');
+    if (url.startsWith('content://')) {
+        return url.replace('content://', window.WEBVIEW_CONTENT_PREFIX + ':///');
     }
-    url = url.substr(7); // len("file://") == 7
-    if (url.length === 0 || url[0] !== '/') { // ensure the new URL starts with /
-      url = '/' + url;
-    }
-    return window.WEBVIEW_SERVER_URL + '/_file_' + url;
+
+    return url;
   },
   setServerBasePath: function(path) {
     exec(null, null, 'IonicWebView', 'setServerBasePath', [path]);
