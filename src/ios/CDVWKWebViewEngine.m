@@ -96,7 +96,6 @@
 @property (nonatomic, weak) id <WKScriptMessageHandler> weakScriptMessageHandler;
 @property (nonatomic, readwrite) CGRect frame;
 @property (nonatomic, strong) NSString *userAgentCreds;
-@property (nonatomic, assign) BOOL useScheme;
 @property (nonatomic, strong) IONAssetHandler * handler;
 
 @property (nonatomic, readwrite) NSString *CDV_LOCAL_SERVER;
@@ -756,12 +755,8 @@ NSString * const IONIC_FILE_SCHEME = @"app-file";
 -(void)setServerBasePath:(CDVInvokedUrlCommand*)command
 {
     NSString * path = [command argumentAtIndex:0];
-    if (self.useScheme) {
-        self.basePath = path;
-        [self.handler setAssetPath:path];
-    } else {
-        [self setServerPath:path];
-    }
+    self.basePath = path;
+    [self.handler setAssetPath:path];
 
     NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.CDV_LOCAL_SERVER]];
     [(WKWebView*)_engineWebView loadRequest:request];
