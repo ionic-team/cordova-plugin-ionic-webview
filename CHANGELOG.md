@@ -1,3 +1,31 @@
+# [3.0.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.1...v3.0.0) (2019-01-03)
+
+
+### Bug Fixes
+
+* **iOS:** Remove unused code ([#247](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/247)) ([bceb17a](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/bceb17a))
+
+
+### Features
+
+* Allows configuration of Mixed Content Mode ([#240](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/240)) ([486d412](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/486d412)), closes [#231](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/231)
+* **Android:** Implement ionic-file and ionic-content urls ([#242](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/242)) ([8ef0c30](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/8ef0c30)), closes [#204](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/204) [#183](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/183)
+* **iOS:** Remove GCDWebServer ([#244](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/244)) ([0dee0cf](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/0dee0cf))
+* **WebViewLocalServer.java:** return 404 error code when a local file is not found ([#217](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/217)) ([f7a551e](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/f7a551e)), closes [#216](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/216)
+
+
+### BREAKING CHANGES
+
+* **iOS:** Sets deployment-target to 11, so will only work on iOS 11+
+
+* Address changes
+* changes the default from 1 (never) to 0 (always)
+* **WebViewLocalServer.java:** Until now, the Android part of the plugin was returning a 200 http code even though
+the requested file didn't exist. This behavior was inconsistent with the historical behavior of the
+iOS webView. This change makes them both work in the same manner but introduces a breaking change
+for the current Android users that are expecting a 200 http code no matter what and are testing the
+not found error just by checking if the body is null.
+
 ## [2.3.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.0...v2.3.1) (2018-12-06)
 
 
