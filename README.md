@@ -31,6 +31,8 @@ This plugin uses WKWebView on iOS and the latest evergreen webview on Android. A
 
 Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `3.x`, which uses the new features that may not work with all apps. See [Requirements](#requirements) and [Migrating to 3.x](#migrating-to-3x).
 
+2.x documentation can be found [here](https://github.com/ionic-team/cordova-plugin-ionic-webview/blob/2.x/README.md).
+
 :book: **Documentation**: [https://beta.ionicframework.com/docs/building/webview][ionic-webview-docs]
 
 :mega: **Support/Questions?** Please see our [Support Page][ionic-support] for general support questions. The issues on GitHub should be reserved for bug reports and feature requests.
