@@ -5,6 +5,9 @@ var WebView = {
     if (!url) {
       return url;
     }
+    if (url.startsWith('/')) {
+        return window.WEBVIEW_FILE_PREFIX + "://" + url;
+    }
     if (url.startsWith('file://')) {
       return url.replace('file', window.WEBVIEW_FILE_PREFIX);
     }
