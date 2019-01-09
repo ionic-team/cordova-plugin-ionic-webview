@@ -67,7 +67,7 @@
 -(BOOL) isMediaExtension:(NSString *) pathExtension {
     NSArray * mediaExtensions = @[@"m4v", @"mov", @"mp4",
                            @"aac", @"ac3", @"aiff", @"au", @"flac", @"m4a", @"mp3", @"wav"];
-    if ([mediaExtensions containsObject:pathExtension]) {
+    if ([mediaExtensions containsObject:pathExtension.lowercaseString]) {
         return YES;
     }
     return NO;
