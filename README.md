@@ -97,6 +97,16 @@ WKWebView may not fully launch (the deviceready event may not fire) unless if th
 <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
 ```
 
+WKBind
+--------------
+The hostname the server will bind to. There aren't a lot of other valid options, but some prefer binding to "127.0.0.1"
+
+#### config.xml
+```xml
+<preference name="WKBind" value="localhost" />
+```
+
+
 Webserver port
 --------------
 You can set the port that the built-in local webserver will listen on (default is 8080) using the "WKPort" preference.
@@ -104,9 +114,19 @@ You can set the port that the built-in local webserver will listen on (default i
 If you change the port, be sure to also update your `<allow-navigation>` `href` attribute to match, as mentioned above in the Required Permissions section.
 
 #### config.xml
-```
+```xml
 <preference name="WKPort" value="12345" />
 <allow-navigation href="http://localhost:12345/*"/>
+```
+
+Maximum cache age
+--------------
+You can set the maximum cache-age the local webserver will starts with (default is 3600) using the "WKCacheAge" preference.
+ed above in the Required Permissions section.
+
+#### config.xml
+```xml
+<preference name="WKCacheAge" value="0" />
 ```
 
 Application Transport Security (ATS) in iOS 9

@@ -137,12 +137,17 @@
 }
 - (void)initWebServer:(NSDictionary*)settings
 {
-        [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
-        self.webServer = [[GCDWebServer alloc] init];
-        [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:3600 allowRangeRequests:YES];
+    [GCDWebServer setLogLevel: kGCDWebServerLoggingLevel_Warning];
+    self.webServer = [[GCDWebServer alloc] init];
+    int maxCache = [settings cordovaFloatSettingForKey:@"WKCacheAge" defaultValue:3600];
+    [self.webServer addGETHandlerForBasePath:@"/" directoryPath:@"/" indexFilename:nil cacheAge:maxCache allowRangeRequests:YES];
+    NSString *bind = [settings cordovaSettingForKey:@"WKBind"];
+    if (bind == nil) {
+        bind = @"localhost";
+    }
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
     if(portNumber != 8080){
-        self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://localhost:%d", portNumber];
+        self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"http://%@:%d", bind, portNumber];
     }
         NSDictionary *options = @{
                                   GCDWebServerOption_Port: @(portNumber),
