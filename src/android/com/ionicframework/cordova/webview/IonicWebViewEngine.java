@@ -144,8 +144,6 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
       super.onPageFinished(view, url);
       view.loadUrl("javascript:(function() { " +
               "window.WEBVIEW_SERVER_URL = '" + CDV_LOCAL_SERVER + "';" +
-              "window.WEBVIEW_FILE_PREFIX = '" + WebViewLocalServer.ionicFileScheme + "';" +
-              "window.WEBVIEW_CONTENT_PREFIX = '" + WebViewLocalServer.ionicContentScheme + "';" +
               "})()");
     }
   }

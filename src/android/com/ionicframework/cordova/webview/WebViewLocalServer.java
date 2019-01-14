@@ -50,8 +50,8 @@ public class WebViewLocalServer {
   private String basePath;
   private final static String httpScheme = "http";
   private final static String httpsScheme = "https";
-  public final static String ionicFileScheme = "app-file";
-  public final static String ionicContentScheme = "app-content";
+  public final static String fileStart = "/_app_file_";
+  public final static String contentStart = "/_app_content_";
 
   private final UriMatcher uriMatcher;
   private final AndroidProtocolHandler protocolHandler;
@@ -229,7 +229,8 @@ public class WebViewLocalServer {
   }
 
   private boolean isLocalFile(Uri uri) {
-    if (uri.getScheme().equals(ionicContentScheme) || uri.getScheme().equals(ionicFileScheme)) {
+    String path = uri.getPath();
+    if (path.startsWith(contentStart) || path.startsWith(fileStart)) {
       return true;
     }
     return false;
@@ -406,16 +407,16 @@ public class WebViewLocalServer {
       public InputStream handle(Uri url) {
         InputStream stream = null;
         String path = url.getPath();
-        if (!isAsset) {
-          path = basePath + url.getPath();
-        }
         try {
-          if ((url.getScheme().equals(httpScheme) || url.getScheme().equals(httpsScheme)) && isAsset) {
-            stream = protocolHandler.openAsset(assetPath + path);
-          } else if (url.getScheme().equals(ionicFileScheme) || !isAsset) {
-            stream = protocolHandler.openFile(path);
-          } else if (url.getScheme().equals(ionicContentScheme)) {
+          if (path.startsWith(contentStart)) {
             stream = protocolHandler.openContentUrl(url);
+          } else if (path.startsWith(fileStart) || !isAsset) {
+            if (!path.startsWith(fileStart)) {
+              path = basePath + url.getPath();
+            }
+            stream = protocolHandler.openFile(path);
+          } else {
+            stream = protocolHandler.openAsset(assetPath + path);
           }
         } catch (IOException e) {
           Log.e(TAG, "Unable to open asset URL: " + url);
@@ -428,8 +429,6 @@ public class WebViewLocalServer {
 
     registerUriForScheme(httpScheme, handler, authority);
     registerUriForScheme(httpsScheme, handler, authority);
-    registerUriForScheme(ionicFileScheme, handler, "");
-    registerUriForScheme(ionicContentScheme, handler, "");
 
   }
 
