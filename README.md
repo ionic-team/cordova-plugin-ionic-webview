@@ -56,11 +56,22 @@ Default value is `localhost`.
 Example `ionic://app` on iOS, `http://app` on Android.
 
 If you change it, you'll need to add a new `allow-navigation` entry in the `config.xml` for the configured url (i.e `<allow-navigation href="http://app/*"/>` if `Hostname` is set to `app`).
-This is only needed for the Android url as it uses `http://`, all `ionic://` urls are whitelisted by the plugin.
+This is only needed for the Android url when using `http://`, `https://` or a custom scheme. All `ionic://` urls are whitelisted by the plugin.
 
 ### Android Preferences
 
 Preferences only available Android platform
+
+#### Scheme
+
+```xml
+<preference name="Scheme" value="https" />
+```
+
+Default value is `http`
+
+Configures the Scheme the app uses to load the content.
+
 
 #### MixedContentMode
 
@@ -112,9 +123,9 @@ Whether to use a dark styled keyboard on iOS
     cordova plugin add cordova-plugin-ionic-webview@latest
     ```
 
-1. Apps are now served from HTTP on Android.
+1. Apps are now served from HTTP on Android by default.
 
-    * The default origin for requests from the Android WebView is `http://localhost`. If `Hostname` preference is set, then origin will be  `http://HostnameValue`.
+    * The default origin for requests from the Android WebView is `http://localhost`. If `Hostname` and `Scheme` preferences are set, then origin will be `schemeValue://HostnameValue`.
 
 1. Apps are now served from `ionic://` scheme on iOS.
 
