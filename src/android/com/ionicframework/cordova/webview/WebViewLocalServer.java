@@ -48,14 +48,15 @@ import java.util.UUID;
 public class WebViewLocalServer {
   private static String TAG = "WebViewAssetServer";
   private String basePath;
-  private final static String httpScheme = "http";
-  private final static String httpsScheme = "https";
+  public final static String httpScheme = "http";
+  public final static String httpsScheme = "https";
   public final static String fileStart = "/_app_file_";
   public final static String contentStart = "/_app_content_";
 
   private final UriMatcher uriMatcher;
   private final AndroidProtocolHandler protocolHandler;
   private final String authority;
+  private final String customScheme;
   // Whether we're serving local files or proxying (for example, when doing livereload on a
   // non-local endpoint (will be false in that case)
   private boolean isAsset;
@@ -161,12 +162,13 @@ public class WebViewLocalServer {
     }
   }
 
-  WebViewLocalServer(Context context, String authority, boolean html5mode, ConfigXmlParser parser) {
+  WebViewLocalServer(Context context, String authority, boolean html5mode, ConfigXmlParser parser, String customScheme) {
     uriMatcher = new UriMatcher(null);
     this.html5mode = html5mode;
     this.parser = parser;
     this.protocolHandler = new AndroidProtocolHandler(context.getApplicationContext());
     this.authority = authority;
+    this.customScheme = customScheme;
   }
 
   private static Uri parseAndVerifyUrl(String url) {
@@ -245,7 +247,7 @@ public class WebViewLocalServer {
               handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), responseStream);
     }
 
-    if (path.equals("/") || (!uri.getLastPathSegment().contains(".") && html5mode)) {
+    if (path.equals("") || path.equals("/") || (!uri.getLastPathSegment().contains(".") && html5mode)) {
       InputStream stream;
       String launchURL = parser.getLaunchUrl();
       String launchFile = launchURL.substring(launchURL.lastIndexOf("/") + 1, launchURL.length());
@@ -429,6 +431,9 @@ public class WebViewLocalServer {
 
     registerUriForScheme(httpScheme, handler, authority);
     registerUriForScheme(httpsScheme, handler, authority);
+    if (!customScheme.equals(httpScheme) && !customScheme.equals(httpsScheme)) {
+      registerUriForScheme(customScheme, handler, authority);
+    }
 
   }
 
