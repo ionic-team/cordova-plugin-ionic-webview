@@ -16,15 +16,20 @@
     NSString * scheme = url.scheme;
 
     if ([scheme isEqualToString:IONIC_SCHEME]) {
-        startPath = self.basePath;
-        if ([stringToLoad isEqualToString:@""] || [url.pathExtension isEqualToString:@""]) {
-            startPath = [startPath stringByAppendingString:@"/index.html"];
-        } else {
-            startPath = [startPath stringByAppendingString:stringToLoad];
+        NSRange range = [stringToLoad rangeOfString:@"?"];
+        if (range.location != NSNotFound) {
+            stringToLoad = [stringToLoad substringToIndex:range.location];
         }
-    } else if ([scheme isEqualToString:IONIC_FILE_SCHEME]) {
-        if (![stringToLoad isEqualToString:@""]) {
-            startPath = stringToLoad;
+
+        if ([stringToLoad hasPrefix:@"/_app_file_"]) {
+            startPath = [stringToLoad stringByReplacingOccurrencesOfString:@"/_app_file_" withString:@""];
+        } else {
+            startPath = self.basePath;
+            if ([stringToLoad isEqualToString:@""] || [url.pathExtension isEqualToString:@""]) {
+                startPath = [startPath stringByAppendingString:@"/index.html"];
+            } else {
+                startPath = [startPath stringByAppendingString:stringToLoad];
+            }
         }
     }
 

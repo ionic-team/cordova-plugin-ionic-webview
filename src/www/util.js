@@ -6,15 +6,14 @@ var WebView = {
       return url;
     }
     if (url.startsWith('/')) {
-        return window.WEBVIEW_FILE_PREFIX + "://" + url;
+      return window.WEBVIEW_SERVER_URL + '/_app_file_' + url;
     }
     if (url.startsWith('file://')) {
-      return url.replace('file', window.WEBVIEW_FILE_PREFIX);
+      return window.WEBVIEW_SERVER_URL + url.replace('file://', '/_app_file_');
     }
     if (url.startsWith('content://')) {
-        return url.replace('content://', window.WEBVIEW_CONTENT_PREFIX + ':///');
+      return window.WEBVIEW_SERVER_URL + url.replace('content:/', '/_app_content_');
     }
-
     return url;
   },
   setServerBasePath: function(path) {
