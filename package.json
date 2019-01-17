@@ -25,6 +25,11 @@
       "2.0.0": {
         "cordova-android": ">=6.4.0",
         "cordova-ios": ">=4.0.0-dev"
+      },
+      "3.1.0": {
+        "cordova-android": ">=6.4.0",
+        "cordova-ios": ">=4.0.0-dev",
+        "cordova": ">=7.1.0"
       }
     }
   },

@@ -27,6 +27,7 @@
     <repo>https://github.com/ionic-team/cordova-plugin-ionic-webview</repo>
 
 	<engines>
+        <engine name="cordova" version=">=7.1.0"/>
         <engine name="cordova-ios" version=">=4.0.0-dev"/>
         <engine name="apple-ios" version=">=11.0"/>
         <engine name="cordova-android" version=">=6.4.0"/>
