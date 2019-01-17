@@ -48,25 +48,20 @@ import java.util.UUID;
 public class WebViewLocalServer {
   private static String TAG = "WebViewAssetServer";
   private String basePath;
-  /**
-   * capacitorapp.net is reserved by the Ionic team for use in local capacitor apps.
-   */
-  public final static String knownUnusedAuthority = "capacitorapp.net";
   private final static String httpScheme = "http";
   private final static String httpsScheme = "https";
+  public final static String fileStart = "/_app_file_";
+  public final static String contentStart = "/_app_content_";
 
   private final UriMatcher uriMatcher;
   private final AndroidProtocolHandler protocolHandler;
   private final String authority;
   // Whether we're serving local files or proxying (for example, when doing livereload on a
   // non-local endpoint (will be false in that case)
-  private final boolean isLocal;
   private boolean isAsset;
   // Whether to route all requests to paths without extensions back to `index.html`
   private final boolean html5mode;
   private ConfigXmlParser parser;
-
-  public String getAuthority() { return authority; }
 
   /**
    * A handler that produces responses for paths on the virtual asset server.
@@ -169,18 +164,7 @@ public class WebViewLocalServer {
     this.html5mode = html5mode;
     this.parser = parser;
     this.protocolHandler = new AndroidProtocolHandler(context.getApplicationContext());
-    if (authority != null) {
-      this.authority = authority;
-      if (authority.startsWith("localhost")) {
-        this.isLocal = true;
-      } else {
-        this.isLocal = false;
-      }
-
-    } else {
-      this.isLocal = true;
-      this.authority = UUID.randomUUID().toString() + "" + knownUnusedAuthority;
-    }
+    this.authority = authority;
   }
 
   private static Uri parseAndVerifyUrl(String url) {
@@ -226,7 +210,7 @@ public class WebViewLocalServer {
       return null;
     }
 
-    if (this.isLocal) {
+    if (isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {
       Log.d("SERVER", "Handling local request: " + uri.toString());
       return handleLocalRequest(uri, handler);
     } else {
@@ -234,8 +218,24 @@ public class WebViewLocalServer {
     }
   }
 
+  private boolean isLocalFile(Uri uri) {
+    String path = uri.getPath();
+    if (path.startsWith(contentStart) || path.startsWith(fileStart)) {
+      return true;
+    }
+    return false;
+  }
+
   private WebResourceResponse handleLocalRequest(Uri uri, PathHandler handler) {
     String path = uri.getPath();
+
+    if (isLocalFile(uri)) {
+      InputStream responseStream = new LollipopLazyInputStream(handler, uri);
+      String mimeType = getMimeType(path, responseStream);
+      return createWebResourceResponse(mimeType, handler.getEncoding(),
+              handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), responseStream);
+    }
+
     if (path.equals("/") || (!uri.getLastPathSegment().contains(".") && html5mode)) {
       InputStream stream;
       String launchURL = parser.getLaunchUrl();
@@ -243,7 +243,7 @@ public class WebViewLocalServer {
       try {
         String startPath = this.basePath + "/" + launchFile;
         if (isAsset) {
-          stream = protocolHandler.openAsset(startPath, "");
+          stream = protocolHandler.openAsset(startPath);
         } else {
           stream = protocolHandler.openFile(startPath);
         }
@@ -367,10 +367,9 @@ public class WebViewLocalServer {
    *
    * @param assetPath the local path in the application's asset folder which will be made
    *                  available by the server (for example "/www").
-   * @return prefixes under which the assets are hosted.
    */
-  public AssetHostingDetails hostAssets(String assetPath) {
-    return hostAssets(authority, assetPath, "", true, true);
+  public void hostAssets(String assetPath) {
+    hostAssets(authority, assetPath, "", true, true);
   }
 
 
@@ -384,11 +383,10 @@ public class WebViewLocalServer {
    * @param virtualAssetPath the path on the local server under which the assets should be hosted.
    * @param enableHttp       whether to enable hosting using the http scheme.
    * @param enableHttps      whether to enable hosting using the https scheme.
-   * @return prefixes under which the assets are hosted.
    */
-  public AssetHostingDetails hostAssets(final String assetPath, final String virtualAssetPath,
+  public void hostAssets(final String assetPath, final String virtualAssetPath,
                                         boolean enableHttp, boolean enableHttps) {
-    return hostAssets(authority, assetPath, virtualAssetPath, enableHttp,
+    hostAssets(authority, assetPath, virtualAssetPath, enableHttp,
             enableHttps);
   }
 
@@ -403,36 +401,39 @@ public class WebViewLocalServer {
    * @param virtualAssetPath the path on the local server under which the assets should be hosted.
    * @param enableHttp       whether to enable hosting using the http scheme.
    * @param enableHttps      whether to enable hosting using the https scheme.
-   * @return prefixes under which the assets are hosted.
    */
-  public AssetHostingDetails hostAssets(final String domain,
+  public void hostAssets(final String domain,
                                         final String assetPath, final String virtualAssetPath,
                                         boolean enableHttp, boolean enableHttps) {
     this.isAsset = true;
     this.basePath = assetPath;
-    Uri.Builder uriBuilder = new Uri.Builder();
-    uriBuilder.scheme(httpScheme);
-    uriBuilder.authority(domain);
-    uriBuilder.path(virtualAssetPath);
+
+    createHostingDetails();
+  }
+
+  private void createHostingDetails() {
+    final String assetPath = this.basePath;
 
     if (assetPath.indexOf('*') != -1) {
       throw new IllegalArgumentException("assetPath cannot contain the '*' character.");
     }
-    if (virtualAssetPath.indexOf('*') != -1) {
-      throw new IllegalArgumentException(
-              "virtualAssetPath cannot contain the '*' character.");
-    }
-
-    Uri httpPrefix = null;
-    Uri httpsPrefix = null;
 
     PathHandler handler = new PathHandler() {
       @Override
       public InputStream handle(Uri url) {
-        InputStream stream;
-        String path = url.getPath().replaceFirst(virtualAssetPath, assetPath);
+        InputStream stream = null;
+        String path = url.getPath();
         try {
-          stream = protocolHandler.openAsset(path, assetPath);
+          if (path.startsWith(contentStart)) {
+            stream = protocolHandler.openContentUrl(url);
+          } else if (path.startsWith(fileStart) || !isAsset) {
+            if (!path.startsWith(fileStart)) {
+              path = basePath + url.getPath();
+            }
+            stream = protocolHandler.openFile(path);
+          } else {
+            stream = protocolHandler.openAsset(assetPath + path);
+          }
         } catch (IOException e) {
           Log.e(TAG, "Unable to open asset URL: " + url);
           return null;
@@ -442,18 +443,20 @@ public class WebViewLocalServer {
       }
     };
 
-    if (enableHttp) {
-      httpPrefix = uriBuilder.build();
-      register(Uri.withAppendedPath(httpPrefix, "/"), handler);
-      register(Uri.withAppendedPath(httpPrefix, "**"), handler);
-    }
-    if (enableHttps) {
-      uriBuilder.scheme(httpsScheme);
-      httpsPrefix = uriBuilder.build();
-      register(Uri.withAppendedPath(httpsPrefix, "/"), handler);
-      register(Uri.withAppendedPath(httpsPrefix, "**"), handler);
-    }
-    return new AssetHostingDetails(httpPrefix, httpsPrefix);
+    registerUriForScheme(httpScheme, handler, authority);
+    registerUriForScheme(httpsScheme, handler, authority);
+
+  }
+
+  private void registerUriForScheme(String scheme, PathHandler handler, String authority) {
+    Uri.Builder uriBuilder = new Uri.Builder();
+    uriBuilder.scheme(scheme);
+    uriBuilder.authority(authority);
+    uriBuilder.path("");
+    Uri uriPrefix = uriBuilder.build();
+
+    register(Uri.withAppendedPath(uriPrefix, "/"), handler);
+    register(Uri.withAppendedPath(uriPrefix, "**"), handler);
   }
 
   /**
@@ -545,62 +548,16 @@ public class WebViewLocalServer {
    *
    * @param basePath the local path in the application's data folder which will be made
    *                  available by the server (for example "/www").
-   * @return prefixes under which the assets are hosted.
    */
-  public AssetHostingDetails hostFiles(String basePath) {
-    return hostFiles(basePath, true, true);
+  public void hostFiles(String basePath) {
+    hostFiles(basePath, true, true);
   }
 
-  public AssetHostingDetails hostFiles(final String basePath, boolean enableHttp,
+  public void hostFiles(final String basePath, boolean enableHttp,
                                        boolean enableHttps) {
     this.isAsset = false;
     this.basePath = basePath;
-    Uri.Builder uriBuilder = new Uri.Builder();
-    uriBuilder.scheme(httpScheme);
-    uriBuilder.authority(authority);
-    uriBuilder.path("");
-
-    Uri httpPrefix = null;
-    Uri httpsPrefix = null;
-
-    PathHandler handler = new PathHandler() {
-      @Override
-      public InputStream handle(Uri url) {
-        InputStream stream;
-        try {
-          if (url.getPath().startsWith("/_file_/")) {
-            stream = protocolHandler.openFile( url.getPath().replace("/_file_/", ""));
-          } else {
-            stream = protocolHandler.openFile(basePath + url.getPath());
-          }
-        } catch (IOException e) {
-          Log.e(TAG, "Unable to open asset URL: " + url);
-          return null;
-        }
-
-        String mimeType = null;
-        try {
-          mimeType = URLConnection.guessContentTypeFromStream(stream);
-        } catch (Exception ex) {
-          Log.e(TAG, "Unable to get mime type" + url);
-        }
-
-        return stream;
-      }
-    };
-
-    if (enableHttp) {
-      httpPrefix = uriBuilder.build();
-      register(Uri.withAppendedPath(httpPrefix, "/"), handler);
-      register(Uri.withAppendedPath(httpPrefix, "**"), handler);
-    }
-    if (enableHttps) {
-      uriBuilder.scheme(httpsScheme);
-      httpsPrefix = uriBuilder.build();
-      register(Uri.withAppendedPath(httpsPrefix, "/"), handler);
-      register(Uri.withAppendedPath(httpsPrefix, "**"), handler);
-    }
-    return new AssetHostingDetails(httpPrefix, httpsPrefix);
+    createHostingDetails();
   }
 
   /**

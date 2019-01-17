@@ -26,18 +26,8 @@ public class AndroidProtocolHandler {
     this.context = context;
   }
 
-  public InputStream openAsset(String path, String assetPath) throws IOException {
-    if (path.startsWith(assetPath + "/_file_")) {
-      if (path.contains("content://")) {
-        String contentPath = path.replace(assetPath + "/_file_/", "content://");
-        return context.getContentResolver().openInputStream(Uri.parse(contentPath));
-      } else {
-        String filePath = path.replace(assetPath + "/_file_/", "");
-        return new FileInputStream(new File(filePath));
-      }
-    } else {
-      return context.getAssets().open(path, AssetManager.ACCESS_STREAMING);
-    }
+  public InputStream openAsset(String path) throws IOException {
+    return context.getAssets().open(path, AssetManager.ACCESS_STREAMING);
   }
 
   public InputStream openResource(Uri uri) {
@@ -78,8 +68,20 @@ public class AndroidProtocolHandler {
   }
 
   public InputStream openFile(String filePath) throws IOException  {
-    File localFile = new File(filePath);
+    String realPath = filePath.replace(WebViewLocalServer.fileStart, "");
+    File localFile = new File(realPath);
     return new FileInputStream(localFile);
+  }
+
+  public InputStream openContentUrl(Uri uri)  throws IOException {
+    String realPath = uri.toString().replace(uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + WebViewLocalServer.contentStart, "content:/");
+    InputStream stream = null;
+    try {
+      stream = context.getContentResolver().openInputStream(Uri.parse(realPath));
+    } catch (SecurityException e) {
+      Log.e(TAG, "Unable to open content URL: " + uri, e);
+    }
+    return stream;
   }
 
   private static int getFieldId(Context context, String assetType, String assetName)

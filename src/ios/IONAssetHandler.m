@@ -14,15 +14,15 @@ API_AVAILABLE(ios(11.0)){
     NSString * stringToLoad = url.path;
     NSString * scheme = url.scheme;
     if ([scheme isEqualToString:@"ionic"]) {
-        startPath = self.basePath;
-        if ([stringToLoad isEqualToString:@""] || !url.pathExtension) {
-            startPath = [startPath stringByAppendingString:@"/index.html"];
+        if ([stringToLoad hasPrefix:@"/_app_file_"]) {
+            startPath = [stringToLoad stringByReplacingOccurrencesOfString:@"/_app_file_" withString:@""];
         } else {
-            startPath = [startPath stringByAppendingString:stringToLoad];
-        }
-    } else {
-        if (![stringToLoad isEqualToString:@""]) {
-            startPath = stringToLoad;
+            startPath = self.basePath;
+            if ([stringToLoad isEqualToString:@""] || [url.pathExtension isEqualToString:@""]) {
+                startPath = [startPath stringByAppendingString:@"/index.html"];
+            } else {
+                startPath = [startPath stringByAppendingString:stringToLoad];
+            }
         }
     }
     
