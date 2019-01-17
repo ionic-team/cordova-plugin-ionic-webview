@@ -1,3 +1,17 @@
+# [3.1.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v3.0.0...v3.1.0) (2019-01-17)
+
+
+### Bug Fixes
+
+* **ios:** Fix video playback of files with uppercase extension ([#264](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/264)) ([2c4b225](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/2c4b225)), closes [#260](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/260)
+* Set engines to require Cordova CLI 7.1.0 or newer ([#276](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/276)) ([40f42e1](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/40f42e1)), closes [#263](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/263)
+* Use a single scheme for all files ([#270](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/270)) ([3d1bcdd](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/3d1bcdd)), closes [#258](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/258)
+
+
+### Features
+
+* **Android:** Make app Scheme configurable with a preference ([#274](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/274)) ([18d9f2c](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/18d9f2c)), closes [#269](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/269) [#255](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/255)
+
 # [3.0.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.1...v3.0.0) (2019-01-03)
 
 
