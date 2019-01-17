@@ -111,6 +111,7 @@ Whether to use a dark styled keyboard on iOS
 
 ## Plugin Requirements
 
+* **Cordova CLI**: 7.1.0+
 * **iOS**: iOS 11+ and `cordova-ios` 4+
 * **Android**: Android 4.4+ and `cordova-android` 6.4+
 
