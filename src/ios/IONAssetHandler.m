@@ -16,11 +16,6 @@
     NSString * scheme = url.scheme;
 
     if ([scheme isEqualToString:IONIC_SCHEME]) {
-        NSRange range = [stringToLoad rangeOfString:@"?"];
-        if (range.location != NSNotFound) {
-            stringToLoad = [stringToLoad substringToIndex:range.location];
-        }
-
         if ([stringToLoad hasPrefix:@"/_app_file_"]) {
             startPath = [stringToLoad stringByReplacingOccurrencesOfString:@"/_app_file_" withString:@""];
         } else {
