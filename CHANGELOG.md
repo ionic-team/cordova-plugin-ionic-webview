@@ -1,3 +1,13 @@
+# [2.3.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.1...v2.3.2) (2019-01-18)
+
+
+### Bug Fixes
+
+* **ios:** Fix video playback of files with uppercase extension ([#277](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/277)), closes [#260](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/260)
+* Use a single scheme for all files ([#278](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/278)), closes [#258](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/258)
+
+
+
 ## [2.3.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.0...v2.3.1) (2018-12-06)
 
 
