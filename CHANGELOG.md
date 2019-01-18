@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v3.1.0...v3.1.1) (2019-01-18)
+
+
+### Bug Fixes
+
+* **ios:** Remove unused code ([#281](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/281)) ([fc7ea27](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/fc7ea27))
+
 # [3.1.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v3.0.0...v3.1.0) (2019-01-17)
 
 
