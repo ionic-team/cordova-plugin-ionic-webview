@@ -118,7 +118,7 @@
 
 NSTimer *timer;
 
-NSString * const IONIC_SCHEME = @"ionic";
+NSString * const IONIC_SCHEME = @"httpsionic";
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
