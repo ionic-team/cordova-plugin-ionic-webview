@@ -14,6 +14,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import java.io.File;
 import org.apache.cordova.ConfigXmlParser;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPreferences;
@@ -76,7 +77,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     }
     SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
     String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
-    if (!isDeployDisabled() && !isNewBinary() && path != null && !path.isEmpty()) {
+    if (!isDeployDisabled() && !isNewBinary() && path != null && !path.isEmpty() && new File(path).exists()) {
       setServerBasePath(path);
     }
   }
