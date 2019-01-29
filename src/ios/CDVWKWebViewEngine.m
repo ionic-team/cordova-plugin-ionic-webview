@@ -405,7 +405,11 @@ NSString * const IONIC_SCHEME = @"ionic";
     if (request.URL.fileURL) {
         NSURL* startURL = [NSURL URLWithString:((CDVViewController *)self.viewController).startPage];
         NSString* startFilePath = [self.commandDelegate pathForResource:[startURL path]];
-        NSURL *url = [[NSURL URLWithString:self.CDV_LOCAL_SERVER] URLByAppendingPathComponent:request.URL.path];
+        NSString* strUrl = request.URL.path;
+        if ([strUrl hasPrefix:@"/_app_file_"] == NO) {
+            strUrl = [@"/_app_file_" stringByAppendingString:strUrl];
+        }
+        NSURL *url = [[NSURL URLWithString:self.CDV_LOCAL_SERVER] URLByAppendingPathComponent:strUrl];
         if ([request.URL.path isEqualToString:startFilePath]) {
             url = [NSURL URLWithString:self.CDV_LOCAL_SERVER];
         }
