@@ -1,4 +1,11 @@
-# [2.3.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.1...v2.3.2) (2019-01-18)
+# [2.3.3](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.2...v2.3.3) (2019-02-01)
+
+
+### Bug Fixes
+
+* **Android:** Handle range requests ([#295](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/295))
+
+## [2.3.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.1...v2.3.2) (2019-01-18)
 
 
 ### Bug Fixes
@@ -15,7 +22,7 @@
 
 * Handle convertFileSrc when using ionic:// scheme ([#236](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/236)) ([89ce899](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/89ce899))
 
-# [2.3.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.5...v2.3.0) (2018-12-05)
+## [2.3.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.2.5...v2.3.0) (2018-12-05)
 
 
 ### Features
