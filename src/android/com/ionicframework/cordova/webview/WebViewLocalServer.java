@@ -19,6 +19,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 
 import org.apache.cordova.ConfigXmlParser;
@@ -201,7 +202,7 @@ public class WebViewLocalServer {
    * @param uri the request Uri to process.
    * @return a response if the request URL had a matching handler, null if no handler was found.
    */
-  public WebResourceResponse shouldInterceptRequest(Uri uri) {
+  public WebResourceResponse shouldInterceptRequest(Uri uri, WebResourceRequest request) {
     PathHandler handler;
     synchronized (uriMatcher) {
       handler = (PathHandler) uriMatcher.match(uri);
@@ -212,7 +213,7 @@ public class WebViewLocalServer {
 
     if (isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {
       Log.d("SERVER", "Handling local request: " + uri.toString());
-      return handleLocalRequest(uri, handler);
+      return handleLocalRequest(uri, handler, request);
     } else {
       return handleProxyRequest(uri, handler);
     }
@@ -226,9 +227,31 @@ public class WebViewLocalServer {
     return false;
   }
 
-  private WebResourceResponse handleLocalRequest(Uri uri, PathHandler handler) {
+  private WebResourceResponse handleLocalRequest(Uri uri, PathHandler handler, WebResourceRequest request) {
     String path = uri.getPath();
-
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && request != null && request.getRequestHeaders().get("Range") != null) {
+      InputStream responseStream = new LollipopLazyInputStream(handler, uri);
+      String mimeType = getMimeType(path, responseStream);
+      Map<String, String> tempResponseHeaders = handler.getResponseHeaders();
+      int statusCode = 206;
+      try {
+        int totalRange = responseStream.available();
+        String rangeString = request.getRequestHeaders().get("Range");
+        String[] parts = rangeString.split("=");
+        String[] streamParts = parts[1].split("-");
+        String fromRange = streamParts[0];
+        int range = totalRange-1;
+        if (streamParts.length > 1) {
+          range = Integer.parseInt(streamParts[1]);
+        }
+        tempResponseHeaders.put("Accept-Ranges", "bytes");
+        tempResponseHeaders.put("Content-Range", "bytes " + fromRange + "-" + range + "/" + totalRange);
+      } catch (IOException e) {
+        statusCode = 404;
+      }
+      return createWebResourceResponse(mimeType, handler.getEncoding(),
+              statusCode, handler.getReasonPhrase(), tempResponseHeaders, responseStream);
+    }
     if (isLocalFile(uri)) {
       InputStream responseStream = new LollipopLazyInputStream(handler, uri);
       String mimeType = getMimeType(path, responseStream);
