@@ -96,7 +96,7 @@ Preferences only available for iOS platform
 #### WKSuspendInBackground
 
 ```xml
-<preference name="WKSuspendInBackground" value="false" />
+<preference name="WKSuspendInBackground" value="true" />
 ```
 
 Set to false to stop WKWebView suspending in background too eagerly.
