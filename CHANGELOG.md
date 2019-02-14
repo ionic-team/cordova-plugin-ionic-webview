@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v3.1.1...v3.1.2) (2019-02-04)
+
+
+### Bug Fixes
+
+* **Android:** Handle Range Requests for proper media file handling ([#298](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/298)) ([6f18248](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/6f18248)), closes [#248](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/248) [#205](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/205) [#141](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/141)
+
 ## [3.1.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v3.1.0...v3.1.1) (2019-01-18)
 
 
