@@ -118,8 +118,6 @@
 
 NSTimer *timer;
 
-NSString * const IONIC_SCHEME = @"ionic";
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super init];
@@ -197,7 +195,11 @@ NSString * const IONIC_SCHEME = @"ionic";
     if(bind == nil){
         bind = @"localhost";
     }
-    self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"%@://%@",IONIC_SCHEME, bind];
+    NSString *scheme = [settings cordovaSettingForKey:@"iosScheme"];
+    if(scheme == nil || [scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"]  || [scheme isEqualToString:@"file"]){
+        scheme = @"ionic";
+    }
+    self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"%@://%@", scheme, bind];
 
     self.uiDelegate = [[CDVWKWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
 
@@ -238,9 +240,8 @@ NSString * const IONIC_SCHEME = @"ionic";
     WKWebViewConfiguration* configuration = [self createConfigurationFromSettings:settings];
     configuration.userContentController = userContentController;
 
-    self.handler = [[IONAssetHandler alloc] init];
-    [self.handler setAssetPath:[self getStartPath]];
-    [configuration setURLSchemeHandler:self.handler forURLScheme:IONIC_SCHEME];
+    self.handler = [[IONAssetHandler alloc] initWithBasePath:[self getStartPath] andScheme:scheme];
+    [configuration setURLSchemeHandler:self.handler forURLScheme:scheme];
 
     // re-create WKWebView, since we need to update configuration
     // remove from keyWindow before recreating

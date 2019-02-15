@@ -93,6 +93,20 @@ Other possible values are `1` (`MIXED_CONTENT_NEVER_ALLOW`) and `2` (`MIXED_CONT
 
 Preferences only available for iOS platform
 
+#### iosScheme
+
+```xml
+<preference name="iosScheme" value="httpsionic" />
+```
+
+Default value is `ionic`
+
+Configures the Scheme the app uses to load the content.
+
+Values like `http`, `https` or `file` are not valid and will use default value instead.
+
+If you change it, you'll need to add a new `allow-navigation` entry in the `config.xml` for the configured scheme (i.e `<allow-navigation href="httpsionic://*"/>` if `iosScheme` is set to `httpsionic`).
+
 #### WKSuspendInBackground
 
 ```xml
@@ -128,9 +142,9 @@ Whether to use a dark styled keyboard on iOS
 
     * The default origin for requests from the Android WebView is `http://localhost`. If `Hostname` and `Scheme` preferences are set, then origin will be `schemeValue://HostnameValue`.
 
-1. Apps are now served from `ionic://` scheme on iOS.
+1. Apps are now served from `ionic://` scheme on iOS by default.
 
-    * The default origin for requests from the iOS WebView is `ionic://localhost`. If `Hostname` preference is set, then origin will be `ionic://HostnameValue`.
+    * The default origin for requests from the iOS WebView is `ionic://localhost`. If `Hostname` and `iosScheme` preferences are set, then origin will be `iosSchemeValue://HostnameValue`.
 
 1. Replace any usages of `window.Ionic.normalizeURL()` with `window.Ionic.WebView.convertFileSrc()`.
 
