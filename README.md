@@ -80,7 +80,7 @@ Example `ionic://app`
 
 #### WKSuspendInBackground (Removed in 2.4.0)
 
-This preference has been removed in 2.4.0 version of the plugin. Apps relying on this preference will not work as intended after the update. It will act as the previous default value, which was true.
+This preference has been removed in 2.4.0 version of the plugin as it relied on a private API. Apps relying on this preference will not work as intended after the update. It will act as the previous default value, which was true.
 
 ```xml
 <preference name="WKSuspendInBackground" value="true" />
