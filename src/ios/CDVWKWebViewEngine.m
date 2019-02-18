@@ -117,8 +117,6 @@
 // expose private configuration value required for background operation
 @interface WKWebViewConfiguration ()
 
-@property (setter=_setAlwaysRunsAtForegroundPriority:, nonatomic) bool _alwaysRunsAtForegroundPriority;
-
 @end
 
 
@@ -221,14 +219,8 @@ NSTimer *timer;
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
 
     //enable suspend in background if set in config
-    BOOL suspendInBackground = [settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
+    BOOL suspendInBackground = YES;
     int waitTime = 10;
-
-    //extend default connection coalescing time when background enabled
-    if(!suspendInBackground){
-        NSLog(@"CDVWKWebViewEngine: Suspend in background disabled");
-        waitTime = 60;
-    }
 
     NSDictionary *options = @{
                               GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
@@ -259,8 +251,6 @@ NSTimer *timer;
         return configuration;
     }
 
-    //required to stop wkwebview suspending in background too eagerly (as used in background mode plugin)
-    configuration._alwaysRunsAtForegroundPriority = ![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     configuration.allowsAirPlayForMediaPlayback = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
