@@ -1,4 +1,12 @@
-# [2.3.3](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.2...v2.3.3) (2019-02-01)
+# [2.4.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.3...v2.4.0) (2019-02-18)
+
+
+### Bug Fixes
+
+* **iOS:** Remove WKSuspendInBackground preference ([#310](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/310))
+
+
+## [2.3.3](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.2...v2.3.3) (2019-02-01)
 
 
 ### Bug Fixes
