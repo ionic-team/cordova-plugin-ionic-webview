@@ -1,3 +1,17 @@
+# [4.0.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v3.1.2...v4.0.0) (2019-02-18)
+
+
+### Features
+
+* **ios:** Make iOS app Scheme configurable with a preference ([#307](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/307)) ([d52d37e](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/d52d37e)), closes [#282](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/282)
+* **ios:** Remove WKSuspendInBackground preference ([#309](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/309)) ([73b6659](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/73b6659)), closes [#286](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/286)
+
+
+### BREAKING CHANGES
+
+* **ios:** Remove the WKSuspendInBackground preference, so app relying on that prefere will
+not behave as expected
+
 ## [3.1.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v3.1.1...v3.1.2) (2019-02-04)
 
 
