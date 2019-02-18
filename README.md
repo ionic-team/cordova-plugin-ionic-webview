@@ -29,7 +29,7 @@ A Web View plugin for Cordova, focused on providing the highest performance expe
 
 This plugin uses WKWebView on iOS and the latest evergreen webview on Android. Additionally, this plugin makes it easy to use HTML5 style routing that web developers expect for building single-page apps.
 
-Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `3.x`, which uses the new features that may not work with all apps. See [Requirements](#plugin-requirements) and [Migrating to 3.x](#migrating-to-3x).
+Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `4.x`, which uses the new features that may not work with all apps. See [Requirements](#plugin-requirements) and [Migrating to 4.x](#migrating-to-4x).
 
 2.x documentation can be found [here](https://github.com/ionic-team/cordova-plugin-ionic-webview/blob/2.x/README.md).
 
@@ -107,14 +107,6 @@ Values like `http`, `https` or `file` are not valid and will use default value i
 
 If you change it, you'll need to add a new `allow-navigation` entry in the `config.xml` for the configured scheme (i.e `<allow-navigation href="httpsionic://*"/>` if `iosScheme` is set to `httpsionic`).
 
-#### WKSuspendInBackground
-
-```xml
-<preference name="WKSuspendInBackground" value="true" />
-```
-
-Set to false to stop WKWebView suspending in background too eagerly.
-
 #### KeyboardAppearanceDark
 
 ```xml
@@ -129,7 +121,7 @@ Whether to use a dark styled keyboard on iOS
 * **iOS**: iOS 11+ and `cordova-ios` 4+
 * **Android**: Android 4.4+ and `cordova-android` 6.4+
 
-## Migrating to 3.x
+## Migrating to 4.x
 
 1. Remove and re-add the Web View plugin:
 
