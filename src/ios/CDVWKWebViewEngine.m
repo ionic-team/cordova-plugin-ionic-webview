@@ -176,7 +176,8 @@ NSTimer *timer;
     if (settings == nil) {
         return configuration;
     }
-
+    SEL selector = NSSelectorFromString(@"_setAlwaysRunsAtForegroundPriority:");
+    [configuration performSelector:selector withObject:@(TRUE)];
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     configuration.allowsAirPlayForMediaPlayback = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
