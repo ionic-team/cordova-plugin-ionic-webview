@@ -246,6 +246,8 @@ NSString * const IONIC_SCHEME = @"ionic";
     [self.engineWebView removeFromSuperview];
     WKWebView* wkWebView = [[WKWebView alloc] initWithFrame:self.frame configuration:configuration];
 
+    wkWebView.opaque = false;
+    
     [wkWebView.scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
 
     wkWebView.UIDelegate = self.uiDelegate;
