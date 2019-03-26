@@ -1,4 +1,12 @@
-# [2.4.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.3...v2.4.0) (2019-02-18)
+# [2.4.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.4.0...v2.4.1) (2019-03-26)
+
+
+### Bug Fixes
+
+* **iOS:**  Fix autofocus on iOS 12.2 ([#332](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/332))
+
+
+## [2.4.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.3.3...v2.4.0) (2019-02-18)
 
 
 ### Bug Fixes
