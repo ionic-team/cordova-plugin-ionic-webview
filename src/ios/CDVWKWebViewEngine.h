@@ -24,6 +24,7 @@
 
 @property (nonatomic, strong, readonly) id <WKUIDelegate> uiDelegate;
 @property (nonatomic, strong) NSString * basePath;
+@property (nonatomic) CGPoint lastContentOffset;
 
 -(void)setServerBasePath:(CDVInvokedUrlCommand*)command;
 -(void)getServerBasePath:(CDVInvokedUrlCommand*)command;

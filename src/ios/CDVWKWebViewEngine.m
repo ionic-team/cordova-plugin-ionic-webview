@@ -114,8 +114,6 @@
 
 @synthesize engineWebView = _engineWebView;
 
-NSTimer *timer;
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super init];
@@ -284,15 +282,18 @@ NSTimer *timer;
      selector:@selector(onAppWillEnterForeground:)
      name:UIApplicationWillEnterForegroundNotification object:nil];
 
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self
-     selector:@selector(keyboardWillHide)
-     name:UIKeyboardWillHideNotification object:nil];
+    if (@available(iOS 12.0, *)) {
+        // Handle keyboard dismissal leaving viewport shifted
+        [[NSNotificationCenter defaultCenter]
+         addObserver:self
+         selector:@selector(keyboardWillHide)
+         name:UIKeyboardWillHideNotification object:nil];
 
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self
-     selector:@selector(keyboardWillShow)
-     name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter]
+         addObserver:self
+         selector:@selector(keyboardWillShow)
+         name:UIKeyboardWillShowNotification object:nil];
+    }
 
     NSLog(@"Using Ionic WKWebView");
 
@@ -356,27 +357,17 @@ NSTimer *timer;
 
 -(void)keyboardWillHide
 {
-    if (@available(iOS 12.0, *)) {
-        timer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
-        [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    if (!CGPointEqualToPoint(self.lastContentOffset, self.webView.scrollView.contentOffset)) {
+        [self.webView.scrollView setContentOffset:self.lastContentOffset];
+        [self.webView.scrollView setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
     }
 }
 
 -(void)keyboardWillShow
 {
-    if (timer != nil) {
-        [timer invalidate];
-    }
+    self.lastContentOffset = self.webView.scrollView.contentOffset;
 }
 
--(void)keyboardDisplacementFix
-{
-    // https://stackoverflow.com/a/9637807/824966
-    [UIView animateWithDuration:.25 animations:^{
-        self.webView.scrollView.contentOffset = CGPointMake(0, 0);
-    }];
-
-}
 - (BOOL)shouldReloadWebView
 {
     WKWebView* wkWebView = (WKWebView*)_engineWebView;
