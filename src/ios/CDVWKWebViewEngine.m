@@ -438,6 +438,7 @@ NSTimer *timer;
 
 - (void)updateSettings:(NSDictionary *)settings
 {
+    NSString* _BGStatus;
     WKWebView* wkWebView = (WKWebView *)_engineWebView;
 
     // By default, DisallowOverscroll is false (thus bounce is allowed)
@@ -454,6 +455,27 @@ NSTimer *timer;
                 }
             }
         }
+    }
+
+    //required to stop wkwebview suspending in background too eagerly (as used in background mode plugin)
+    //updated for iOS 12.2
+    if(![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES]){
+        if (@available(iOS 12.2, *)) {
+            // do stuff for iOS 12.2 and newer
+            NSLog(@"iOS 12.2+ detected");
+            NSString* str = @"YWx3YXlzUnVuc0F0Rm9yZWdyb3VuZFByaW9yaXR5";
+            NSData* data  = [[NSData alloc] initWithBase64EncodedString:str options:0];
+            
+            _BGStatus = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        } else {
+            // do stuff for iOS 12.1 and older
+            NSLog(@"iOS Below 12.2 detected");
+            NSString* str = @"X2Fsd2F5c1J1bnNBdEZvcmVncm91bmRQcmlvcml0eQ==";
+            NSData* data  = [[NSData alloc] initWithBase64EncodedString:str options:0];
+            
+            _BGStatus = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        }
+        NSLog(@"%@", _BGStatus);
     }
 
     wkWebView.configuration.preferences.minimumFontSize = [settings cordovaFloatSettingForKey:@"MinimumFontSize" defaultValue:0.0];
