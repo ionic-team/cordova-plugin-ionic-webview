@@ -104,6 +104,9 @@
 // expose private configuration value required for background operation
 @interface WKWebViewConfiguration ()
 
+@property (setter=_setAlwaysRunsAtForegroundPriority:, nonatomic) bool _alwaysRunsAtForegroundPriority;
+@property (setter=_setAlwaysRunsAtForegroundPriority:, nonatomic) bool alwaysRunsAtForegroundPriority;
+
 @end
 
 
@@ -438,7 +441,6 @@ NSTimer *timer;
 
 - (void)updateSettings:(NSDictionary *)settings
 {
-    NSString* _BGStatus;
     WKWebView* wkWebView = (WKWebView *)_engineWebView;
 
     // By default, DisallowOverscroll is false (thus bounce is allowed)
@@ -463,19 +465,13 @@ NSTimer *timer;
         if (@available(iOS 12.2, *)) {
             // do stuff for iOS 12.2 and newer
             NSLog(@"iOS 12.2+ detected");
-            NSString* str = @"YWx3YXlzUnVuc0F0Rm9yZWdyb3VuZFByaW9yaXR5";
-            NSData* data  = [[NSData alloc] initWithBase64EncodedString:str options:0];
-            
-            _BGStatus = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            configuration.alwaysRunsAtForegroundPriority = ![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
         } else {
             // do stuff for iOS 12.1 and older
             NSLog(@"iOS Below 12.2 detected");
-            NSString* str = @"X2Fsd2F5c1J1bnNBdEZvcmVncm91bmRQcmlvcml0eQ==";
-            NSData* data  = [[NSData alloc] initWithBase64EncodedString:str options:0];
-            
-            _BGStatus = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            configuration._alwaysRunsAtForegroundPriority = ![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
         }
-        NSLog(@"%@", _BGStatus);
+        NSLog(@"CDVWKWebViewEngine: Suspend in background disabled");
     }
 
     wkWebView.configuration.preferences.minimumFontSize = [settings cordovaFloatSettingForKey:@"MinimumFontSize" defaultValue:0.0];
