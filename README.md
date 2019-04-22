@@ -54,6 +54,14 @@ Preferences available for both iOS and Android platforms
 
 The default port the server will listen on. _You should change this to a random port number!_
 
+```xml
+<preference name="WKPort" value="YOUR_RANDOM_PORT_NUMBER" />
+<allow-navigation href="http://localhost:YOUR_RANDOM_PORT_NUMBER/*"/>
+```
+
+Replace `localhost` with your custom HostName, if applicable.
+
+
 ### iOS Preferences
 
 Preferences only available for iOS platform
