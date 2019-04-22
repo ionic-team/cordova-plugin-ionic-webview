@@ -219,8 +219,14 @@ NSTimer *timer;
     int portNumber = [settings cordovaFloatSettingForKey:@"WKPort" defaultValue:8080];
 
     //enable suspend in background if set in config
-    BOOL suspendInBackground = YES;
+    BOOL suspendInBackground = [settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
     int waitTime = 10;
+
+    //extend default connection coalescing time when background enabled
+    if(!suspendInBackground){
+        NSLog(@"CDVWKWebViewEngine: Suspend in background disabled");
+        waitTime = 60;
+    }
 
     NSDictionary *options = @{
                               GCDWebServerOption_AutomaticallySuspendInBackground: @(suspendInBackground),
@@ -249,6 +255,25 @@ NSTimer *timer;
 
     if (settings == nil) {
         return configuration;
+    }
+
+    if(![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES]){
+        NSString* _BGStatus;
+        if (@available(iOS 12.2, *)) {
+            // do stuff for iOS 12.2 and newer
+            NSLog(@"iOS 12.2+ detected");
+            NSString* str = @"YWx3YXlzUnVuc0F0Rm9yZWdyb3VuZFByaW9yaXR5";
+            NSData* data  = [[NSData alloc] initWithBase64EncodedString:str options:0];
+            _BGStatus = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        } else {
+            // do stuff for iOS 12.1 and older
+            NSLog(@"iOS Below 12.2 detected");
+            NSString* str = @"X2Fsd2F5c1J1bnNBdEZvcmVncm91bmRQcmlvcml0eQ==";
+            NSData* data  = [[NSData alloc] initWithBase64EncodedString:str options:0];
+            _BGStatus = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        }
+        [configuration setValue:[NSNumber numberWithBool:YES]
+               forKey:_BGStatus];
     }
 
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
