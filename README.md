@@ -86,15 +86,14 @@ If `UseScheme` is set to yes, it will use the `HostName` value as the host of th
 
 Example `ionic://app`
 
-#### WKSuspendInBackground (Removed in 2.4.0)
-
-This preference has been removed in 2.4.0 version of the plugin as it relied on a private API. Apps relying on this preference will not work as intended after the update. It will act as the previous default value, which was true.
+#### WKSuspendInBackground
 
 ```xml
-<preference name="WKSuspendInBackground" value="true" />
+<preference name="WKSuspendInBackground" value="false" />
 ```
+Default value is `true` (suspend).
 
-Whether to try to keep the server running when the app is backgrounded. Note: the server will likely be suspended by the OS after a few minutes. In particular, long-lived background tasks are not allowed on iOS outside of select audio and geolocation tasks.
+Whether to suspend or try to keep the server running when the app is backgrounded. Note: the server will likely be suspended by the OS after a few minutes. In particular, long-lived background tasks are not allowed on iOS outside of select audio and geolocation tasks.
 
 #### WKBind
 
