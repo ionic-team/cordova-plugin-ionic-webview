@@ -107,6 +107,16 @@ Values like `http`, `https` or `file` are not valid and will use default value i
 
 If you change it, you'll need to add a new `allow-navigation` entry in the `config.xml` for the configured scheme (i.e `<allow-navigation href="httpsionic://*"/>` if `iosScheme` is set to `httpsionic`).
 
+#### WKSuspendInBackground
+
+ ```xml
+<preference name="WKSuspendInBackground" value="false" />
+```
+
+Default value is `true` (suspend).
+
+Set to false to stop WKWebView suspending in background too eagerly.
+
 #### KeyboardAppearanceDark
 
 ```xml
