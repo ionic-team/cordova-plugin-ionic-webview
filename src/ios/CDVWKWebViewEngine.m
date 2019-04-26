@@ -179,6 +179,21 @@ NSTimer *timer;
     if (settings == nil) {
         return configuration;
     }
+ 
+    //required to stop wkwebview suspending in background too eagerly (as used in background mode plugin)
+    //updated for iOS 12.2
+    if(![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES]){
+        if (@available(iOS 12.2, *)) {
+            // do stuff for iOS 12.2 and newer
+            NSLog(@"iOS 12.2+ detected");
+            configuration.alwaysRunsAtForegroundPriority = ![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
+        } else {
+            // do stuff for iOS 12.1 and older
+            NSLog(@"iOS Below 12.2 detected");
+            configuration._alwaysRunsAtForegroundPriority = ![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
+        }
+        NSLog(@"CDVWKWebViewEngine: Suspend in background disabled");
+    }
 
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
@@ -457,21 +472,6 @@ NSTimer *timer;
                 }
             }
         }
-    }
-
-    //required to stop wkwebview suspending in background too eagerly (as used in background mode plugin)
-    //updated for iOS 12.2
-    if(![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES]){
-        if (@available(iOS 12.2, *)) {
-            // do stuff for iOS 12.2 and newer
-            NSLog(@"iOS 12.2+ detected");
-            configuration.alwaysRunsAtForegroundPriority = ![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
-        } else {
-            // do stuff for iOS 12.1 and older
-            NSLog(@"iOS Below 12.2 detected");
-            configuration._alwaysRunsAtForegroundPriority = ![settings cordovaBoolSettingForKey:@"WKSuspendInBackground" defaultValue:YES];
-        }
-        NSLog(@"CDVWKWebViewEngine: Suspend in background disabled");
     }
 
     wkWebView.configuration.preferences.minimumFontSize = [settings cordovaFloatSettingForKey:@"MinimumFontSize" defaultValue:0.0];
