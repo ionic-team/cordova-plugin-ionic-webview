@@ -216,6 +216,15 @@ public class WebViewLocalServer {
    * @return a response if the request URL had a matching handler, null if no handler was found.
    */
   public WebResourceResponse shouldInterceptRequest(Uri uri, WebResourceRequest request) {
+    if (isProxySource(uri)) {
+        String fixedUri = uri.toString().replaceFirst("http://localhost/_app_proxy_/", "");
+        
+        InputStream responseStream = new LollipopLazyInputStream(handler, Uri.parse(fixedUri));
+        String mimeType = getMimeType(path, responseStream);
+        return createWebResourceResponse(mimeType, handler.getEncoding(),
+              handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), responseStream);
+    }
+
     PathHandler handler;
     synchronized (uriMatcher) {
       handler = (PathHandler) uriMatcher.match(uri);
@@ -225,7 +234,7 @@ public class WebViewLocalServer {
       return null;
     }
 
-    if (isProxySource(uri) || isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {
+    if (isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {
       Log.d("SERVER", "Handling local request: " + uri.toString());
       return handleLocalRequest(uri, handler, request);
     } else {
@@ -272,16 +281,7 @@ public class WebViewLocalServer {
       return createWebResourceResponse(mimeType, handler.getEncoding(),
               statusCode, handler.getReasonPhrase(), tempResponseHeaders, responseStream);
     }
-     
-    if (isProxySource(uri)) {
-      String fixedUri = uri.toString().replaceFirst("http://localhost/_app_proxy_/", "");
-        
-      InputStream responseStream = new LollipopLazyInputStream(handler, Uri.parse(fixedUri));
-      String mimeType = getMimeType(path, responseStream);
-      return createWebResourceResponse(mimeType, handler.getEncoding(),
-              handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), responseStream);
-    }
-      
+
     if (isLocalFile(uri)) {
       InputStream responseStream = new LollipopLazyInputStream(handler, uri);
       String mimeType = getMimeType(path, responseStream);
