@@ -53,6 +53,7 @@ public class WebViewLocalServer {
   public final static String httpsScheme = "https";
   public final static String fileStart = "/_app_file_";
   public final static String contentStart = "/_app_content_";
+  public final static String proxyStart = "/_app_proxy_";
 
   private final UriMatcher uriMatcher;
   private final AndroidProtocolHandler protocolHandler;
@@ -219,6 +220,7 @@ public class WebViewLocalServer {
     synchronized (uriMatcher) {
       handler = (PathHandler) uriMatcher.match(uri);
     }
+    
     if (handler == null) {
       return null;
     }
@@ -231,6 +233,11 @@ public class WebViewLocalServer {
     }
   }
 
+  private boolean isProxySource(Uri uri) {
+    String path = uri.getPath();
+    return path.startsWith(proxyStart);
+  }
+    
   private boolean isLocalFile(Uri uri) {
     String path = uri.getPath();
     if (path.startsWith(contentStart) || path.startsWith(fileStart)) {
@@ -265,6 +272,16 @@ public class WebViewLocalServer {
       return createWebResourceResponse(mimeType, handler.getEncoding(),
               statusCode, handler.getReasonPhrase(), tempResponseHeaders, responseStream);
     }
+     
+    if (isProxySource(uri)) {
+      String fixedUri = uri.toString().replaceFirst("http://localhost/_app_proxy_/", "");
+        
+      InputStream responseStream = new LollipopLazyInputStream(handler, Uri.parse(fixedUri));
+      String mimeType = getMimeType(path, responseStream);
+      return createWebResourceResponse(mimeType, handler.getEncoding(),
+              handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), responseStream);
+    }
+      
     if (isLocalFile(uri)) {
       InputStream responseStream = new LollipopLazyInputStream(handler, uri);
       String mimeType = getMimeType(path, responseStream);
