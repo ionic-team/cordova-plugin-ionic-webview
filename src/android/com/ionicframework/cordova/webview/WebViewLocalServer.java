@@ -225,7 +225,7 @@ public class WebViewLocalServer {
       return null;
     }
 
-    if (isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {
+    if (isProxySource(uri) || isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {
       Log.d("SERVER", "Handling local request: " + uri.toString());
       return handleLocalRequest(uri, handler, request);
     } else {
