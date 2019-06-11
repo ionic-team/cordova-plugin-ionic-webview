@@ -34,6 +34,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import java.net.URL;
+import java.net.URLConnection;
+
+
 /**
  * Helper class meant to be used with the android.webkit.WebView class to enable hosting assets,
  * resources and other data on 'virtual' http(s):// URL.
@@ -217,14 +221,22 @@ public class WebViewLocalServer {
    */
   public WebResourceResponse shouldInterceptRequest(Uri uri, WebResourceRequest request) {
     if (isProxySource(uri)) {
-        String fixedUri = uri.toString().replaceFirst("http://localhost/_app_proxy_/", "");
-        
-        InputStream responseStream = new LollipopLazyInputStream(handler, Uri.parse(fixedUri));
-        String mimeType = getMimeType(path, responseStream);
-        return createWebResourceResponse(mimeType, handler.getEncoding(),
-              handler.getStatusCode(), handler.getReasonPhrase(), handler.getResponseHeaders(), responseStream);
+        try {
+            String fixedUri = uri.toString().replaceFirst("http://localhost/_app_proxy_/", "");
+            URL httpsUrl = new URL(fixedUri);
+            URLConnection connection = httpsUrl.openConnection();
+            connection.setRequestProperty("Access-Control-Allow-Origin", "*");
+            connection.setRequestProperty("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
+            connection.setRequestProperty("Access-Control-Allow-Headers", "agent, user-data, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
+            return new WebResourceResponse(connection.getContentType(), connection.getContentEncoding(), connection.getInputStream());
+        } catch (Exception e) {
+            //an error occurred
+            return null;
+        }
     }
 
+    
     PathHandler handler;
     synchronized (uriMatcher) {
       handler = (PathHandler) uriMatcher.match(uri);
