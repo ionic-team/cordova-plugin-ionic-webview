@@ -28,15 +28,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
 
 import java.net.URL;
 import java.net.URLConnection;
-
 
 /**
  * Helper class meant to be used with the android.webkit.WebView class to enable hosting assets,
@@ -57,7 +55,7 @@ public class WebViewLocalServer {
   public final static String httpsScheme = "https";
   public final static String fileStart = "/_app_file_";
   public final static String contentStart = "/_app_content_";
-  public final static String proxyStart = "/_app_proxy_";
+  public final static String proxyStart = "/_local_proxy_";
 
   private final UriMatcher uriMatcher;
   private final AndroidProtocolHandler protocolHandler;
@@ -220,23 +218,6 @@ public class WebViewLocalServer {
    * @return a response if the request URL had a matching handler, null if no handler was found.
    */
   public WebResourceResponse shouldInterceptRequest(Uri uri, WebResourceRequest request) {
-    if (isProxySource(uri)) {
-        try {
-            String fixedUri = uri.toString().replaceFirst("http://localhost/_app_proxy_/", "");
-            URL httpsUrl = new URL(fixedUri);
-            URLConnection connection = httpsUrl.openConnection();
-            connection.setRequestProperty("Access-Control-Allow-Origin", "*");
-            connection.setRequestProperty("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
-            connection.setRequestProperty("Access-Control-Allow-Headers", "agent, user-data, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-
-            return new WebResourceResponse(connection.getContentType(), connection.getContentEncoding(), connection.getInputStream());
-        } catch (Exception e) {
-            //an error occurred
-            return null;
-        }
-    }
-
-    
     PathHandler handler;
     synchronized (uriMatcher) {
       handler = (PathHandler) uriMatcher.match(uri);
@@ -248,13 +229,18 @@ public class WebViewLocalServer {
 
     if (isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {
       Log.d("SERVER", "Handling local request: " + uri.toString());
-      return handleLocalRequest(uri, handler, request);
+
+      if(isLocalProxySource(uri)) {
+        return handleLocalProxyRequest(uri, request);
+      } else {
+        return handleLocalRequest(uri, handler, request);
+      }
     } else {
       return handleProxyRequest(uri, handler);
     }
   }
 
-  private boolean isProxySource(Uri uri) {
+  private boolean isLocalProxySource(Uri uri) {
     String path = uri.getPath();
     return path.startsWith(proxyStart);
   }
@@ -267,6 +253,38 @@ public class WebViewLocalServer {
     return false;
   }
 
+  private WebResourceResponse handleLocalProxyRequest(Uri uri, WebResourceRequest request) {
+    String fixedUri = uri.toString().replaceFirst("http://localhost/_local_proxy_/", ""); // Fix the url by removing the proxy schema
+
+    try {
+        URL httpsUrl = new URL(fixedUri);
+        URLConnection connection = httpsUrl.openConnection();
+        HttpURLConnection httpConnection = (HttpURLConnection)connection;
+
+        httpConnection.setRequestMethod(request.getMethod());
+        for (Map.Entry<String, String> entry : request.getRequestHeaders().entrySet()) {
+            httpConnection.setRequestProperty(entry.getKey(), entry.getValue());
+        }
+
+        httpConnection.connect();
+
+        // Pass them trough (Convert String,List<String> to String,String)
+        Map<String, String> headers = new HashMap<String, String>();
+        for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
+            headers.put(entry.getKey(), entry.getValue().get(0));
+        }
+        
+        // Bypass CORS
+        headers.put("Access-Control-Allow-Origin", "*");
+        headers.put("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
+        headers.put("Access-Control-Allow-Headers", "agent, user-data, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+        
+        return new WebResourceResponse(connection.getContentType(), connection.getContentEncoding(), httpConnection.getResponseCode(), httpConnection.getResponseMessage(), headers, connection.getInputStream());
+    } catch (Exception e) {
+        //an error occurred
+        return null;
+    }
+  }
 
   private WebResourceResponse handleLocalRequest(Uri uri, PathHandler handler, WebResourceRequest request) {
     String path = uri.getPath();

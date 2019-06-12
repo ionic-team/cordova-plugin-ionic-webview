@@ -14,6 +14,9 @@ var WebView = {
     if (url.startsWith('content://')) {
       return window.WEBVIEW_SERVER_URL + url.replace('content:/', '/_app_content_');
     }
+    if (url.startsWith('proxy://')) {
+      return window.WEBVIEW_SERVER_URL + url.replace('proxy:/', '/_local_proxy_');
+    }
     return url;
   },
   setServerBasePath: function(path) {
