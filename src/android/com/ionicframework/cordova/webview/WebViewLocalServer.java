@@ -218,10 +218,6 @@ public class WebViewLocalServer {
    * @return a response if the request URL had a matching handler, null if no handler was found.
    */
   public WebResourceResponse shouldInterceptRequest(Uri uri, WebResourceRequest request) {
-      if(isLocalProxySource(uri)) {
-        return handleLocalProxyRequest(uri, request);
-      }
-
     PathHandler handler;
     synchronized (uriMatcher) {
       handler = (PathHandler) uriMatcher.match(uri);
@@ -264,69 +260,34 @@ public class WebViewLocalServer {
         URL httpsUrl = new URL(fixedUri);
         URLConnection connection = httpsUrl.openConnection();
         HttpURLConnection httpConnection = (HttpURLConnection)connection;
-        InputStream responseStream = connection.getInputStream();
-
-        Map<String, String> headers = new HashMap<String, String>();
-        for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
-            String key = entry.getKey();
-            headers.put(key, entry.getValue().get(0));
-        }
         
-        int code = httpConnection.getResponseCode();
+        Map<String, String> headers = new HashMap<String, String>();
         if(request != null && request.getRequestHeaders().get("Range") != null) {
             String rangeString = request.getRequestHeaders().get("Range");
-            int contentLength = 0;
+            httpConnection.addRequestProperty("Range", rangeString);
+            
+            String contentHeader = connection.getHeaderFields().get("Content-Length").get(0);
 
-            if(responseStream.available() <= 0){
-                contentLength = Integer.parseInt(headers.get("Content-Length"));
-            } else {
-                contentLength = responseStream.available();
-            }
-
+            int contentLength = Integer.parseInt(contentHeader);
             String[] parts = rangeString.split("=");
             String[] streamParts = parts[1].split("-");
             String fromRange = streamParts[0];
             int range = contentLength - 1;
 
             headers.put("Accept-Ranges", "bytes");
-            //headers.put("Content-Length", headers.get("Content-Length"));
+            headers.put("Content-Length", contentHeader);
             headers.put("Content-Range", "bytes " + fromRange + "-" + range + "/" + contentLength);
-
-            /*
-            int contentLength = Integer.parseInt(contentStr[1]);
-            String[] parts = rangeString.split("=");
-            String[] streamParts = parts[1].split("-");
-            String fromRange = streamParts[0];
-            int range = contentLength - 1;
-
-            headers.put("Accept-Ranges", "bytes");
-            headers.put("Content-Length", contentStr[1]);
-            headers.put("Content-Range", "bytes " + fromRange + "-" + range + "/" + contentLength);*/
-
-            code = 206; // Partial content being served
-            //String[] contentLength = request.getRequestHeaders().get("Content-Length").split(",");
-
-            /*int currentRange = Integer.parseInt(rangeString.split("=")[1].replace("-", ""));
-            int totalRange = Integer.parseInt(contentLength[1].trim());
-
-            httpConnection.setRequestProperty("Range", rangeString);
-            //httpConnection.connect();
-
-            headers.put("Content-Length", contentLength[1].trim());
-            headers.put("Content-Range", "bytes " + currentRange + "-" + (totalRange - 1) + "/" + totalRange);*/
         }
 
         // Bypass CORS
         headers.put("Access-Control-Allow-Origin", "*");
         headers.put("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
         headers.put("Access-Control-Allow-Headers", "agent, user-data, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-        headers.put("Content-Type", request.getRequestHeaders().get("Content-Type"));
 
         return new WebResourceResponse(connection.getContentType(), connection.getContentEncoding(), 
-                code, httpConnection.getResponseMessage(), headers, responseStream);
+                httpConnection.getResponseCode(), httpConnection.getResponseMessage(), headers, httpConnection.getInputStream());
 
     } catch (Exception e) {
-        //an error occurred
         return null;
     }
   }
