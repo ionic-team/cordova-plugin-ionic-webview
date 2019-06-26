@@ -1,4 +1,12 @@
-# [2.5.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.4.1...v2.5.0) (2019-6-10)
+# [2.5.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.5.0...v2.5.1) (2019-6-26)
+
+
+### Bug Fixes
+
+* **iOS:**  show error message when app fails to load ([#382](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/382))
+
+
+## [2.5.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.4.1...v2.5.0) (2019-6-10)
 
 
 ### Bug Fixes
