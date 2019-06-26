@@ -692,6 +692,11 @@ NSTimer *timer;
         NSLog(@"%@", [errorUrl absoluteString]);
         [theWebView loadRequest:[NSURLRequest requestWithURL:errorUrl]];
     }
+#ifdef DEBUG
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleDefault handler:nil]];
+    [vc presentViewController:alertController animated:YES completion:nil];
+#endif
 }
 
 - (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
