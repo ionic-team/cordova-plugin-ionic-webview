@@ -136,7 +136,7 @@ Whether to use a dark styled keyboard on iOS
 1. Remove and re-add the Web View plugin:
 
     ```
-    cordova plugin rm cordova-plugin-ionic-webview
+    cordova plugin rm cordova-plugin-ionic-webview  --force
     cordova plugin add cordova-plugin-ionic-webview@latest
     ```
 
