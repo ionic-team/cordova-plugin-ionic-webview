@@ -601,7 +601,9 @@ static void * KVOContext = &KVOContext;
         if(request.URL.fragment) {
             url = [NSURL URLWithString:[@"#" stringByAppendingString:request.URL.fragment] relativeToURL:url];
         }
-        request = [NSURLRequest requestWithURL:url];
+        if (!self.useScheme) {
+            request = [NSURLRequest requestWithURL:url];
+        }
     }
     if ([self isSafeToReload]) {
         return [(WKWebView*)_engineWebView loadRequest:request];
