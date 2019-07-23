@@ -40,7 +40,7 @@
     "@semantic-release/github": "^5.0.6",
     "@semantic-release/npm": "^5.0.4",
     "commitizen": "^3.0.2",
-    "cz-conventional-changelog": "^2.1.0",
+    "cz-conventional-changelog": "^3.0.2",
     "semantic-release": "^15.9.17",
     "sync-cordova-xml": "^0.4.0"
   },
