@@ -125,6 +125,14 @@ Set to false to stop WKWebView suspending in background too eagerly.
 
 Whether to use a dark styled keyboard on iOS
 
+#### ScrollEnabled
+
+```xml
+<preference name="ScrollEnabled" value="true" />
+```
+
+Ionic apps work better if the WKWebView is not scrollable, so the scroll is disabled by default, but can be enabled with this preference. This only affects the main ScrollView of the WKWebView, so only affects the body, not other scrollable components.
+
 ## Plugin Requirements
 
 * **Cordova CLI**: 7.1.0+
