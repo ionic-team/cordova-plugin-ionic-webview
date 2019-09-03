@@ -66,19 +66,19 @@
         <allow-navigation href="ionic://*"/>
         <preference name="deployment-target" value="11.0"/>
         <feature name="IonicWebView">
-            <param name="ios-package" value="CDVWKWebViewEngine"/>
+            <param name="ios-package" value="IONWKWebViewEngine"/>
         </feature>
-        <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine"/>
+        <preference name="CordovaWebViewEngine" value="IONWKWebViewEngine"/>
     </config-file>
 
     <framework src="WebKit.framework" weak="true"/>
 
-    <header-file src="src/ios/CDVWKWebViewEngine.h"/>
-    <source-file src="src/ios/CDVWKWebViewEngine.m"/>
-    <header-file src="src/ios/CDVWKWebViewUIDelegate.h"/>
-    <source-file src="src/ios/CDVWKWebViewUIDelegate.m"/>
-    <header-file src="src/ios/CDVWKProcessPoolFactory.h"/>
-    <source-file src="src/ios/CDVWKProcessPoolFactory.m"/>
+    <header-file src="src/ios/IONWKWebViewEngine.h"/>
+    <source-file src="src/ios/IONWKWebViewEngine.m"/>
+    <header-file src="src/ios/IONWKWebViewUIDelegate.h"/>
+    <source-file src="src/ios/IONWKWebViewUIDelegate.m"/>
+    <header-file src="src/ios/IONWKProcessPoolFactory.h"/>
+    <source-file src="src/ios/IONWKProcessPoolFactory.m"/>
     <header-file src="src/ios/IONAssetHandler.h"/>
     <source-file src="src/ios/IONAssetHandler.m"/>
     <asset src="src/ios/wk-plugin.js" target="wk-plugin.js"/>

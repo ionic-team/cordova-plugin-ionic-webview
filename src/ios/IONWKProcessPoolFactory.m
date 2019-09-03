@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
-
+ 
  http://www.apache.org/licenses/LICENSE-2.0
-
+ 
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,15 +17,33 @@
  under the License.
  */
 
+#import <Foundation/Foundation.h>
 #import <WebKit/WebKit.h>
-#import <Cordova/CDV.h>
+#import "IONWKProcessPoolFactory.h"
 
-@interface CDVWKWebViewEngine : CDVPlugin <CDVWebViewEngineProtocol, WKScriptMessageHandler, WKNavigationDelegate>
+static IONWKProcessPoolFactory *factory = nil;
 
-@property (nonatomic, strong, readonly) id <WKUIDelegate> uiDelegate;
-@property (nonatomic, strong) NSString * basePath;
+@implementation IONWKProcessPoolFactory
 
--(void)setServerBasePath:(CDVInvokedUrlCommand*)command;
--(void)getServerBasePath:(CDVInvokedUrlCommand*)command;
++ (instancetype)sharedFactory
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        factory = [[IONWKProcessPoolFactory alloc] init];
+    });
+    
+    return factory;
+}
 
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _sharedPool = [[WKProcessPool alloc] init];
+    }
+    return self;
+}
+
+- (WKProcessPool*) sharedProcessPool {
+    return _sharedPool;
+}
 @end

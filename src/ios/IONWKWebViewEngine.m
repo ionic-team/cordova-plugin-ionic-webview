@@ -23,9 +23,9 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 
-#import "CDVWKWebViewEngine.h"
-#import "CDVWKWebViewUIDelegate.h"
-#import "CDVWKProcessPoolFactory.h"
+#import "IONWKWebViewEngine.h"
+#import "IONWKWebViewUIDelegate.h"
+#import "IONWKProcessPoolFactory.h"
 #import "IONAssetHandler.h"
 
 #define CDV_BRIDGE_NAME @"cordova"
@@ -80,7 +80,7 @@
 @end
 
 
-@interface CDVWKWeakScriptMessageHandler : NSObject <WKScriptMessageHandler>
+@interface IONWKWeakScriptMessageHandler : NSObject <WKScriptMessageHandler>
 
 @property (nonatomic, weak, readonly) id<WKScriptMessageHandler>scriptMessageHandler;
 
@@ -89,7 +89,7 @@
 @end
 
 
-@interface CDVWKWebViewEngine ()
+@interface IONWKWebViewEngine ()
 
 @property (nonatomic, strong, readwrite) UIView* engineWebView;
 @property (nonatomic, strong, readwrite) id <WKUIDelegate> uiDelegate;
@@ -110,7 +110,7 @@
 // see forwardingTargetForSelector: selector comment for the reason for this pragma
 #pragma clang diagnostic ignored "-Wprotocol"
 
-@implementation CDVWKWebViewEngine
+@implementation IONWKWebViewEngine
 
 @synthesize engineWebView = _engineWebView;
 
@@ -170,7 +170,7 @@ NSTimer *timer;
 - (WKWebViewConfiguration*) createConfigurationFromSettings:(NSDictionary*)settings
 {
     WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
-    configuration.processPool = [[CDVWKProcessPoolFactory sharedFactory] sharedProcessPool];
+    configuration.processPool = [[IONWKProcessPoolFactory sharedFactory] sharedProcessPool];
     configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
 
     if (settings == nil) {
@@ -216,16 +216,16 @@ NSTimer *timer;
     }
     self.CDV_LOCAL_SERVER = [NSString stringWithFormat:@"%@://%@", scheme, bind];
 
-    self.uiDelegate = [[CDVWKWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
+    self.uiDelegate = [[IONWKWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
 
-    CDVWKWeakScriptMessageHandler *weakScriptMessageHandler = [[CDVWKWeakScriptMessageHandler alloc] initWithScriptMessageHandler:self];
+    IONWKWeakScriptMessageHandler *weakScriptMessageHandler = [[IONWKWeakScriptMessageHandler alloc] initWithScriptMessageHandler:self];
 
     WKUserContentController* userContentController = [[WKUserContentController alloc] init];
     [userContentController addScriptMessageHandler:weakScriptMessageHandler name:CDV_BRIDGE_NAME];
     [userContentController addScriptMessageHandler:weakScriptMessageHandler name:CDV_IONIC_STOP_SCROLL];
 
     // Inject XHR Polyfill
-    NSLog(@"CDVWKWebViewEngine: trying to inject XHR polyfill");
+    NSLog(@"IONWKWebViewEngine: trying to inject XHR polyfill");
     WKUserScript *wkScript = [self wkPluginScript];
     if (wkScript) {
         [userContentController addUserScript:wkScript];
@@ -238,7 +238,7 @@ NSTimer *timer;
 
     BOOL autoCordova = [settings cordovaBoolSettingForKey:@"AutoInjectCordova" defaultValue:NO];
     if (autoCordova){
-        NSLog(@"CDVWKWebViewEngine: trying to inject XHR polyfill");
+        NSLog(@"IONWKWebViewEngine: trying to inject XHR polyfill");
         WKUserScript *cordova = [self autoCordovify];
         if (cordova) {
             [userContentController addUserScript:cordova];
@@ -297,7 +297,7 @@ NSTimer *timer;
     [self updateSettings:settings];
 
     // check if content thread has died on resume
-    NSLog(@"%@", @"CDVWKWebViewEngine will reload WKWebView if required on resume");
+    NSLog(@"%@", @"IONWKWebViewEngine will reload WKWebView if required on resume");
     [[NSNotificationCenter defaultCenter]
      addObserver:self
      selector:@selector(onAppWillEnterForeground:)
@@ -367,7 +367,7 @@ NSTimer *timer;
 
 - (void)onAppWillEnterForeground:(NSNotification *)notification {
     if ([self shouldReloadWebView]) {
-        NSLog(@"%@", @"CDVWKWebViewEngine reloading!");
+        NSLog(@"%@", @"IONWKWebViewEngine reloading!");
         [(WKWebView*)_engineWebView reload];
     }
 }
@@ -410,10 +410,10 @@ NSTimer *timer;
     BOOL reload = (title_is_nil || location_is_blank);
 
 #ifdef DEBUG
-    NSLog(@"%@", @"CDVWKWebViewEngine shouldReloadWebView::");
-    NSLog(@"CDVWKWebViewEngine shouldReloadWebView title: %@", title);
-    NSLog(@"CDVWKWebViewEngine shouldReloadWebView location: %@", [location absoluteString]);
-    NSLog(@"CDVWKWebViewEngine shouldReloadWebView reload: %u", reload);
+    NSLog(@"%@", @"IONWKWebViewEngine shouldReloadWebView::");
+    NSLog(@"IONWKWebViewEngine shouldReloadWebView title: %@", title);
+    NSLog(@"IONWKWebViewEngine shouldReloadWebView location: %@", [location absoluteString]);
+    NSLog(@"IONWKWebViewEngine shouldReloadWebView reload: %u", reload);
 #endif
 
     return reload;
@@ -532,13 +532,13 @@ NSTimer *timer;
 {
     NSString *scriptFile = [[NSBundle mainBundle] pathForResource:@"www/wk-plugin" ofType:@"js"];
     if (scriptFile == nil) {
-        NSLog(@"CDVWKWebViewEngine: WK plugin was not found");
+        NSLog(@"IONWKWebViewEngine: WK plugin was not found");
         return nil;
     }
     NSError *error = nil;
     NSString *source = [NSString stringWithContentsOfFile:scriptFile encoding:NSUTF8StringEncoding error:&error];
     if (source == nil || error != nil) {
-        NSLog(@"CDVWKWebViewEngine: WK plugin can not be loaded: %@", error);
+        NSLog(@"IONWKWebViewEngine: WK plugin can not be loaded: %@", error);
         return nil;
     }
     source = [source stringByAppendingString:[NSString stringWithFormat:@"window.WEBVIEW_SERVER_URL = '%@';", self.CDV_LOCAL_SERVER]];
@@ -572,16 +572,16 @@ NSTimer *timer;
 {
     NSURL *cordovaURL = [[NSBundle mainBundle] URLForResource:@"www/cordova" withExtension:@"js"];
     if (cordovaURL == nil) {
-        NSLog(@"CDVWKWebViewEngine: cordova.js WAS NOT FOUND");
+        NSLog(@"IONWKWebViewEngine: cordova.js WAS NOT FOUND");
         return nil;
     }
     NSError *error = nil;
     NSString *source = [NSString stringWithContentsOfURL:cordovaURL encoding:NSUTF8StringEncoding error:&error];
     if (source == nil || error != nil) {
-        NSLog(@"CDVWKWebViewEngine: cordova.js can not be loaded: %@", error);
+        NSLog(@"IONWKWebViewEngine: cordova.js can not be loaded: %@", error);
         return nil;
     }
-    NSLog(@"CDVWKWebViewEngine: auto injecting cordova");
+    NSLog(@"IONWKWebViewEngine: auto injecting cordova");
     NSString *cordovaPath = [self.CDV_LOCAL_SERVER stringByAppendingString:cordovaURL.URLByDeletingLastPathComponent.path];
     NSString *replacement = [NSString stringWithFormat:@"var pathPrefix = '%@/';", cordovaPath];
     source = [source stringByReplacingOccurrencesOfString:@"var pathPrefix = findCordovaPath();" withString:replacement];
@@ -635,7 +635,7 @@ NSTimer *timer;
 - (void)handleStopScroll
 {
     WKWebView* wkWebView = (WKWebView*)_engineWebView;
-    NSLog(@"CDVWKWebViewEngine: handleStopScroll");
+    NSLog(@"IONWKWebViewEngine: handleStopScroll");
     [self recursiveStopScroll:[wkWebView scrollView]];
     [wkWebView evaluateJavaScript:@"window.IonicStopScroll.fire()" completionHandler:nil];
 }
@@ -794,9 +794,9 @@ NSTimer *timer;
 
 @end
 
-#pragma mark - CDVWKWeakScriptMessageHandler
+#pragma mark - IONWKWeakScriptMessageHandler
 
-@implementation CDVWKWeakScriptMessageHandler
+@implementation IONWKWeakScriptMessageHandler
 
 - (instancetype)initWithScriptMessageHandler:(id<WKScriptMessageHandler>)scriptMessageHandler
 {

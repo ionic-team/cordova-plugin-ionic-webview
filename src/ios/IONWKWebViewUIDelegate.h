@@ -19,7 +19,7 @@
 
 #import <WebKit/WebKit.h>
 
-@interface CDVWKWebViewUIDelegate : NSObject <WKUIDelegate>
+@interface IONWKWebViewUIDelegate : NSObject <WKUIDelegate>
 
 @property (nonatomic, copy) NSString* title;
 

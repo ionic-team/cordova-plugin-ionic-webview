@@ -19,7 +19,7 @@
 
 #import <WebKit/WebKit.h>
 
-@interface CDVWKProcessPoolFactory : NSObject
+@interface IONWKProcessPoolFactory : NSObject
 @property (nonatomic, retain) WKProcessPool* sharedPool;
 
 +(instancetype) sharedFactory;
