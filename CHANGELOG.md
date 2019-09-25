@@ -1,4 +1,12 @@
-# [2.5.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.5.0...v2.5.1) (2019-6-26)
+# [2.5.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.5.1...v2.5.2) (2019-9-25)
+
+### Bug Fixes
+
+* **iOS:**  make programmatically focus work on iOS 13 ([#440](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/440))
+* **android:**  return proper mimeType for wasm files ([#439](https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/439))
+
+
+## [2.5.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.5.0...v2.5.1) (2019-6-26)
 
 
 ### Bug Fixes
