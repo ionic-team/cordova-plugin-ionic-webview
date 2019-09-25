@@ -31,6 +31,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
 
   private WebViewLocalServer localServer;
   private String CDV_LOCAL_SERVER;
+  private String scheme;
   private static final String LAST_BINARY_VERSION_CODE = "lastBinaryVersionCode";
   private static final String LAST_BINARY_VERSION_NAME = "lastBinaryVersionName";
 
@@ -60,7 +61,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     parser.parse(cordova.getActivity());
 
     String hostname = preferences.getString("Hostname", "localhost");
-    String scheme = preferences.getString("Scheme", "http");
+    scheme = preferences.getString("Scheme", "http");
     CDV_LOCAL_SERVER = scheme + "://" + hostname;
 
     localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme);
@@ -138,7 +139,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
         view.stopLoading();
         // When using a custom scheme the app won't load if server start url doesn't end in /
         String startUrl = CDV_LOCAL_SERVER;
-        if (!CDV_LOCAL_SERVER.startsWith(WebViewLocalServer.httpsScheme) && !CDV_LOCAL_SERVER.startsWith(WebViewLocalServer.httpScheme)) {
+        if (!scheme.equalsIgnoreCase(WebViewLocalServer.httpsScheme) && !scheme.equalsIgnoreCase(WebViewLocalServer.httpScheme)) {
           startUrl += "/";
         }
         view.loadUrl(startUrl);
