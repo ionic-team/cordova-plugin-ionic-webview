@@ -1,3 +1,12 @@
+## [4.1.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v4.1.1...v4.1.2) (2019-09-25)
+
+
+### Bug Fixes
+
+* **android:** allow schemes that start by https ([#437](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/437)) ([fab9d1f](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/fab9d1f))
+* **Android:** return proper mimeType for wasm files ([0eb8a37](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/0eb8a37))
+* **ios:** make programmatically focus work on iOS 13 ([#438](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/438)) ([7a514b0](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/7a514b0)), closes [#435](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/435)
+
 ## [4.1.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v4.1.0...v4.1.1) (2019-06-26)
 
 
