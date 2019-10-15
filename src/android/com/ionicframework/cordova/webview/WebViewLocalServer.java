@@ -360,7 +360,7 @@ public class WebViewLocalServer {
         Log.d(IonicWebViewEngine.TAG, "We shouldn't be here");
       }
       if (mimeType == null) {
-        if (path.endsWith(".js")) {
+        if (path.endsWith(".js") || path.endsWith(".mjs")) {
           // Make sure JS files get the proper mimetype to support ES modules
           mimeType = "application/javascript";
         } else if (path.endsWith(".wasm")) {
