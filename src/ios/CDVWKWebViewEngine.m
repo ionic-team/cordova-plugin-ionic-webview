@@ -761,8 +761,7 @@ NSTimer *timer;
             [scheme isEqualToString:@"mailto"] ||
             [scheme isEqualToString:@"facetime"] ||
             [scheme isEqualToString:@"sms"] ||
-            [scheme isEqualToString:@"maps"] ||
-            [scheme isEqualToString:@"itms-services"]) {
+            [scheme isEqualToString:@"maps"]) {
             [[UIApplication sharedApplication] openURL:url];
             decisionHandler(WKNavigationActionPolicyCancel);
         } else {
