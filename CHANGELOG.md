@@ -1,3 +1,13 @@
+# [2.5.3](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.5.2...v2.5.3) (2019-10-30)
+
+### Bug Fixes
+
+* **android:** return proper mimeType for .mjs files ([#456](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/456)) ([fcbef0d](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/fcbef0d)) 
+* **iOS:**  mitigate media memory usage ([#459](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/459)) ([33c5b61](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/33c5b61))
+* **iOS:**  remove itms-services private scheme ([#464](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/464)) ([4ca1fb4](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/4ca1fb4))
+
+
+
 # [2.5.2](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v2.5.1...v2.5.2) (2019-9-25)
 
 ### Bug Fixes
