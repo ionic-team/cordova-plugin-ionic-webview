@@ -25,8 +25,14 @@ API_AVAILABLE(ios(11.0)){
             }
         }
     }
-    
-    NSData * data = [[NSData alloc] initWithContentsOfFile:startPath];
+    NSError * fileError = nil;
+    NSData * data = nil;
+    if ([self isMediaExtension:url.pathExtension]) {
+        data = [NSData dataWithContentsOfFile:startPath options:NSDataReadingMappedIfSafe error:&fileError];
+    }
+    if (!data || fileError) {
+        data =  [[NSData alloc] initWithContentsOfFile:startPath];
+    }
     NSInteger statusCode = 200;
     if (!data) {
         statusCode = 404;
