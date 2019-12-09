@@ -25,6 +25,7 @@ import org.apache.cordova.PluginManager;
 import org.apache.cordova.engine.SystemWebViewClient;
 import org.apache.cordova.engine.SystemWebViewEngine;
 import org.apache.cordova.engine.SystemWebView;
+import java.util.ArrayList;
 
 public class IonicWebViewEngine extends SystemWebViewEngine {
   public static final String TAG = "IonicWebViewEngine";
@@ -64,7 +65,7 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     scheme = preferences.getString("Scheme", "http");
     CDV_LOCAL_SERVER = scheme + "://" + hostname;
 
-    localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme);
+    localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme, new ArrayList());
     localServer.hostAssets("www");
 
     webView.setWebViewClient(new ServerClient(this, parser));
@@ -162,5 +163,16 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
 
   public String getServerBasePath() {
     return this.localServer.getBasePath();
+  }
+
+  public void setOrigin(String hostname, String scheme) {
+
+    ConfigXmlParser parser = new ConfigXmlParser();
+    parser.parse(cordova.getActivity());
+    this.scheme = scheme;
+    localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme, new ArrayList<String>());
+    localServer.hostAssets("www");
+    CDV_LOCAL_SERVER = scheme + "://" + hostname;
+    webView.loadUrl(CDV_LOCAL_SERVER);
   }
 }
