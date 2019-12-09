@@ -25,8 +25,8 @@ var WebView = {
   persistServerBasePath: function() {
     exec(null, null, 'IonicWebView', 'persistServerBasePath', []);
   },
-  setOrigin: function(hostname, scheme) {
-    exec(null, null, 'IonicWebView', 'setOrigin', [hostname, scheme]);
+  setOrigin: function(hostname, scheme, paths) {
+    exec(null, null, 'IonicWebView', 'setOrigin', [hostname, scheme, paths]);
   }
 }
 

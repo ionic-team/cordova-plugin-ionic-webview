@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+
 /**
  * Helper class meant to be used with the android.webkit.WebView class to enable hosting assets,
  * resources and other data on 'virtual' http(s):// URL.
@@ -65,7 +67,7 @@ public class WebViewLocalServer {
   // Whether to route all requests to paths without extensions back to `index.html`
   private final boolean html5mode;
   private ConfigXmlParser parser;
-  private ArrayList<String> ignorePaths;
+  private JSONArray ignorePaths;
 
   public String getAuthority() { return authority; }
 
@@ -165,7 +167,7 @@ public class WebViewLocalServer {
     }
   }
 
-  WebViewLocalServer(Context context, String authority, boolean html5mode, ConfigXmlParser parser, String customScheme, ArrayList<String> ignorePaths) {
+  WebViewLocalServer(Context context, String authority, boolean html5mode, ConfigXmlParser parser, String customScheme, JSONArray ignorePaths) {
     uriMatcher = new UriMatcher(null);
     this.html5mode = html5mode;
     this.parser = parser;
@@ -226,9 +228,17 @@ public class WebViewLocalServer {
       return null;
     }
 
-    for(String path : ignorePaths) {
-      if (uri.getPath().contains(path)) {
-        return null;
+    if(this.ignorePaths != null) {
+      for (int i = 0; i < this.ignorePaths.length(); i++) {
+        try {
+          String path = this.ignorePaths.getString(i);
+
+          if (uri.getPath().contains(path)) {
+            return null;
+          }
+        } catch(Exception e) {
+          // Ingore
+        }
       }
     }
 
