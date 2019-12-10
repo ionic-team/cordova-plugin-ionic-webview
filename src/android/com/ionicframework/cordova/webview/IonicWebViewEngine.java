@@ -173,7 +173,10 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     this.scheme = scheme;
     localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme, paths);
     localServer.hostAssets("www");
+    String url = webView.getUrl();
+    String oldHost = CDV_LOCAL_SERVER;
     CDV_LOCAL_SERVER = scheme + "://" + hostname;
-    webView.loadUrl(CDV_LOCAL_SERVER);
+    url = url.replace(oldHost, CDV_LOCAL_SERVER);
+    webView.loadUrl(url);
   }
 }
