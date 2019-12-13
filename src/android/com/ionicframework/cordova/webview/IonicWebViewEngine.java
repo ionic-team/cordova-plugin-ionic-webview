@@ -64,9 +64,26 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
 
     String hostname = preferences.getString("Hostname", "localhost");
     scheme = preferences.getString("Scheme", "http");
+
+    SharedPreferences prefs = cordova.getActivity().getApplicationContext()
+        .getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
+    String hostnamePref = prefs.getString(IonicWebView.CDV_HOSTNAME, null);
+    String schemePref = prefs.getString(IonicWebView.CDV_SCHEME, null);
+    JSONArray paths = null;
+    if (hostnamePref != null && schemePref != null) {
+      String pathsPref = prefs.getString(IonicWebView.CDV_PATHS, null);
+      try {
+        paths = new JSONArray(pathsPref);
+      } catch(Exception e) {
+        //invalid ignore
+      }
+      hostname = hostnamePref;
+      scheme = schemePref;
+    }
+
     CDV_LOCAL_SERVER = scheme + "://" + hostname;
 
-    localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme, null);
+    localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme, paths);
     localServer.hostAssets("www");
 
     webView.setWebViewClient(new ServerClient(this, parser));
@@ -77,7 +94,6 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
       int mode = preferences.getInteger("MixedContentMode", 0);
       settings.setMixedContentMode(mode);
     }
-    SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
     String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
     if (!isDeployDisabled() && !isNewBinary() && path != null && !path.isEmpty()) {
       setServerBasePath(path);
