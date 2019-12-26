@@ -739,6 +739,11 @@ NSTimer *timer;
                 navType = (int)UIWebViewNavigationTypeOther;
             }
             shouldAllowRequest = (((BOOL (*)(id, SEL, id, int))objc_msgSend)(plugin, selector, navigationAction.request, navType));
+
+            if (!navigationAction.targetFrame.isMainFrame){
+                shouldAllowRequest = YES;
+            }
+
             if (!shouldAllowRequest) {
                 break;
             }
