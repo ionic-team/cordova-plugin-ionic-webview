@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.webkit.ServiceWorkerController;
+import android.webkit.ServiceWorkerClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
