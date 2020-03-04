@@ -14,10 +14,10 @@ var WebView = {
       return window.WEBVIEW_SERVER_URL + url.replace('file://', '/_app_file_');
     }
     if (convertHttp && url.startsWith('http://')) {
-      return window.WEBVIEW_SERVER_URL + url.replace('http://', '/_http_proxy_');
+      return window.WEBVIEW_SERVER_URL + '/_http_proxy_' + encodeURIComponent(url.replace('http://', ''));
     }
     if (convertHttp && url.startsWith('https://')) {
-      return window.WEBVIEW_SERVER_URL + url.replace('https://', '/_https_proxy_');
+      return window.WEBVIEW_SERVER_URL + '/_https_proxy_' + encodeURIComponent(url.replace('https://', ''));
     }
     if (url.startsWith('content://')) {
       return window.WEBVIEW_SERVER_URL + url.replace('content:/', '/_app_content_');
