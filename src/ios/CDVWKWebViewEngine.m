@@ -114,8 +114,6 @@
 
 @synthesize engineWebView = _engineWebView;
 
-NSTimer *timer;
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super init];
@@ -303,15 +301,12 @@ NSTimer *timer;
      selector:@selector(onAppWillEnterForeground:)
      name:UIApplicationWillEnterForegroundNotification object:nil];
 
+    // For keyboard dismissal leaving viewport shifted (can potentially be removed when apple releases the fix for the issue discussed here: https://github.com/apache/cordova-ios/issues/417#issuecomment-423340885)
     [[NSNotificationCenter defaultCenter]
      addObserver:self
      selector:@selector(keyboardWillHide)
      name:UIKeyboardWillHideNotification object:nil];
 
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self
-     selector:@selector(keyboardWillShow)
-     name:UIKeyboardWillShowNotification object:nil];
 
     NSLog(@"Using Ionic WKWebView");
 
@@ -378,27 +373,22 @@ NSTimer *timer;
 
 -(void)keyboardWillHide
 {
-    if (@available(iOS 12.0, *)) {
-        timer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
-        [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    // For keyboard dismissal leaving viewport shifted (can potentially be removed when apple releases the fix for the issue discussed here: https://github.com/apache/cordova-ios/issues/417#issuecomment-423340885)
+    UIScrollView * scrollView = self.webView.scrollView;
+    // Calculate some vars for convenience
+    CGFloat contentLengthWithInsets = scrollView.contentSize.height + scrollView.adjustedContentInset.top + scrollView.adjustedContentInset.bottom;
+    CGFloat contentOffsetY = scrollView.contentOffset.y;
+    CGFloat screenHeight = scrollView.frame.size.height;
+    CGFloat maxAllowedOffsetY = fmax(contentLengthWithInsets - screenHeight, 0); // 0 is for the case where content is shorter than screen
+
+    // If the keyboard allowed the user to get to an offset beyond the max
+    if (contentOffsetY > maxAllowedOffsetY) {
+        // Reset the scroll to the max allowed so that there is no additional empty white space at the bottom where the keyboard occupied!
+        CGPoint bottomOfPage = CGPointMake(scrollView.contentOffset.x, maxAllowedOffsetY);
+        [scrollView setContentOffset:bottomOfPage];
     }
 }
 
--(void)keyboardWillShow
-{
-    if (timer != nil) {
-        [timer invalidate];
-    }
-}
-
--(void)keyboardDisplacementFix
-{
-    // https://stackoverflow.com/a/9637807/824966
-    [UIView animateWithDuration:.25 animations:^{
-        self.webView.scrollView.contentOffset = CGPointMake(0, 0);
-    }];
-
-}
 - (BOOL)shouldReloadWebView
 {
     WKWebView* wkWebView = (WKWebView*)_engineWebView;
