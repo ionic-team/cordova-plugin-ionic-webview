@@ -166,6 +166,10 @@ Ionic apps work better if the WKWebView is not scrollable, so the scroll is disa
         npm install @ionic-native/ionic-webview@beta
         ```
 
+## FAQ
+See [FAQ](doc/FAQ.md) for common problems, solutions, and configuration advice.
+
+
 [ionic-homepage]: https://ionicframework.com
 [ionic-docs]: https://ionicframework.com/docs
 [ionic-webview-docs]: https://beta.ionicframework.com/docs/building/webview
