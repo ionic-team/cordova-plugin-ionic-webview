@@ -36,60 +36,6 @@
 #define LAST_BINARY_VERSION_CODE @"lastBinaryVersionCode"
 #define LAST_BINARY_VERSION_NAME @"lastBinaryVersionName"
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-
-@implementation UIScrollView (BugIOS11)
-
-+ (void)load {
-    if (@available(iOS 11.0, *)) {
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            Class class = [self class];
-            SEL originalSelector = @selector(init);
-            SEL swizzledSelector = @selector(xxx_init);
-
-            Method originalMethod = class_getInstanceMethod(class, originalSelector);
-            Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
-
-            BOOL didAddMethod =
-            class_addMethod(class,
-                            originalSelector,
-                            method_getImplementation(swizzledMethod),
-                            method_getTypeEncoding(swizzledMethod));
-
-            if (didAddMethod) {
-                class_replaceMethod(class,
-                                    swizzledSelector,
-                                    method_getImplementation(originalMethod),
-                                    method_getTypeEncoding(originalMethod));
-            } else {
-                method_exchangeImplementations(originalMethod, swizzledMethod);
-            }
-        });
-    }
-}
-
-#pragma mark - Method Swizzling
-
-- (id)xxx_init {
-    id a = [self xxx_init];
-    if (@available(iOS 11.0, *)) {
-        NSArray *stack = [NSThread callStackSymbols];
-        for(NSString *trace in stack) {
-            if([trace containsString:@"WebKit"]) {
-                [a setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
-                break;
-            }
-        }
-    }
-    return a;
-}
-
-@end
-
-#endif
-
-
 @interface CDVWKWeakScriptMessageHandler : NSObject <WKScriptMessageHandler>
 
 @property (nonatomic, weak, readonly) id<WKScriptMessageHandler>scriptMessageHandler;
@@ -354,12 +300,6 @@ NSTimer *timer;
     // remove from keyWindow before recreating
     [self.engineWebView removeFromSuperview];
     WKWebView* wkWebView = [[WKWebView alloc] initWithFrame:self.frame configuration:configuration];
-
-    #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-    if (@available(iOS 11.0, *)) {
-      [wkWebView.scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
-    }
-    #endif
 
     wkWebView.UIDelegate = self.uiDelegate;
     self.engineWebView = wkWebView;
