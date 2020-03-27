@@ -694,7 +694,8 @@ NSTimer *timer;
 
     NSURL* errorUrl = vc.errorURL;
     if (errorUrl) {
-        errorUrl = [NSURL URLWithString:[NSString stringWithFormat:@"?error=%@", [message stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] relativeToURL:errorUrl];
+        NSCharacterSet *charSet = [NSCharacterSet URLFragmentAllowedCharacterSet];
+        errorUrl = [NSURL URLWithString:[NSString stringWithFormat:@"?error=%@", [message stringByAddingPercentEncodingWithAllowedCharacters:charSet]] relativeToURL:errorUrl];
         NSLog(@"%@", [errorUrl absoluteString]);
         [theWebView loadRequest:[NSURLRequest requestWithURL:errorUrl]];
     }
@@ -769,7 +770,7 @@ NSTimer *timer;
             [scheme isEqualToString:@"facetime"] ||
             [scheme isEqualToString:@"sms"] ||
             [scheme isEqualToString:@"maps"]) {
-            [[UIApplication sharedApplication] openURL:url];
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
             decisionHandler(WKNavigationActionPolicyCancel);
         } else {
             decisionHandler(WKNavigationActionPolicyAllow);
