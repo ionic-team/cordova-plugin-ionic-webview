@@ -277,7 +277,7 @@ NSTimer *timer;
     // add to keyWindow to ensure it is 'active'
     [UIApplication.sharedApplication.keyWindow addSubview:self.engineWebView];
 
-    NSString * overrideUserAgent = [self.commandDelegate.settings objectForKey:[@"OverrideUserAgent" lowercaseString]];
+    NSString * overrideUserAgent = [settings cordovaSettingForKey:@"OverrideUserAgent"];
     if (overrideUserAgent != nil) {
         wkWebView.customUserAgent = overrideUserAgent;
     }
