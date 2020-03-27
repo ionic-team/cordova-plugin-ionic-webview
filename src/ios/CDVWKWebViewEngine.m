@@ -301,12 +301,15 @@
      selector:@selector(onAppWillEnterForeground:)
      name:UIApplicationWillEnterForegroundNotification object:nil];
 
-    // For keyboard dismissal leaving viewport shifted (can potentially be removed when apple releases the fix for the issue discussed here: https://github.com/apache/cordova-ios/issues/417#issuecomment-423340885)
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self
-     selector:@selector(keyboardWillHide)
-     name:UIKeyboardWillHideNotification object:nil];
-
+    // If less than ios 13.4
+    if (@available(iOS 13.4, *)) {} else {
+        // For keyboard dismissal leaving viewport shifted (can potentially be removed when apple releases the fix for the issue discussed here: https://github.com/apache/cordova-ios/issues/417#issuecomment-423340885)
+        // Apple has released a fix in 13.4, but not in 12.x (as of 12.4.6)
+        [[NSNotificationCenter defaultCenter]
+        addObserver:self
+        selector:@selector(keyboardWillHide)
+        name:UIKeyboardWillHideNotification object:nil];
+    }
 
     NSLog(@"Using Ionic WKWebView");
 
