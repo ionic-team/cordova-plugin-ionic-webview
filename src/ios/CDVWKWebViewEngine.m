@@ -195,7 +195,14 @@ NSTimer *timer;
         [configuration setValue:[NSNumber numberWithBool:YES]
                          forKey:_BGStatus];
     }
-
+    NSString *userAgent = configuration.applicationNameForUserAgent;
+    if (
+        [settings cordovaSettingForKey:@"OverrideUserAgent"] == nil &&
+        [settings cordovaSettingForKey:@"AppendUserAgent"] != nil
+        ) {
+        userAgent = [NSString stringWithFormat:@"%@ %@", userAgent, [settings cordovaSettingForKey:@"AppendUserAgent"]];
+    }
+    configuration.applicationNameForUserAgent = userAgent;
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     configuration.allowsAirPlayForMediaPlayback = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
@@ -270,8 +277,9 @@ NSTimer *timer;
     // add to keyWindow to ensure it is 'active'
     [UIApplication.sharedApplication.keyWindow addSubview:self.engineWebView];
 
-    if ([self.viewController isKindOfClass:[CDVViewController class]]) {
-        wkWebView.customUserAgent = ((CDVViewController*) self.viewController).userAgent;
+    NSString * overrideUserAgent = [settings cordovaSettingForKey:@"OverrideUserAgent"];
+    if (overrideUserAgent != nil) {
+        wkWebView.customUserAgent = overrideUserAgent;
     }
 
     if ([self.viewController conformsToProtocol:@protocol(WKUIDelegate)]) {
@@ -670,9 +678,6 @@ NSTimer *timer;
 
 - (void)webView:(WKWebView*)webView didFinishNavigation:(WKNavigation*)navigation
 {
-    CDVViewController* vc = (CDVViewController*)self.viewController;
-    [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
-
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPageDidLoadNotification object:webView]];
 }
 
@@ -684,7 +689,6 @@ NSTimer *timer;
 - (void)webView:(WKWebView*)theWebView didFailNavigation:(WKNavigation*)navigation withError:(NSError*)error
 {
     CDVViewController* vc = (CDVViewController*)self.viewController;
-    [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
 
     NSString* message = [NSString stringWithFormat:@"Failed to load webpage with error: %@", [error localizedDescription]];
     NSLog(@"%@", message);
