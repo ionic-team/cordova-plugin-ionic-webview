@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
-import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -121,12 +120,6 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
       return localServer.shouldInterceptRequest(request.getUrl(), request);
-    }
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    @Override
-    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-      return localServer.shouldInterceptRequest(Uri.parse(url), null);
     }
 
     @Override
