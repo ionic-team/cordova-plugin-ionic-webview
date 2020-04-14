@@ -83,8 +83,10 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
       setServerBasePath(path);
     }
 
+    boolean setAsServiceWorkerClient = preferences.getBoolean("ResolveServiceWorkerRequests", false);
     ServiceWorkerController controller = null;
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+
+    if (setAsServiceWorkerClient && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
         controller = ServiceWorkerController.getInstance();
         controller.setServiceWorkerClient(new ServiceWorkerClient(){
             @Override
