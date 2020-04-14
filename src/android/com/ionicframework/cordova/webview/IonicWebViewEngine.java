@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.webkit.ServiceWorkerController;
+import android.webkit.ServiceWorkerClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -79,6 +81,19 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
     String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
     if (!isDeployDisabled() && !isNewBinary() && path != null && !path.isEmpty()) {
       setServerBasePath(path);
+    }
+
+    boolean setAsServiceWorkerClient = preferences.getBoolean("ResolveServiceWorkerRequests", false);
+    ServiceWorkerController controller = null;
+
+    if (setAsServiceWorkerClient && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        controller = ServiceWorkerController.getInstance();
+        controller.setServiceWorkerClient(new ServiceWorkerClient(){
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebResourceRequest request) {
+                return localServer.shouldInterceptRequest(request.getUrl(), request);
+            }
+        });
     }
   }
 

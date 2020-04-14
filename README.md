@@ -72,6 +72,15 @@ Default value is `http`
 
 Configures the Scheme the app uses to load the content.
 
+#### ResolveServiceWorkerRequests
+
+```xml
+<preference name="ResolveServiceWorkerRequests" value="true" />
+```
+
+Default value is `false`
+
+Enable to resolve requests made by Service Workers through the local server.
 
 #### MixedContentMode
 
