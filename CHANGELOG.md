@@ -1,3 +1,18 @@
+# [4.2.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v4.1.3...v4.2.0) (2020-04-14)
+
+
+### Bug Fixes
+
+* **ionassethandler.m:** fix startPath is getting null ([#463](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/463)) ([0bf16f1](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/0bf16f1b73b853f40781c5de83964457cc4493d5))
+* **ios:** avoid app scrolling to top on keyboard hide ([#533](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/533)) ([7974eb4](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/7974eb4160f5e83cf4b3e98905beba1f874464a6))
+* **ios:** Replace deprecated APIs ([#539](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/539)) ([27b9021](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/27b9021d5d76b3e6dc6bfc83ab46b98cd301e694))
+
+
+### Features
+
+* **android:** proxy service worker requests through local server ([#452](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/452)) ([c672175](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/c672175b7527d64b077f7715b2ff145325524add))
+* **ios:** implement custom userAgent handling ([#537](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/537)) ([8587114](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/85871147ba8e5b23b693e518bf5ea800cccce8cc))
+
 ## [4.1.3](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v4.1.2...v4.1.3) (2019-10-30)
 
 
