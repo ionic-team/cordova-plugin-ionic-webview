@@ -86,7 +86,7 @@
                 }
             }] resume];
         } else {
-            startPath = self.basePath;
+            startPath = self.basePath ? self.basePath : @"";
             if ([stringToLoad isEqualToString:@""] || [url.pathExtension isEqualToString:@""]) {
                 startPath = [startPath stringByAppendingString:@"/index.html"];
             } else {

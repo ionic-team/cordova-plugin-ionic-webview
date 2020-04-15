@@ -114,8 +114,6 @@
 
 @synthesize engineWebView = _engineWebView;
 
-NSTimer *timer;
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super init];
@@ -195,7 +193,14 @@ NSTimer *timer;
         [configuration setValue:[NSNumber numberWithBool:YES]
                          forKey:_BGStatus];
     }
-
+    NSString *userAgent = configuration.applicationNameForUserAgent;
+    if (
+        [settings cordovaSettingForKey:@"OverrideUserAgent"] == nil &&
+        [settings cordovaSettingForKey:@"AppendUserAgent"] != nil
+        ) {
+        userAgent = [NSString stringWithFormat:@"%@ %@", userAgent, [settings cordovaSettingForKey:@"AppendUserAgent"]];
+    }
+    configuration.applicationNameForUserAgent = userAgent;
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     configuration.allowsAirPlayForMediaPlayback = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
@@ -270,8 +275,9 @@ NSTimer *timer;
     // add to keyWindow to ensure it is 'active'
     [UIApplication.sharedApplication.keyWindow addSubview:self.engineWebView];
 
-    if ([self.viewController isKindOfClass:[CDVViewController class]]) {
-        wkWebView.customUserAgent = ((CDVViewController*) self.viewController).userAgent;
+    NSString * overrideUserAgent = [settings cordovaSettingForKey:@"OverrideUserAgent"];
+    if (overrideUserAgent != nil) {
+        wkWebView.customUserAgent = overrideUserAgent;
     }
 
     if ([self.viewController conformsToProtocol:@protocol(WKUIDelegate)]) {
@@ -303,15 +309,15 @@ NSTimer *timer;
      selector:@selector(onAppWillEnterForeground:)
      name:UIApplicationWillEnterForegroundNotification object:nil];
 
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self
-     selector:@selector(keyboardWillHide)
-     name:UIKeyboardWillHideNotification object:nil];
-
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self
-     selector:@selector(keyboardWillShow)
-     name:UIKeyboardWillShowNotification object:nil];
+    // If less than ios 13.4
+    if (@available(iOS 13.4, *)) {} else {
+        // For keyboard dismissal leaving viewport shifted (can potentially be removed when apple releases the fix for the issue discussed here: https://github.com/apache/cordova-ios/issues/417#issuecomment-423340885)
+        // Apple has released a fix in 13.4, but not in 12.x (as of 12.4.6)
+        [[NSNotificationCenter defaultCenter]
+        addObserver:self
+        selector:@selector(keyboardWillHide)
+        name:UIKeyboardWillHideNotification object:nil];
+    }
 
     NSLog(@"Using Ionic WKWebView");
 
@@ -378,27 +384,22 @@ NSTimer *timer;
 
 -(void)keyboardWillHide
 {
-    if (@available(iOS 12.0, *)) {
-        timer = [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(keyboardDisplacementFix) userInfo:nil repeats:false];
-        [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    // For keyboard dismissal leaving viewport shifted (can potentially be removed when apple releases the fix for the issue discussed here: https://github.com/apache/cordova-ios/issues/417#issuecomment-423340885)
+    UIScrollView * scrollView = self.webView.scrollView;
+    // Calculate some vars for convenience
+    CGFloat contentLengthWithInsets = scrollView.contentSize.height + scrollView.adjustedContentInset.top + scrollView.adjustedContentInset.bottom;
+    CGFloat contentOffsetY = scrollView.contentOffset.y;
+    CGFloat screenHeight = scrollView.frame.size.height;
+    CGFloat maxAllowedOffsetY = fmax(contentLengthWithInsets - screenHeight, 0); // 0 is for the case where content is shorter than screen
+
+    // If the keyboard allowed the user to get to an offset beyond the max
+    if (contentOffsetY > maxAllowedOffsetY) {
+        // Reset the scroll to the max allowed so that there is no additional empty white space at the bottom where the keyboard occupied!
+        CGPoint bottomOfPage = CGPointMake(scrollView.contentOffset.x, maxAllowedOffsetY);
+        [scrollView setContentOffset:bottomOfPage];
     }
 }
 
--(void)keyboardWillShow
-{
-    if (timer != nil) {
-        [timer invalidate];
-    }
-}
-
--(void)keyboardDisplacementFix
-{
-    // https://stackoverflow.com/a/9637807/824966
-    [UIView animateWithDuration:.25 animations:^{
-        self.webView.scrollView.contentOffset = CGPointMake(0, 0);
-    }];
-
-}
 - (BOOL)shouldReloadWebView
 {
     WKWebView* wkWebView = (WKWebView*)_engineWebView;
@@ -518,7 +519,6 @@ NSTimer *timer;
 }
 
 // This forwards the methods that are in the header that are not implemented here.
-// Both WKWebView and UIWebView implement the below:
 //     loadHTMLString:baseURL:
 //     loadRequest:
 - (id)forwardingTargetForSelector:(SEL)aSelector
@@ -670,9 +670,6 @@ NSTimer *timer;
 
 - (void)webView:(WKWebView*)webView didFinishNavigation:(WKNavigation*)navigation
 {
-    CDVViewController* vc = (CDVViewController*)self.viewController;
-    [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
-
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPageDidLoadNotification object:webView]];
 }
 
@@ -684,14 +681,14 @@ NSTimer *timer;
 - (void)webView:(WKWebView*)theWebView didFailNavigation:(WKNavigation*)navigation withError:(NSError*)error
 {
     CDVViewController* vc = (CDVViewController*)self.viewController;
-    [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
 
     NSString* message = [NSString stringWithFormat:@"Failed to load webpage with error: %@", [error localizedDescription]];
     NSLog(@"%@", message);
 
     NSURL* errorUrl = vc.errorURL;
     if (errorUrl) {
-        errorUrl = [NSURL URLWithString:[NSString stringWithFormat:@"?error=%@", [message stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] relativeToURL:errorUrl];
+        NSCharacterSet *charSet = [NSCharacterSet URLFragmentAllowedCharacterSet];
+        errorUrl = [NSURL URLWithString:[NSString stringWithFormat:@"?error=%@", [message stringByAddingPercentEncodingWithAllowedCharacters:charSet]] relativeToURL:errorUrl];
         NSLog(@"%@", [errorUrl absoluteString]);
         [theWebView loadRequest:[NSURLRequest requestWithURL:errorUrl]];
     }
@@ -736,7 +733,11 @@ NSTimer *timer;
             // https://issues.apache.org/jira/browse/CB-12497
             int navType = (int)navigationAction.navigationType;
             if (WKNavigationTypeOther == navigationAction.navigationType) {
-                navType = (int)UIWebViewNavigationTypeOther;
+                #ifdef __CORDOVA_6_0_0
+                    navType = -1;
+                #else
+                    navType = 5;
+                #endif
             }
             shouldAllowRequest = (((BOOL (*)(id, SEL, id, int))objc_msgSend)(plugin, selector, navigationAction.request, navType));
             if (!shouldAllowRequest) {
@@ -762,7 +763,7 @@ NSTimer *timer;
             [scheme isEqualToString:@"facetime"] ||
             [scheme isEqualToString:@"sms"] ||
             [scheme isEqualToString:@"maps"]) {
-            [[UIApplication sharedApplication] openURL:url];
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
             decisionHandler(WKNavigationActionPolicyCancel);
         } else {
             decisionHandler(WKNavigationActionPolicyAllow);
