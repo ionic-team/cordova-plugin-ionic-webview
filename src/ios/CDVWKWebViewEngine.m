@@ -670,6 +670,10 @@
 
 - (void)webView:(WKWebView*)webView didFinishNavigation:(WKNavigation*)navigation
 {
+    #ifndef __CORDOVA_6_0_0
+        CDVViewController* vc = (CDVViewController*)self.viewController;
+        [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
+    #endif
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPageDidLoadNotification object:webView]];
 }
 
@@ -681,6 +685,9 @@
 - (void)webView:(WKWebView*)theWebView didFailNavigation:(WKNavigation*)navigation withError:(NSError*)error
 {
     CDVViewController* vc = (CDVViewController*)self.viewController;
+    #ifndef __CORDOVA_6_0_0
+        [CDVUserAgentUtil releaseLock:vc.userAgentLockToken];
+    #endif
 
     NSString* message = [NSString stringWithFormat:@"Failed to load webpage with error: %@", [error localizedDescription]];
     NSLog(@"%@", message);
