@@ -1,3 +1,10 @@
+## [4.2.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v4.2.0...v4.2.1) (2020-04-28)
+
+
+### Bug Fixes
+
+* **ios:** release userAgentLock for IAB compat ([#558](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/558)) ([4c027f3](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/4c027f3e1dadf790b1d699936b90b670b401db9e)), closes [#551](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/551)
+
 # [4.2.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v4.1.3...v4.2.0) (2020-04-14)
 
 
