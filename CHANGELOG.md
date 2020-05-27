@@ -1,3 +1,21 @@
+# [5.0.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v4.2.1...v5.0.0) (2020-05-27)
+
+
+### Features
+
+* **android:** remove RequiresApi annotation and drop support for API 19 ([#540](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/540)) ([17d2ada](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/17d2ada038cbd6548ed14887b1b7a0cbc98f1d83))
+* **ios:** remove normalizeURL function ([#576](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/576)) ([d5bdbaa](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/d5bdbaaf128bdd49cebe50fff52fbcf226998e7d))
+* **ios:** remove wkRewriteURL function ([#577](https://github.com/ionic-team/cordova-plugin-ionic-webview/issues/577)) ([02c18ea](https://github.com/ionic-team/cordova-plugin-ionic-webview/commit/02c18ea359e344ab904733b8dc582ceb4e25d581))
+
+
+### BREAKING CHANGES
+
+* **ios:** wkRewriteURL was deprecated and has been removed, use
+window.Ionic.WebView.convertFileSrc instead
+* **ios:** normalizeURL was deprecated and has been removed, use
+window.Ionic.WebView.convertFileSrc instead
+* **android:** Drop Android 4.4 support (SDK API level 19). Min required is 21.
+
 ## [4.2.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v4.2.0...v4.2.1) (2020-04-28)
 
 
