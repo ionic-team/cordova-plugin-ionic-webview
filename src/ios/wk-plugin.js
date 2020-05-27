@@ -8,17 +8,12 @@
   // Initialize Ionic
   window.Ionic = window.Ionic || {};
 
-  function normalizeURL(url) {
-    console.warn('normalizeURL is deprecated, use window.Ionic.WebView.convertFileSrc');
-    return window.Ionic.WebView.convertFileSrc(url);
-  }
   if (typeof window.wkRewriteURL === 'undefined') {
     window.wkRewriteURL = function (url) {
       console.warn('wkRewriteURL is deprecated, use window.Ionic.WebView.convertFileSrc instead');
       return window.Ionic.WebView.convertFileSrc(url);
     }
   }
-  window.Ionic.normalizeURL = normalizeURL;
 
   var stopScrollHandler = window.webkit.messageHandlers.stopScroll;
   if (!stopScrollHandler) {
