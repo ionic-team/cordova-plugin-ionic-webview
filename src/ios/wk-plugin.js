@@ -8,13 +8,6 @@
   // Initialize Ionic
   window.Ionic = window.Ionic || {};
 
-  if (typeof window.wkRewriteURL === 'undefined') {
-    window.wkRewriteURL = function (url) {
-      console.warn('wkRewriteURL is deprecated, use window.Ionic.WebView.convertFileSrc instead');
-      return window.Ionic.WebView.convertFileSrc(url);
-    }
-  }
-
   var stopScrollHandler = window.webkit.messageHandlers.stopScroll;
   if (!stopScrollHandler) {
     console.error('Can not find stopScroll handler');
