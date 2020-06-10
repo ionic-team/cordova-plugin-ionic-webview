@@ -725,12 +725,12 @@
 {
     NSURL* url = [navigationAction.request URL];
     CDVViewController* vc = (CDVViewController*)self.viewController;
+    BOOL anyPluginsResponded = NO;
+    BOOL shouldAllowRequest = NO;
 
     /*
      * Give plugins the chance to handle the url
      */
-    BOOL anyPluginsResponded = NO;
-    BOOL shouldAllowRequest = NO;
 
     for (NSString* pluginName in vc.pluginObjects) {
         CDVPlugin* plugin = [vc.pluginObjects objectForKey:pluginName];
@@ -749,6 +749,25 @@
             shouldAllowRequest = (((BOOL (*)(id, SEL, id, int))objc_msgSend)(plugin, selector, navigationAction.request, navType));
             if (!shouldAllowRequest) {
                 break;
+            }
+        }
+    }
+
+    /*
+     * Give plugins the chance to handle iframe request
+     */
+    if(!navigationAction.targetFrame.isMainFrame){
+        for (NSString* pluginName in vc.pluginObjects) {
+           CDVPlugin* plugin = [vc.pluginObjects objectForKey:pluginName];
+           
+           SEL selector = NSSelectorFromString(@"shouldAllowSubframeRequest:");
+           
+           if ([plugin respondsToSelector:selector]) {
+               anyPluginsResponded = YES;
+               shouldAllowRequest = (((BOOL (*)(id, SEL, id))objc_msgSend)(plugin, selector, navigationAction.request));
+               if (!shouldAllowRequest) {
+                   break;
+               }
             }
         }
     }
