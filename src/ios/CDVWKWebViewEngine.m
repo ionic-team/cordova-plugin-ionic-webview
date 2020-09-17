@@ -204,6 +204,16 @@
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
     configuration.allowsAirPlayForMediaPlayback = [settings cordovaBoolSettingForKey:@"MediaPlaybackAllowsAirPlay" defaultValue:YES];
+
+    if (@available(iOS 13.0, *)) {
+        NSString *contentMode = [settings cordovaSettingForKey:@"PreferredContentMode"];
+        if ([contentMode isEqual: @"mobile"]) {
+            configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeMobile;
+        } else if ([contentMode isEqual: @"desktop"]) {
+            configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeDesktop;
+        }
+    }
+
     return configuration;
 }
 

@@ -142,6 +142,16 @@ Whether to use a dark styled keyboard on iOS
 
 Ionic apps work better if the WKWebView is not scrollable, so the scroll is disabled by default, but can be enabled with this preference. This only affects the main ScrollView of the WKWebView, so only affects the body, not other scrollable components.
 
+#### PreferredContentMode
+
+```xml
+<preference name="PreferredContentMode" value="mobile" />
+```
+
+Override the default content mode (and user agent) for the WKWebView on iPads (`iPadOS 13.0+`). Valid values are: `mobile` and `desktop`.
+
+Since the introduction of iPadOS 13, iPads try to adapt their content mode / user agent for the optimal browsing experience. This may result in iPads having their user agent set to Macintosh making it hard to detect them as mobile devices using user agent string sniffing. 
+
 ## Plugin Requirements
 
 * **Cordova CLI**: 7.1.0+
