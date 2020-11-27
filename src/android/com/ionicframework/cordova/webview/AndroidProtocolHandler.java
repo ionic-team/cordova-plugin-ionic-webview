@@ -68,7 +68,7 @@ public class AndroidProtocolHandler {
   }
 
   public InputStream openFile(String filePath) throws IOException  {
-    String realPath = filePath.replace(WebViewLocalServer.fileStart, "");
+    String realPath = filePath;
     File localFile = new File(realPath);
     return new FileInputStream(localFile);
   }
@@ -77,9 +77,9 @@ public class AndroidProtocolHandler {
     Integer port = uri.getPort();
     String realPath;
     if (port == -1) {
-      realPath = uri.toString().replace(uri.getScheme() + "://" + uri.getHost() + WebViewLocalServer.contentStart, "content:/");
+      realPath = uri.toString().replace(uri.getScheme() + "://" + uri.getHost(), "content:/");
     } else {
-      realPath = uri.toString().replace(uri.getScheme() + "://" + uri.getHost() + ":" + port + WebViewLocalServer.contentStart, "content:/");
+      realPath = uri.toString().replace(uri.getScheme() + "://" + uri.getHost() + ":" + port, "content:/");
     }
     InputStream stream = null;
     try {
