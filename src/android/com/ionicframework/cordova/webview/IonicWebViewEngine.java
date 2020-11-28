@@ -1,9 +1,6 @@
 package com.ionicframework.cordova.webview;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.Log;
@@ -28,7 +25,6 @@ import org.apache.cordova.engine.SystemWebViewEngine;
 import org.apache.cordova.engine.SystemWebView;
 
 import androidx.webkit.WebViewAssetLoader;
-import androidx.webkit.internal.AssetHelper;
 
 import java.io.InputStream;
 
@@ -77,11 +73,6 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
         assetLoader = new WebViewAssetLoader.Builder()
                 .setDomain(hostname)
                 .setHttpAllowed(true)
-                // ---- Path handler
-                // Default path handler not working
-                // .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
-                // .addPathHandler("/res/", new WebViewAssetLoader.ResourcesPathHandler(this))
-                //  => implementing custom handler
                 .addPathHandler("/", path -> {
                     try {
                         if (path.isEmpty())
@@ -118,9 +109,6 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
             int mode = preferences.getInteger("MixedContentMode", 0);
             settings.setMixedContentMode(mode);
         }
-        SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
-        String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
-
 
         boolean setAsServiceWorkerClient = preferences.getBoolean("ResolveServiceWorkerRequests", false);
         ServiceWorkerController controller = null;
@@ -168,19 +156,10 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-            view.loadUrl("javascript:(function() { " +
-                    "window.WEBVIEW_SERVER_URL = '" + LOCAL_SERVER + "';" +
-                    "})()");
         }
     }
 
-    public void setServerBasePath(String path) {
-        //localServer.hostFiles(path);
-        //webView.loadUrl(LOCAL_SERVER);
-    }
-
     public String getServerBasePath() {
-        //return this.localServer.getBasePath();
         return LOCAL_SERVER;
     }
 }
