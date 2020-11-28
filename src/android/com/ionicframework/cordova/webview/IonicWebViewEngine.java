@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.webkit.ServiceWorkerController;
 import android.webkit.ServiceWorkerClient;
 import android.webkit.WebResourceRequest;
@@ -86,7 +87,18 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
                         if (path.isEmpty())
                             path = "index.html";
                         InputStream is = protocolHandler.openAsset("www/" + path);
-                        @SuppressLint("RestrictedApi") String mimeType = AssetHelper.guessMimeType(path);
+                        String mimeType = "text/html";
+                        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+                        if (extension != null) {
+                            if (path.endsWith(".js") || path.endsWith(".mjs")) {
+                                // Make sure JS files get the proper mimetype to support ES modules
+                                mimeType = "application/javascript";
+                            } else if (path.endsWith(".wasm")) {
+                                mimeType = "application/wasm";
+                            } else {
+                                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                            }
+                        }
 
                         return new WebResourceResponse(mimeType, null, is);
                     } catch (Exception e) {
