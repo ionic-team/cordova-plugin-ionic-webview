@@ -448,7 +448,7 @@ public class WebViewLocalServer {
             stream = protocolHandler.openAsset(assetPath + path);
           }
         } catch (IOException e) {
-          Log.e(TAG, "Unable to open asset URL: " + url);
+          Log.e(TAG, "Unable to open asset URL: " + url, e);
           return null;
         }
 
