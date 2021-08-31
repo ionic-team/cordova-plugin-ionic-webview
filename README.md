@@ -142,6 +142,16 @@ Whether to use a dark styled keyboard on iOS
 
 Ionic apps work better if the WKWebView is not scrollable, so the scroll is disabled by default, but can be enabled with this preference. This only affects the main ScrollView of the WKWebView, so only affects the body, not other scrollable components.
 
+#### WKFullScreenEnabled
+
+```xml
+<preference name="WKFullScreenEnabled" value="true" />
+```
+
+Default value is `false`.
+
+Whether to enable fullscreen functions in WKWebView. If enabled, the functions document.documentElement.webkitRequestFullscreen and document.documentElement.webkitRequestFullScreen will be available.
+
 ## Plugin Requirements
 
 * **Cordova CLI**: 7.1.0+

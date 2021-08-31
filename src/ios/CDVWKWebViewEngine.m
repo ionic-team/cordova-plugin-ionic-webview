@@ -200,6 +200,9 @@
         ) {
         userAgent = [NSString stringWithFormat:@"%@ %@", userAgent, [settings cordovaSettingForKey:@"AppendUserAgent"]];
     }
+    if([settings cordovaBoolSettingForKey:@"WKFullScreenEnabled" defaultValue:NO]){
+        [configuration.preferences setValue:[NSNumber numberWithBool:YES] forKey:@"fullScreenEnabled"];
+    }
     configuration.applicationNameForUserAgent = userAgent;
     configuration.allowsInlineMediaPlayback = [settings cordovaBoolSettingForKey:@"AllowInlineMediaPlayback" defaultValue:YES];
     configuration.suppressesIncrementalRendering = [settings cordovaBoolSettingForKey:@"SuppressesIncrementalRendering" defaultValue:NO];
