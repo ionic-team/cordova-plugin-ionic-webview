@@ -33,7 +33,7 @@ Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `
 
 2.x documentation can be found [here](https://github.com/ionic-team/cordova-plugin-ionic-webview/blob/2.x/README.md).
 
-:book: **Documentation**: [https://beta.ionicframework.com/docs/building/webview][ionic-webview-docs]
+:book: **Documentation**: [https://ionicframework.com/docs/core-concepts/webview][ionic-webview-docs]
 
 :mega: **Support/Questions?** Please see our [Support Page][ionic-support] for general support questions. The issues on GitHub should be reserved for bug reports and feature requests.
 
