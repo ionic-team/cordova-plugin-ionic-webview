@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-ionic-webview",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Ionic Web View Engine Plugin",
   "scripts": {
     "sync_plugin_xml": "sync-cordova-xml package.json plugin.xml --output=plugin.xml",

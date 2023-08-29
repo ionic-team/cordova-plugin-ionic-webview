@@ -1,3 +1,9 @@
+# [5.0.1](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v5.0.0...v5.0.1) (2023-08-29)
+
+### Features
+
+* **ios:** iOS 16.4 Webkit inspection enabled correctly https://github.com/ionic-team/cordova-plugin-ionic-webview/pull/677
+
 # [5.0.0](https://github.com/ionic-team/cordova-plugin-ionic-webview/compare/v4.2.1...v5.0.0) (2020-05-27)
 
 
