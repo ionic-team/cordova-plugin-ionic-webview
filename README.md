@@ -29,7 +29,7 @@ A Web View plugin for Cordova, focused on providing the highest performance expe
 
 This plugin uses WKWebView on iOS and the latest evergreen webview on Android. Additionally, this plugin makes it easy to use HTML5 style routing that web developers expect for building single-page apps.
 
-Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `4.x`, which uses the new features that may not work with all apps. See [Requirements](#plugin-requirements) and [Migrating to 4.x](#migrating-to-4x).
+Note: This repo and its documentation are for `cordova-plugin-ionic-webview` @ `5.x`, which uses the new features that may not work with all apps. See [Requirements](#plugin-requirements) and [Migrating to 5.x](#migrating-to-5x).
 
 2.x documentation can be found [here](https://github.com/ionic-team/cordova-plugin-ionic-webview/blob/2.x/README.md).
 
@@ -146,9 +146,9 @@ Ionic apps work better if the WKWebView is not scrollable, so the scroll is disa
 
 * **Cordova CLI**: 7.1.0+
 * **iOS**: iOS 11+ and `cordova-ios` 4+
-* **Android**: Android 4.4+ and `cordova-android` 6.4+
+* **Android**: Android 5+ and `cordova-android` 6.4+
 
-## Migrating to 4.x
+## Migrating to 5.x
 
 1. Remove and re-add the Web View plugin:
 
@@ -157,22 +157,24 @@ Ionic apps work better if the WKWebView is not scrollable, so the scroll is disa
     cordova plugin add cordova-plugin-ionic-webview@latest
     ```
 
-1. Apps are now served from HTTP on Android by default.
+1. If using `cordova-android` < 9, make sure you have `<preference name="android-minSdkVersion" value="21" />` in the config.xml as this version of the plugin only supports Android 5+ (SDK 21+). If using `cordova-android` >= 9 is not neccessary as `cordova-android` 9 only supports Android 5.1+ (SDK 22+)
+
+1. Since version 2, apps are served from HTTP on Android by default.
 
     * The default origin for requests from the Android WebView is `http://localhost`. If `Hostname` and `Scheme` preferences are set, then origin will be `schemeValue://HostnameValue`.
 
-1. Apps are now served from `ionic://` scheme on iOS by default.
+1. Since version 3, apps are served from `ionic://` scheme on iOS by default.
 
     * The default origin for requests from the iOS WebView is `ionic://localhost`. If `Hostname` and `iosScheme` preferences are set, then origin will be `iosSchemeValue://HostnameValue`.
 
 1. The WebView is not able to display images, videos or other files from file or content protocols or if it doesn't have protocol at all. For those cases use `window.Ionic.WebView.convertFileSrc()` to get the proper url.
 
-1. Replace any usages of `window.Ionic.normalizeURL()` with `window.Ionic.WebView.convertFileSrc()`.
+1. Replace any usages of `window.Ionic.normalizeURL()` and `window.wkRewriteURL()` with `window.Ionic.WebView.convertFileSrc()`.
 
     * For Ionic Angular projects, there is an [Ionic Native wrapper](https://beta.ionicframework.com/docs/native/ionic-webview):
 
         ```
-        npm install @ionic-native/ionic-webview@beta
+        npm install @ionic-native/ionic-webview@latest
         ```
 
 [ionic-homepage]: https://ionicframework.com
