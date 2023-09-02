@@ -27,5 +27,6 @@
 
 -(void)setServerBasePath:(CDVInvokedUrlCommand*)command;
 -(void)getServerBasePath:(CDVInvokedUrlCommand*)command;
+-(void)setAllowBackNavigationGestures:(CDVInvokedUrlCommand*)command;
 
 @end
