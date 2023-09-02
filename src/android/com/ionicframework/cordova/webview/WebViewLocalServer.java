@@ -33,6 +33,9 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.ArrayList;
+
+import org.json.JSONArray;
 
 /**
  * Helper class meant to be used with the android.webkit.WebView class to enable hosting assets,
@@ -64,6 +67,7 @@ public class WebViewLocalServer {
   // Whether to route all requests to paths without extensions back to `index.html`
   private final boolean html5mode;
   private ConfigXmlParser parser;
+  private JSONArray ignorePaths;
 
   public String getAuthority() { return authority; }
 
@@ -163,13 +167,14 @@ public class WebViewLocalServer {
     }
   }
 
-  WebViewLocalServer(Context context, String authority, boolean html5mode, ConfigXmlParser parser, String customScheme) {
+  WebViewLocalServer(Context context, String authority, boolean html5mode, ConfigXmlParser parser, String customScheme, JSONArray ignorePaths) {
     uriMatcher = new UriMatcher(null);
     this.html5mode = html5mode;
     this.parser = parser;
     this.protocolHandler = new AndroidProtocolHandler(context.getApplicationContext());
     this.authority = authority;
     this.customScheme = customScheme;
+    this.ignorePaths = ignorePaths;
   }
 
   private static Uri parseAndVerifyUrl(String url) {
@@ -221,6 +226,20 @@ public class WebViewLocalServer {
     }
     if (handler == null) {
       return null;
+    }
+
+    if(this.ignorePaths != null) {
+      for (int i = 0; i < this.ignorePaths.length(); i++) {
+        try {
+          String path = this.ignorePaths.getString(i);
+
+          if (uri.getPath().contains(path)) {
+            return null;
+          }
+        } catch(Exception e) {
+          // Ingore
+        }
+      }
     }
 
     if (isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {

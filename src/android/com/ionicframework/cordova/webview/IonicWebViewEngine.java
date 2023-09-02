@@ -25,6 +25,8 @@ import org.apache.cordova.PluginManager;
 import org.apache.cordova.engine.SystemWebViewClient;
 import org.apache.cordova.engine.SystemWebViewEngine;
 import org.apache.cordova.engine.SystemWebView;
+import java.util.ArrayList;
+import org.json.JSONArray;
 
 public class IonicWebViewEngine extends SystemWebViewEngine {
   public static final String TAG = "IonicWebViewEngine";
@@ -62,9 +64,26 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
 
     String hostname = preferences.getString("Hostname", "localhost");
     scheme = preferences.getString("Scheme", "http");
+
+    SharedPreferences prefs = cordova.getActivity().getApplicationContext()
+        .getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
+    String hostnamePref = prefs.getString(IonicWebView.CDV_HOSTNAME, null);
+    String schemePref = prefs.getString(IonicWebView.CDV_SCHEME, null);
+    JSONArray paths = null;
+    if (hostnamePref != null && schemePref != null) {
+      String pathsPref = prefs.getString(IonicWebView.CDV_PATHS, null);
+      try {
+        paths = new JSONArray(pathsPref);
+      } catch(Exception e) {
+        //invalid ignore
+      }
+      hostname = hostnamePref;
+      scheme = schemePref;
+    }
+
     CDV_LOCAL_SERVER = scheme + "://" + hostname;
 
-    localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme);
+    localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme, paths);
     localServer.hostAssets("www");
 
     webView.setWebViewClient(new ServerClient(this, parser));
@@ -75,7 +94,6 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
       int mode = preferences.getInteger("MixedContentMode", 0);
       settings.setMixedContentMode(mode);
     }
-    SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences(IonicWebView.WEBVIEW_PREFS_NAME, Activity.MODE_PRIVATE);
     String path = prefs.getString(IonicWebView.CDV_SERVER_PATH, null);
     if (!isDeployDisabled() && !isNewBinary() && path != null && !path.isEmpty()) {
       setServerBasePath(path);
@@ -168,5 +186,19 @@ public class IonicWebViewEngine extends SystemWebViewEngine {
 
   public String getServerBasePath() {
     return this.localServer.getBasePath();
+  }
+
+  public void setOrigin(String hostname, String scheme, JSONArray paths) {
+
+    ConfigXmlParser parser = new ConfigXmlParser();
+    parser.parse(cordova.getActivity());
+    this.scheme = scheme;
+    localServer = new WebViewLocalServer(cordova.getActivity(), hostname, true, parser, scheme, paths);
+    localServer.hostAssets("www");
+    String url = webView.getUrl();
+    String oldHost = CDV_LOCAL_SERVER;
+    CDV_LOCAL_SERVER = scheme + "://" + hostname;
+    url = url.replace(oldHost, CDV_LOCAL_SERVER);
+    webView.loadUrl(url);
   }
 }
