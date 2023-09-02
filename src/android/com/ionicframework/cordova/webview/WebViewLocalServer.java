@@ -28,11 +28,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
+
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Helper class meant to be used with the android.webkit.WebView class to enable hosting assets,
@@ -53,6 +55,7 @@ public class WebViewLocalServer {
   public final static String httpsScheme = "https";
   public final static String fileStart = "/_app_file_";
   public final static String contentStart = "/_app_content_";
+  public final static String proxyStart = "/_local_proxy_";
 
   private final UriMatcher uriMatcher;
   private final AndroidProtocolHandler protocolHandler;
@@ -219,18 +222,29 @@ public class WebViewLocalServer {
     synchronized (uriMatcher) {
       handler = (PathHandler) uriMatcher.match(uri);
     }
+    
     if (handler == null) {
       return null;
     }
 
     if (isLocalFile(uri) || uri.getAuthority().equals(this.authority)) {
       Log.d("SERVER", "Handling local request: " + uri.toString());
-      return handleLocalRequest(uri, handler, request);
+
+      if(isLocalProxySource(uri)) {
+        return handleLocalProxyRequest(uri, request);
+      } else {
+        return handleLocalRequest(uri, handler, request);
+      }
     } else {
       return handleProxyRequest(uri, handler);
     }
   }
 
+  private boolean isLocalProxySource(Uri uri) {
+    String path = uri.getPath();
+    return path.startsWith(proxyStart);
+  }
+    
   private boolean isLocalFile(Uri uri) {
     String path = uri.getPath();
     if (path.startsWith(contentStart) || path.startsWith(fileStart)) {
@@ -239,6 +253,44 @@ public class WebViewLocalServer {
     return false;
   }
 
+  private WebResourceResponse handleLocalProxyRequest(Uri uri, WebResourceRequest request) {
+    String fixedUri = uri.toString().replaceFirst("http://localhost/_local_proxy_/", ""); // Fix the url by removing the proxy schema
+
+    try {
+        URL httpsUrl = new URL(fixedUri);
+        URLConnection connection = httpsUrl.openConnection();
+        HttpURLConnection httpConnection = (HttpURLConnection)connection;
+        
+        Map<String, String> headers = new HashMap<String, String>();
+        if(request != null && request.getRequestHeaders().get("Range") != null) {
+            String rangeString = request.getRequestHeaders().get("Range");
+            httpConnection.addRequestProperty("Range", rangeString);
+            
+            String contentHeader = connection.getHeaderFields().get("Content-Length").get(0);
+
+            int contentLength = Integer.parseInt(contentHeader);
+            String[] parts = rangeString.split("=");
+            String[] streamParts = parts[1].split("-");
+            String fromRange = streamParts[0];
+            int range = contentLength - 1;
+
+            headers.put("Accept-Ranges", "bytes");
+            headers.put("Content-Length", contentHeader);
+            headers.put("Content-Range", "bytes " + fromRange + "-" + range + "/" + contentLength);
+        }
+
+        // Bypass CORS
+        headers.put("Access-Control-Allow-Origin", "*");
+        headers.put("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
+        headers.put("Access-Control-Allow-Headers", "agent, user-data, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
+        return new WebResourceResponse(connection.getContentType(), connection.getContentEncoding(), 
+                httpConnection.getResponseCode(), httpConnection.getResponseMessage(), headers, httpConnection.getInputStream());
+
+    } catch (Exception e) {
+        return null;
+    }
+  }
 
   private WebResourceResponse handleLocalRequest(Uri uri, PathHandler handler, WebResourceRequest request) {
     String path = uri.getPath();
@@ -265,6 +317,7 @@ public class WebViewLocalServer {
       return createWebResourceResponse(mimeType, handler.getEncoding(),
               statusCode, handler.getReasonPhrase(), tempResponseHeaders, responseStream);
     }
+
     if (isLocalFile(uri)) {
       InputStream responseStream = new LollipopLazyInputStream(handler, uri);
       String mimeType = getMimeType(path, responseStream);
