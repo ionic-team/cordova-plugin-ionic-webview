@@ -2,6 +2,8 @@ var exec = require('cordova/exec');
 
 var WebView = {
   convertFileSrc: function(url) {
+    const convertHttp = !location.protocol.startsWith("http") && !location.protocol.startsWith("https")
+
     if (!url) {
       return url;
     }
@@ -10,6 +12,12 @@ var WebView = {
     }
     if (url.indexOf('file://')===0) {
       return window.WEBVIEW_SERVER_URL + url.replace('file://', '/_app_file_');
+    }
+    if (convertHttp && url.url.indexOf('http://')===0) {
+      return window.WEBVIEW_SERVER_URL + '/_http_proxy_' + encodeURIComponent(url.replace('http://', ''));
+    }
+    if (convertHttp && url.url.indexOf('https://')===0) {
+      return window.WEBVIEW_SERVER_URL + '/_https_proxy_' + encodeURIComponent(url.replace('https://', ''));
     }
     if (url.indexOf('content://')===0) {
       return window.WEBVIEW_SERVER_URL + url.replace('content:/', '/_app_content_');
