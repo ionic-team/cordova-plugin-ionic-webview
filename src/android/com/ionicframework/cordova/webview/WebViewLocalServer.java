@@ -193,7 +193,7 @@ public class WebViewLocalServer {
     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       int finalStatusCode = statusCode;
       try {
-        if (data.available() == 0) {
+        if (data.available() == -1) {
           finalStatusCode = 404;
         }
       } catch (IOException e) {
@@ -595,7 +595,7 @@ public class WebViewLocalServer {
     @Override
     public int available() throws IOException {
       InputStream is = getInputStream();
-      return (is != null) ? is.available() : 0;
+      return (is != null) ? is.available() : -1;
     }
 
     @Override
