@@ -263,6 +263,7 @@
     self.handler = [[IONAssetHandler alloc] initWithBasePath:[self getStartPath] andScheme:scheme];
     [configuration setURLSchemeHandler:self.handler forURLScheme:scheme];
 
+    [self apply_stuff_to_configuration:configuration];
     // re-create WKWebView, since we need to update configuration
     // remove from keyWindow before recreating
     [self.engineWebView removeFromSuperview];
