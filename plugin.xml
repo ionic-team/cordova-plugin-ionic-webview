@@ -71,7 +71,7 @@
 
     <framework src="WebKit.framework" weak="true"/>
 
-    <header-file src="src/ios/CDVWKWebViewEngine.h"/>
+    <header-file src="src/ios/CDVWKWebViewEngine.h" type="BridgingHeader" />
     <source-file src="src/ios/CDVWKWebViewEngine.m"/>
     <header-file src="src/ios/CDVWKWebViewUIDelegate.h"/>
     <source-file src="src/ios/CDVWKWebViewUIDelegate.m"/>
